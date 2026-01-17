@@ -1,19 +1,20 @@
 import random
 import time
-from flask import Flask, jsonify, request
 from dataclasses import dataclass
 from typing import List
 
-from bson import ObjectId, Binary
+import bson
+from bson import Binary
+from flask import Flask, jsonify, request
 
-# from backend.mongo import connect
+from backend.mongo import connect
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
-# mongo = connect()
+mongo = connect()
 
 @dataclass
 class Question:
-    questionId: ObjectId
+    questionId: bson.ObjectId
     content: str
     userAnswer: str
     aiAnswer: str
@@ -21,7 +22,7 @@ class Question:
 
 @dataclass
 class Session:
-    sessionID: ObjectId
+    sessionID: bson.ObjectId
     name: str
     questions: List[Question]
     adaptive: bool
@@ -32,7 +33,7 @@ class Session:
 
 @dataclass
 class Class:
-    classID: ObjectId
+    classID: bson.ObjectId
     syllabus: Binary
     styleFiles: List[Binary]
     name: str
@@ -54,14 +55,29 @@ def hello():
 def get_class_cards():
     return jsonify(class_cards)
 
-@server.route("/api/createClass", methods=["POST"])
+@server.route("/api/createClass")
 def create_class():
-    time.sleep(7.71)
-    name = request.form.get("Name", "Untitled class")
-    professor = request.form.get("Professor", "Instructor")
-    next_id = max(card["id"] for card in class_cards) + 1 if class_cards else 1
-    class_cards.append({"id": next_id, "name": name, "professor": professor})
-    return jsonify({"classID": str(next_id)})
+    #multipart/form-data
+    if "syllabus" not in request.files:
+        return jsonify({"error": "No syllabus file provided"}), 400
+
+    syllabus_file = request.files["syllabus"]
+    syllabus_bytes = syllabus_file.read()
+
+    class_doc = {
+        "syllabus": Binary(syllabus_bytes),
+        "styleFiles": [],
+        "name": request.form.get("name", "Untitled Class"),
+        "professor": request.form.get("professor", "Unknown"),
+        "topics": [],
+        "sessions": []
+    }
+
+    result = mongo.classes.insert_one(class_doc)
+
+    return jsonify({
+        "classID": str(result.inserted_id)
+    })
 
 @server.route("/api/createSession")
 def create_session():
