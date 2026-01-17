@@ -11,6 +11,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from file_utils import FileUtils
+from wolfram_checker import WolframAlphaChecker
+
 
 JsonDict = dict[str, t.Any]
 
@@ -103,6 +106,8 @@ class GeminiClient:
         model: str = "gemini-1.5-pro-latest",
         base_url: str = "https://generativelanguage.googleapis.com/v1beta",
         timeout_s: float = 60.0,
+        tokenc_api_key: str | None = None,
+        tokenc_aggressiveness: float = 0.5,
     ) -> None:
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not self.api_key:
@@ -110,6 +115,60 @@ class GeminiClient:
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout_s = timeout_s
+        self.tokenc_api_key = tokenc_api_key or os.environ.get("TOKENC_API_KEY")
+        self.tokenc_aggressiveness = float(tokenc_aggressiveness)
+        self._tokenc_client: t.Any | None = None
+
+    def _get_tokenc_client(self) -> t.Any | None:
+        if not self.tokenc_api_key:
+            return None
+        if self._tokenc_client is not None:
+            return self._tokenc_client
+        try:
+            from tokenc import TokenClient  # type: ignore
+        except Exception:
+            return None
+        self._tokenc_client = TokenClient(api_key=self.tokenc_api_key)
+        return self._tokenc_client
+
+    def _compress_text(self, text: str) -> str:
+        client = self._get_tokenc_client()
+        if client is None:
+            return text
+        s = text.strip()
+        if len(s) < 400:
+            return text
+        try:
+            resp = client.compress_input(input=text, aggressiveness=self.tokenc_aggressiveness)
+            out = getattr(resp, "output", None)
+            if isinstance(out, str) and out.strip():
+                return out
+        except Exception:
+            return text
+        return text
+
+    def _compress_strings(self, obj: t.Any) -> t.Any:
+        if isinstance(obj, str):
+            return self._compress_text(obj)
+        if isinstance(obj, list):
+            return [self._compress_strings(x) for x in obj]
+        if isinstance(obj, dict):
+            return {k: self._compress_strings(v) for k, v in obj.items()}
+        return obj
+
+    def _maybe_compress_prompt_text(self, text: str) -> str:
+        client = self._get_tokenc_client()
+        if client is None:
+            return text
+        s = text.lstrip()
+        if s.startswith("{") or s.startswith("["):
+            try:
+                parsed = json.loads(text)
+                compressed = self._compress_strings(parsed)
+                return json.dumps(compressed, ensure_ascii=False)
+            except Exception:
+                return self._compress_text(text)
+        return self._compress_text(text)
 
     def generate_json(
         self,
@@ -126,10 +185,10 @@ class GeminiClient:
 
         if few_shots:
             for shot_user, shot_json in few_shots:
-                contents.append({"role": "user", "parts": [{"text": shot_user}]})
+                contents.append({"role": "user", "parts": [{"text": self._maybe_compress_prompt_text(shot_user)}]})
                 contents.append({"role": "model", "parts": [{"text": json.dumps(shot_json, ensure_ascii=False)}]})
 
-        parts: list[JsonDict] = [{"text": user_prompt}]
+        parts: list[JsonDict] = [{"text": self._maybe_compress_prompt_text(user_prompt)}]
         if image_bytes is not None:
             parts.append(
                 {
@@ -142,7 +201,7 @@ class GeminiClient:
         contents.append({"role": "user", "parts": parts})
 
         payload: JsonDict = {
-            "systemInstruction": {"parts": [{"text": system_instruction}]},
+            "systemInstruction": {"parts": [{"text": self._compress_text(system_instruction)}]},
             "contents": contents,
             "generationConfig": {
                 "temperature": temperature,
@@ -187,48 +246,17 @@ class GeminiClient:
             raise RuntimeError(f"Gemini did not return valid JSON: {text[:4000]}") from e
 
 
-class WolframAlphaClient:
-    def __init__(
-        self,
-        app_id: str | None = None,
-        timeout_s: float = 30.0,
-    ) -> None:
-        self.app_id = app_id or os.environ.get("WOLFRAM_APP_ID") or os.environ.get("WOLFRAM_APPID")
-        if not self.app_id:
-            raise RuntimeError("Missing WOLFRAM_APP_ID (or WOLFRAM_APPID).")
-        self.timeout_s = timeout_s
-
-    def result_text(self, query: str) -> str | None:
-        q = query.strip()
-        if not q:
-            return None
-        url = (
-            "https://api.wolframalpha.com/v1/result?"
-            + urllib.parse.urlencode({"i": q, "appid": self.app_id}, quote_via=urllib.parse.quote)
-        )
-        req = urllib.request.Request(url, method="GET")
-        try:
-            with urllib.request.urlopen(req, timeout=self.timeout_s) as resp:
-                return resp.read().decode("utf-8").strip()
-        except urllib.error.HTTPError as e:
-            try:
-                body = e.read().decode("utf-8")
-            except Exception:
-                body = None
-            if e.code in (400, 501):
-                return None if not body else body.strip()
-            raise
-
-
 class SophiaAIUtil:
     def __init__(
         self,
         *,
         gemini: GeminiClient | None = None,
-        wolfram: WolframAlphaClient | None = None,
+        wolfram: WolframAlphaChecker | None = None,
+        file_utils: FileUtils | None = None,
     ) -> None:
         self.gemini = gemini or GeminiClient()
-        self.wolfram = wolfram or WolframAlphaClient()
+        self.wolfram = wolfram or WolframAlphaChecker()
+        self.file_utils = file_utils or FileUtils()
 
     def adjust_session_parameters(
         self,
@@ -294,8 +322,7 @@ class SophiaAIUtil:
             max_output_tokens=256,
         )
         wolfram_query = str(out.get("wolfram_query") or "").strip()
-        result = self.wolfram.result_text(wolfram_query)
-        ok = bool(result) and ("Wolfram|Alpha did not understand" not in result)
+        ok, result = self.wolfram.best_effort_answer(wolfram_query)
         return ValidationResult(ok=ok, wolfram_query=wolfram_query or None, wolfram_result=result)
 
     def validate_hint_against_step(
@@ -818,6 +845,68 @@ class SophiaAIUtil:
             concepts=list(out.get("concepts") or []),
             practice_problems=list(out.get("practice_problems") or []),
             updated_at_iso=dt.datetime.now(dt.timezone.utc).isoformat(),
+        )
+
+    def parse_syllabus_pdf(
+        self,
+        *,
+        syllabus_pdf_path: str,
+        save_text_path: str | None = None,
+        max_pages: int = 12,
+    ) -> str:
+        text = self.file_utils.extract_syllabus_text(
+            pdf_path=syllabus_pdf_path,
+            gemini_client=self.gemini,
+            max_pages=max_pages,
+        )
+        if save_text_path:
+            self.file_utils.write_text(save_text_path, text)
+        return text
+
+    def parse_practice_problem_pdfs(
+        self,
+        *,
+        problem_pdf_paths: list[str],
+        save_text_path: str | None = None,
+        max_pages_per_pdf: int = 12,
+    ) -> list[str]:
+        all_problems: list[str] = []
+        for p in problem_pdf_paths:
+            all_problems.extend(
+                self.file_utils.extract_problems_plaintext_latex(
+                    pdf_path=p,
+                    gemini_client=self.gemini,
+                    max_pages=max_pages_per_pdf,
+                )
+            )
+        if save_text_path:
+            self.file_utils.write_text(save_text_path, "\n".join([f"- {p}" for p in all_problems]))
+        return all_problems
+
+    def create_class_file_from_pdfs(
+        self,
+        *,
+        syllabus_pdf_path: str,
+        problem_pdf_paths: list[str],
+        class_name: str | None = None,
+        save_syllabus_text_path: str | None = None,
+        save_problems_text_path: str | None = None,
+        max_pages_per_pdf: int = 12,
+    ) -> ClassFile:
+        syllabus_text = self.parse_syllabus_pdf(
+            syllabus_pdf_path=syllabus_pdf_path,
+            save_text_path=save_syllabus_text_path,
+            max_pages=max_pages_per_pdf,
+        )
+        problems = self.parse_practice_problem_pdfs(
+            problem_pdf_paths=problem_pdf_paths,
+            save_text_path=save_problems_text_path,
+            max_pages_per_pdf=max_pages_per_pdf,
+        )
+        return self.create_class_file(
+            syllabus_text=syllabus_text,
+            practice_problems_text="\n".join(problems),
+            class_name=class_name,
         )
 
     def save_class_file(self, *, path: str, class_file: ClassFile) -> None:
