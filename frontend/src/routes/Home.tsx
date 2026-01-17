@@ -283,7 +283,7 @@ export const Home = () => {
             {editing ? (
               <div className="mt-4 space-y-4">
                 <InlineEditField
-                  label="Class name"
+                  label="Class name asd"
                   value={editing.Name}
                   onSave={(value) => editNameMutation.mutate({ classID: editing.classID, newName: value })}
                 />

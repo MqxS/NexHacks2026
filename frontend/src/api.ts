@@ -30,7 +30,8 @@ type BackendQuestion = {
   questionId: string
 }
 
-const isDev = import.meta.env.DEV
+// const isDev = import.meta.env.DEV
+const isDev = false
 const devClassesKey = 'dev:classCards'
 
 const loadDevClasses = (): ClassCard[] => {
