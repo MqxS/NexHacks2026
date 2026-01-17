@@ -1,8 +1,44 @@
 import random
 import time
 from flask import Flask, jsonify, request
+from dataclasses import dataclass
+from typing import List
+
+from bson import ObjectId, Binary
+
+from backend.mongo import connect
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
+mongo = connect()
+
+@dataclass
+class Question:
+    questionId: ObjectId
+    content: str
+    userAnswer: str
+    aiAnswer: str
+    wasUserCorrect: bool
+
+@dataclass
+class Session:
+    sessionID: ObjectId
+    name: str
+    questions: List[Question]
+    adaptive: bool
+    difficulty: float
+    isCumulative : bool
+    focusedConcepts: List[str]
+    file: Binary
+
+@dataclass
+class Class:
+    classID: ObjectId
+    syllabus: Binary
+    styleFiles: List[Binary]
+    name: str
+    professor: str
+    topics: List[str]
+    sessions: List[Session]
 
 class_cards = [
     {"id": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
