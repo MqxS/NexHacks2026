@@ -95,15 +95,21 @@ body {
   }
 }
 
-@keyframes gravity-dot {
-  0% {
-    transform: translate(-50%, -50%) rotate(180deg) translateX(var(--dot-offset));
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
   }
-  55% {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-dot {
+  from {
     transform: translate(-50%, -50%) rotate(0deg) translateX(var(--dot-offset));
   }
-  100% {
-    transform: translate(-50%, -50%) rotate(180deg) translateX(var(--dot-offset));
+  to {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(var(--dot-offset));
   }
 }
 
@@ -136,6 +142,6 @@ body {
   height: var(--dot-size);
   border-radius: 9999px;
   background: #aab396;
-  animation: gravity-dot 3.6s cubic-bezier(0.1, 0.8, 0.5, 0.2) infinite;
+  animation: orbit-dot 3.6s linear infinite;
   box-shadow: 0 0 12px rgba(170, 179, 150, 0.6);
 }
