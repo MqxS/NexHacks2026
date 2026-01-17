@@ -23,15 +23,10 @@ const hashSeed = (value: string) => {
   return hash || 1
 }
 
-const shuffleArt = (seed: number) => {
-  const pool = [...classArt]
-  let value = seed >>> 0
-  for (let i = pool.length - 1; i > 0; i -= 1) {
-    value = (value * 1664525 + 1013904223) >>> 0
-    const j = Math.floor((value / 4294967296) * (i + 1))
-    ;[pool[i], pool[j]] = [pool[j], pool[i]]
-  }
-  return pool
+const artForId = (id: string) => {
+  if (classArt.length === 0) return undefined
+  const index = hashSeed(id) % classArt.length
+  return classArt[index]
 }
 
 const createSchema = z.object({
@@ -129,11 +124,10 @@ export const Home = () => {
   const carouselItems = [...cards, { classID: 'create', Name: 'Create class', Professor: 'Start a fresh study space' }]
   const initialIndex = carouselItems.length === 1 ? 0 : 1
   const artById = useMemo(() => {
-    if (classArt.length === 0) return {}
-    const ids = carouselItems.map((item) => item.classID)
-    const shuffled = shuffleArt(hashSeed(ids.join('|')))
-    return ids.reduce<Record<string, string>>((acc, id, index) => {
-      acc[id] = shuffled[index % shuffled.length]
+    return carouselItems.reduce<Record<string, string>>((acc, item) => {
+      if (item.classID === 'create') return acc
+      const art = artForId(item.classID)
+      if (art) acc[item.classID] = art
       return acc
     }, {})
   }, [carouselItems])
