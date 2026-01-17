@@ -6,7 +6,6 @@ import subprocess
 import tempfile
 import typing as t
 
-
 class FileUtils:
     def read_bytes(self, path: str) -> bytes:
         with open(path, "rb") as f:

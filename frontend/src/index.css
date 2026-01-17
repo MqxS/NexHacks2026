@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-paper text-espresso antialiased;
+  font-family: 'Manrope', ui-sans-serif, system-ui;
+}
+
+*:focus-visible {
+  outline: 2px solid #AAB396;
+  outline-offset: 2px;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(103, 70, 54, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(103, 70, 54, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  position: relative;
+}
+
+.app-shell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(103, 70, 54, 0.05) 1px, transparent 0);
+  background-size: 3px 3px;
+  opacity: 0.35;
+}
+
+.graph-panel {
+  background-color: rgba(255, 248, 232, 0.92);
+  border: 1px solid rgba(103, 70, 54, 0.12);
+  box-shadow: 0 6px 20px rgba(103, 70, 54, 0.18);
+  position: relative;
+}
+
+.graph-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: linear-gradient(rgba(103, 70, 54, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(103, 70, 54, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.08"/></svg>');
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.skeleton {
+  background: linear-gradient(110deg, rgba(255, 248, 232, 0.6) 8%, rgba(247, 238, 211, 0.7) 18%, rgba(255, 248, 232, 0.6) 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gravity-dot {
+  0% {
+    transform: translate(-50%, -50%) rotate(70deg) translateX(var(--dot-offset));
+  }
+  60% {
+    transform: translate(-50%, -50%) rotate(-70deg) translateX(var(--dot-offset));
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(70deg) translateX(var(--dot-offset));
+  }
+}
+
+@keyframes gravity-dot-secondary {
+  0% {
+    transform: translate(-50%, -50%) rotate(250deg) translateX(var(--dot-offset));
+  }
+  60% {
+    transform: translate(-50%, -50%) rotate(110deg) translateX(var(--dot-offset));
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(250deg) translateX(var(--dot-offset));
+  }
+}
+
+.orbit-loader {
+  position: relative;
+  --orbit-size: 120px;
+  --orbit-radius: 60px;
+  --dot-size: 30px;
+  --dot-radius: 15px;
+  --dot-offset: calc(var(--orbit-radius) - var(--dot-radius));
+  width: var(--orbit-size);
+  height: var(--orbit-size);
+  box-sizing: border-box;
+}
+
+.orbit-loader .orbit-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px dashed rgba(103, 70, 54, 0.4);
+  animation: orbit 8s linear infinite;
+  box-sizing: border-box;
+}
+
+.orbit-loader .orbit-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 9999px;
+  background: #aab396;
+  animation: gravity-dot 3.4s cubic-bezier(0.2, 0.6, 0.2, 1) infinite;
+  box-shadow: 0 0 12px rgba(170, 179, 150, 0.6);
+}
+
+.orbit-loader .orbit-dot.secondary {
+  --dot-size: 10px;
+  --dot-radius: 5px;
+  background: #f7eed3;
+  animation-name: gravity-dot-secondary;
+  animation-duration: 4.2s;
+}
