@@ -103,7 +103,11 @@ export const ClassSessionSetup = () => {
                       <ChevronDown className="h-4 w-4" />
                     </button>
                   </DropdownMenu.Trigger>
-                  <DropdownMenu.Content className="mt-2 w-64 rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper">
+                  <DropdownMenu.Content
+                    align="start"
+                    sideOffset={8}
+                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper"
+                  >
                     <input
                       value={topicSearch}
                       onChange={(event) => setTopicSearch(event.target.value)}

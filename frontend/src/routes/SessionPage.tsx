@@ -9,7 +9,8 @@ import { LatexRenderer } from '../components/LatexRenderer'
 import { LoadingSkeleton } from '../components/LoadingSkeleton'
 import { cn } from '../lib/utils'
 import * as Switch from '@radix-ui/react-switch'
-import { ChevronLeft, Lightbulb, Sliders } from 'lucide-react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { ChevronDown, ChevronLeft, Lightbulb, Sliders } from 'lucide-react'
 
 type SessionParams = {
   difficulty: number
@@ -24,11 +25,11 @@ export const SessionPage = () => {
   const [answer, setAnswer] = useState('')
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [adaptive, setAdaptive] = useState(false)
-  const [hintOpen, setHintOpen] = useState(false)
   const [hintRequest, setHintRequest] = useState('')
-  const [hint, setHint] = useState<string | null>(null)
+  const [hints, setHints] = useState<string[]>([])
   const [panelOpen, setPanelOpen] = useState(false)
   const [exitOpen, setExitOpen] = useState(false)
+  const [topicSearch, setTopicSearch] = useState('')
   const [params, setParams] = useState<SessionParams>({
     difficulty: 0.5,
     topic: 'All topics',
@@ -48,6 +49,12 @@ export const SessionPage = () => {
     enabled: Boolean(sessionID)
   })
 
+  const topicsQuery = useQuery({
+    queryKey: ['classTopics', classID],
+    queryFn: () => api.getClassTopics(classID ?? ''),
+    enabled: Boolean(classID)
+  })
+
   useEffect(() => {
     setFeedback(null)
     setAnswer('')
@@ -60,7 +67,7 @@ export const SessionPage = () => {
   })
 
   const nextQuestion = () => {
-    setHint(null)
+    setHints([])
     setHintRequest('')
     questionQuery.refetch()
   }
@@ -85,7 +92,8 @@ export const SessionPage = () => {
   const hintMutation = useMutation({
     mutationFn: () => api.requestHint({ questionID: questionQuery.data?.questionID ?? '', hintRequest }),
     onSuccess: (data) => {
-      setHint(data.hint)
+      setHints((prev) => [...prev, data.hint])
+      setHintRequest('')
       toast.success('Hint delivered')
     },
     onError: (error: Error) => toast.error(error.message || 'Could not request hint')
@@ -153,15 +161,10 @@ export const SessionPage = () => {
             placeholder="Type your answer here..."
           />
           <div className="mt-3 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setHintOpen(true)}
-              disabled={!questionQuery.data}
-              className="flex items-center gap-2 rounded-full border border-espresso/20 px-3 py-1 text-sm disabled:opacity-60"
-            >
+            <div className="flex items-center gap-2 text-xs text-espresso/60">
               <Lightbulb className="h-4 w-4" />
-              Ask for hint
-            </button>
+              Hint panel is on the right
+            </div>
             <button
               type="button"
               onClick={() => answerMutation.mutate()}
@@ -209,16 +212,10 @@ export const SessionPage = () => {
           </PaperCard>
         ) : null}
 
-        {hint ? (
-          <PaperCard className="border border-sage/40 bg-sand/40">
-            <p className="text-xs font-semibold uppercase tracking-wide text-espresso/50">Hint</p>
-            <LatexRenderer content={hint} className="mt-2 text-sm" />
-          </PaperCard>
-        ) : null}
       </div>
 
       <div className="space-y-4">
-        <PaperCard className="flex items-center justify-between">
+        <PaperCard className="flex items-center justify-between gap-8 pr-4">
           <div>
             <p className="text-sm font-medium text-espresso">Session parameters</p>
             <p className="text-xs text-espresso/60">Adjust without leaving the question.</p>
@@ -241,12 +238,53 @@ export const SessionPage = () => {
             <p className="text-xs text-espresso/60">Open the panel to save updates.</p>
           </PaperCard>
         ) : null}
+
+        <PaperCard>
+          <p className="text-sm font-medium text-espresso">Ask for a hint</p>
+          <p className="mt-1 text-xs text-espresso/60">Keep the conversation flowing while you solve.</p>
+          <textarea
+            value={hintRequest}
+            onChange={(event) => setHintRequest(event.target.value)}
+            className="mt-3 h-24 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+            placeholder="Where are you stuck? What have you tried?"
+          />
+          <button
+            type="button"
+            className="mt-3 w-full rounded-full border border-espresso/20 px-4 py-2 text-sm text-espresso"
+          >
+            Upload photo of work (coming soon)
+          </button>
+          <button
+            type="button"
+            onClick={() => hintMutation.mutate()}
+            disabled={!questionQuery.data || hintRequest.trim().length === 0}
+            className={cn(
+              'mt-4 w-full rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper',
+              'disabled:cursor-not-allowed disabled:opacity-60'
+            )}
+          >
+            {hintMutation.isPending ? 'Requesting...' : 'Get hint'}
+          </button>
+        </PaperCard>
+
+        {hints.length > 0 ? (
+          <PaperCard className="border border-sage/40 bg-sand/40">
+            <p className="text-xs font-semibold uppercase tracking-wide text-espresso/50">Hints</p>
+            <div className="mt-3 space-y-3 text-sm text-espresso">
+              {hints.map((item, index) => (
+                <div key={`${item}-${index}`} className="rounded-xl border border-espresso/10 bg-paper/70 p-3">
+                  <LatexRenderer content={item} className="text-sm" />
+                </div>
+              ))}
+            </div>
+          </PaperCard>
+        ) : null}
       </div>
 
       <Dialog.Root open={panelOpen} onOpenChange={setPanelOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-espresso/40 backdrop-blur-sm" />
-          <Dialog.Content className="fixed right-6 top-6 w-[90vw] max-w-md rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-espresso/40 backdrop-blur-[1px]" />
+          <Dialog.Content className="fixed right-6 top-6 z-50 w-[90vw] max-w-md rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
             <Dialog.Title className="text-lg font-semibold text-espresso">Adjust session</Dialog.Title>
             <div className="mt-4 space-y-4">
               <div>
@@ -263,11 +301,43 @@ export const SessionPage = () => {
               </div>
               <div>
                 <label className="text-sm font-medium text-espresso">Topic</label>
-                <input
-                  value={params.topic}
-                  onChange={(event) => setParams({ ...params, topic: event.target.value })}
-                  className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
-                />
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button
+                      type="button"
+                      className="mt-2 flex w-full items-center justify-between rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+                    >
+                      {params.topic || 'Select a topic'}
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content
+                    align="start"
+                    sideOffset={8}
+                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper"
+                  >
+                    <input
+                      value={topicSearch}
+                      onChange={(event) => setTopicSearch(event.target.value)}
+                      className="mb-2 w-full rounded-lg border border-espresso/20 bg-paper px-2 py-1 text-xs"
+                      placeholder="Search topics"
+                    />
+                    {(topicsQuery.data ?? [])
+                      .filter((item: string) => item.toLowerCase().includes(topicSearch.toLowerCase()))
+                      .map((item: string) => (
+                        <DropdownMenu.Item
+                          key={item}
+                          className="cursor-pointer rounded-lg px-3 py-2 text-sm text-espresso outline-none hover:bg-sand"
+                          onSelect={() => setParams({ ...params, topic: item })}
+                        >
+                          {item}
+                        </DropdownMenu.Item>
+                      ))}
+                    {topicsQuery.data && topicsQuery.data.length === 0 ? (
+                      <div className="px-3 py-2 text-xs text-espresso/60">No topics available</div>
+                    ) : null}
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
               </div>
               <div className="flex items-center gap-2">
                 <input
@@ -302,45 +372,10 @@ export const SessionPage = () => {
         </Dialog.Portal>
       </Dialog.Root>
 
-      <Dialog.Root open={hintOpen} onOpenChange={setHintOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-espresso/40 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
-            <Dialog.Title className="text-lg font-semibold text-espresso">Request a hint</Dialog.Title>
-            <Dialog.Description className="mt-1 text-sm text-espresso/70">
-              Where are you stuck? What have you tried?
-            </Dialog.Description>
-            <textarea
-              value={hintRequest}
-              onChange={(event) => setHintRequest(event.target.value)}
-              className="mt-3 h-24 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
-              placeholder="Explain your approach so far"
-            />
-            <button
-              type="button"
-              className="mt-3 w-full rounded-full border border-espresso/20 px-4 py-2 text-sm text-espresso"
-            >
-              Upload photo of work (coming soon)
-            </button>
-            <button
-              type="button"
-              onClick={() => hintMutation.mutate()}
-              disabled={hintRequest.trim().length === 0}
-              className={cn(
-                'mt-4 w-full rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper',
-                'disabled:cursor-not-allowed disabled:opacity-60'
-              )}
-            >
-              {hintMutation.isPending ? 'Requesting...' : 'Get hint'}
-            </button>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-
       <Dialog.Root open={exitOpen} onOpenChange={setExitOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-espresso/40 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-espresso/40 backdrop-blur-[2px]" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
             <Dialog.Title className="text-lg font-semibold text-espresso">Leave session?</Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-espresso/70">
               Your progress is saved. You can return later.
