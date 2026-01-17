@@ -42,8 +42,14 @@ const devId = () => {
   return `class_${Date.now()}`
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+
 async function request<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, init)
+  const url =
+    typeof input === 'string' && input.startsWith('/api/')
+      ? `${API_BASE}${input}`
+      : input
+  const response = await fetch(url, init)
   if (!response.ok) {
     const message = await response.text()
     throw new Error(message || 'Request failed')
