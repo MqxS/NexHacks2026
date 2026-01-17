@@ -55,7 +55,7 @@ def hello():
 def get_class_cards():
     return jsonify(class_cards)
 
-@server.route("/api/createClass")
+@server.route("/api/createClass", methods=["POST"])
 def create_class():
     #multipart/form-data
     if "syllabus" not in request.files:
