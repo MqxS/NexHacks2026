@@ -57,8 +57,21 @@ def get_class_cards():
 @server.route("/api/createClass", methods=["POST"])
 def create_class():
     time.sleep(7.71)
-    name = request.form.get("Name", "Untitled class")
-    professor = request.form.get("Professor", "Instructor")
+    payload = request.get_json(silent=True) or {}
+    name = (
+        request.form.get("Name")
+        or request.form.get("name")
+        or payload.get("Name")
+        or payload.get("name")
+        or "Untitled class"
+    )
+    professor = (
+        request.form.get("Professor")
+        or request.form.get("professor")
+        or payload.get("Professor")
+        or payload.get("professor")
+        or "Instructor"
+    )
     next_id = max(card["id"] for card in class_cards) + 1 if class_cards else 1
     class_cards.append({"id": next_id, "name": name, "professor": professor})
     return jsonify({"classID": str(next_id)})

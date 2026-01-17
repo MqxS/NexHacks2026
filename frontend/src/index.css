@@ -97,25 +97,13 @@ body {
 
 @keyframes gravity-dot {
   0% {
-    transform: translate(-50%, -50%) rotate(70deg) translateX(var(--dot-offset));
+    transform: translate(-50%, -50%) rotate(180deg) translateX(var(--dot-offset));
   }
-  60% {
-    transform: translate(-50%, -50%) rotate(-70deg) translateX(var(--dot-offset));
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(70deg) translateX(var(--dot-offset));
-  }
-}
-
-@keyframes gravity-dot-secondary {
-  0% {
-    transform: translate(-50%, -50%) rotate(250deg) translateX(var(--dot-offset));
-  }
-  60% {
-    transform: translate(-50%, -50%) rotate(110deg) translateX(var(--dot-offset));
+  55% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(var(--dot-offset));
   }
   100% {
-    transform: translate(-50%, -50%) rotate(250deg) translateX(var(--dot-offset));
+    transform: translate(-50%, -50%) rotate(180deg) translateX(var(--dot-offset));
   }
 }
 
@@ -148,14 +136,6 @@ body {
   height: var(--dot-size);
   border-radius: 9999px;
   background: #aab396;
-  animation: gravity-dot 3.4s cubic-bezier(0.2, 0.6, 0.2, 1) infinite;
+  animation: gravity-dot 3.6s cubic-bezier(0.1, 0.8, 0.5, 0.2) infinite;
   box-shadow: 0 0 12px rgba(170, 179, 150, 0.6);
-}
-
-.orbit-loader .orbit-dot.secondary {
-  --dot-size: 10px;
-  --dot-radius: 5px;
-  background: #f7eed3;
-  animation-name: gravity-dot-secondary;
-  animation-duration: 4.2s;
 }

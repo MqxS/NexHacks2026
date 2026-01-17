@@ -109,8 +109,8 @@ export const api = {
   createClass: (formData: FormData) => {
     if (isDev) {
       const classID = devId()
-      const Name = String(formData.get('Name') ?? 'Untitled class')
-      const Professor = String(formData.get('Professor') ?? 'Instructor')
+      const Name = String(formData.get('Name') ?? formData.get('name') ?? 'Untitled class')
+      const Professor = String(formData.get('Professor') ?? formData.get('professor') ?? 'Instructor')
       const next = [...loadDevClasses(), { classID, Name, Professor }]
       saveDevClasses(next)
       return Promise.resolve({ classID })

@@ -76,7 +76,9 @@ export const ClassSessionSetup = () => {
   })
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[2fr,1fr]">
+    <>
+      <SessionLoadingOverlay active={createSession.isPending} />
+      <div className="grid gap-10 lg:grid-cols-[2fr,1fr]">
       <div className="space-y-8">
         <PaperCard className="p-8">
           <div className="flex items-start justify-between">
@@ -266,6 +268,23 @@ export const ClassSessionSetup = () => {
             session.
           </p>
         </PaperCard>
+      </div>
+      </div>
+    </>
+  )
+}
+
+const SessionLoadingOverlay = ({ active }: { active: boolean }) => {
+  if (!active) return null
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-espresso/30 backdrop-blur-[2px]">
+      <div className="rounded-3xl border border-espresso/20 bg-paper/90 px-10 py-8 text-center shadow-lift">
+        <div className="mx-auto mb-4 orbit-loader">
+          <div className="orbit-ring" />
+          <div className="orbit-dot" />
+        </div>
+        <p className="text-sm font-medium text-espresso">Preparing your session...</p>
+        <p className="mt-1 text-xs text-espresso/60">Setting up topics and pacing</p>
       </div>
     </div>
   )
