@@ -248,7 +248,7 @@ export const Home = () => {
                   files={attachments}
                   onFiles={setAttachments}
                   multiple
-                  helper="Dont worry - you can upload more later."
+                  helper="Don't worry - you can upload more later."
                 />
               </div>
               <div>

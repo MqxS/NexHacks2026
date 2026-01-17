@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef, useLayoutEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -31,6 +31,8 @@ export const SessionPage = () => {
   const [panelOpen, setPanelOpen] = useState(false)
   const [exitOpen, setExitOpen] = useState(false)
   const [topicSearch, setTopicSearch] = useState('')
+  const [questionSize, setQuestionSize] = useState<'text-lg' | 'text-base' | 'text-sm'>('text-lg')
+  const questionRef = useRef<HTMLDivElement | null>(null)
   const [params, setParams] = useState<SessionParams>({
     difficulty: 0.5,
     topic: 'All topics',
@@ -94,6 +96,36 @@ export const SessionPage = () => {
     },
     onError: (error: Error) => toast.error(error.message || 'Could not load next question')
   })
+
+  useLayoutEffect(() => {
+    const element = questionRef.current
+    if (!element) return
+
+    const sizes: Array<'text-lg' | 'text-base' | 'text-sm'> = ['text-lg', 'text-base', 'text-sm']
+
+    const evaluate = () => {
+      for (const size of sizes) {
+        element.classList.remove('text-lg', 'text-base', 'text-sm')
+        element.classList.add(size)
+        if (element.scrollHeight <= element.clientHeight + 4) {
+          setQuestionSize(size)
+          return
+        }
+      }
+      setQuestionSize('text-sm')
+    }
+
+    const raf = requestAnimationFrame(evaluate)
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(evaluate)
+    })
+    observer.observe(element)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      observer.disconnect()
+    }
+  }, [questionQuery.data?.Content, nextQuestionMutation.isPending])
 
   const adaptiveMutation = useMutation({
     mutationFn: (value: boolean) => api.setAdaptive({ sessionID: sessionID ?? '', active: value }),
@@ -168,8 +200,10 @@ export const SessionPage = () => {
           ) : (
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-espresso/50">Question</p>
-              <div className="mt-3 text-base text-espresso">
-                <LatexRenderer content={questionQuery.data?.Content ?? ''} />
+              <div className="mt-3 text-espresso">
+                <div ref={questionRef} className="max-h-[240px] overflow-hidden">
+                  <LatexRenderer content={questionQuery.data?.Content ?? ''} className={cn('leading-relaxed', questionSize)} />
+                </div>
               </div>
             </div>
           )}
