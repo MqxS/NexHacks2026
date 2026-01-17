@@ -13,7 +13,7 @@ import { UploadDropzone } from '../components/UploadDropzone'
 import { PaperCard } from '../components/PaperCard'
 import { cn } from '../lib/utils'
 import { useNavigate } from 'react-router-dom'
-import { classArt } from '../lib/classArt'
+import { classArt, createClassArt } from '../lib/classArt'
 
 const hashSeed = (value: string) => {
   let hash = 0
@@ -163,18 +163,18 @@ export const Home = () => {
           items={carouselItems}
           initialIndex={initialIndex}
           renderItem={(item, _index, selected) => {
-            if (item.classID === 'create') {
-              return (
-                <ClassCardUI
-                  name="Create class"
-                  professor="Upload a syllabus to begin"
-                  selected={selected}
-                  onOpen={() => setCreateOpen(true)}
-                  variant="create"
-                  artUrl={artById[item.classID]}
-                />
-              )
-            }
+              if (item.classID === 'create') {
+                return (
+                  <ClassCardUI
+                    name="Create class"
+                    professor="Upload a syllabus to begin"
+                    selected={selected}
+                    onOpen={() => setCreateOpen(true)}
+                    variant="create"
+                    artUrl={createClassArt}
+                  />
+                )
+              }
             return (
               <ClassCardUI
                 name={item.Name}
