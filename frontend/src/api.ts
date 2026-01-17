@@ -67,7 +67,10 @@ const devId = () => {
 const resolveApiBase = () => {
   if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE
   if (typeof window !== 'undefined') {
-    return `${window.location.protocol}//${window.location.hostname}:8080`
+    if (import.meta.env.DEV) {
+      return `${window.location.protocol}//${window.location.hostname}:8080`
+    }
+    return window.location.origin
   }
   return 'http://localhost:8080'
 }

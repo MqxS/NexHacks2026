@@ -1,7 +1,14 @@
 import random
-from flask import Flask, jsonify
+import time
+from flask import Flask, jsonify, request
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
+
+class_cards = [
+    {"id": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
+    {"id": 2, "name": "Science", "professor": "Dr. Joseph"},
+    {"id": 3, "name": "History", "professor": "Dr. Max"}
+]
 
 @server.route("/api/hello")
 def hello():
@@ -9,19 +16,16 @@ def hello():
 
 @server.route("/api/getClassCards")
 def get_class_cards():
-    class_cards = [
-        {"id": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
-        {"id": 2, "name": "Science", "professor": "Dr. Joseph"},
-        {"id": 3, "name": "History", "professor": "Dr. Max"}
-    ]
     return jsonify(class_cards)
 
-@server.route("/api/getClass")
-def crease_class():
-    classes = [
-        {"id": 1}
-    ]
-    return jsonify(classes)
+@server.route("/api/createClass", methods=["POST"])
+def create_class():
+    time.sleep(1.2)
+    name = request.form.get("Name", "Untitled class")
+    professor = request.form.get("Professor", "Instructor")
+    next_id = max(card["id"] for card in class_cards) + 1 if class_cards else 1
+    class_cards.append({"id": next_id, "name": name, "professor": professor})
+    return jsonify({"classID": str(next_id)})
 
 @server.route("/api/createSession")
 def create_session():
