@@ -103,7 +103,7 @@ class GeminiClient:
     def __init__(
         self,
         api_key: str | None = None,
-        model: str = "gemini-1.5-pro-latest",
+        model: str = "gemini-3-flash",
         base_url: str = "https://generativelanguage.googleapis.com/v1beta",
         timeout_s: float = 60.0,
         tokenc_api_key: str | None = None,
@@ -112,7 +112,7 @@ class GeminiClient:
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not self.api_key:
             raise RuntimeError("Missing GEMINI_API_KEY (or GOOGLE_API_KEY).")
-        self.model = model
+        self.model = os.environ.get("GEMINI_MODEL") or model
         self.base_url = base_url.rstrip("/")
         self.timeout_s = timeout_s
         self.tokenc_api_key = tokenc_api_key or os.environ.get("TOKENC_API_KEY")
