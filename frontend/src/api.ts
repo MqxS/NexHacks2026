@@ -57,12 +57,18 @@ const devId = () => {
   return `class_${Date.now()}`
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+const resolveApiBase = () => {
+  if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.hostname}:8080`
+  }
+  return 'http://localhost:8080'
+}
 
 async function request<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
   const url =
     typeof input === 'string' && input.startsWith('/api/')
-      ? `${API_BASE}${input}`
+      ? `${resolveApiBase()}${input}`
       : input
   const response = await fetch(url, init)
   if (!response.ok) {
