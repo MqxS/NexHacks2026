@@ -8,6 +8,7 @@ export const ClassCard = ({
   selected,
   onOpen,
   onEdit,
+  artUrl,
   variant = 'class'
 }: {
   name: string
@@ -15,45 +16,51 @@ export const ClassCard = ({
   selected?: boolean
   onOpen?: () => void
   onEdit?: () => void
+  artUrl?: string
   variant?: 'class' | 'create'
 }) => {
   return (
     <PaperCard
       className={cn(
-        'w-[420px] min-h-[300px] shrink-0 border border-espresso/15 bg-paper/90 transition-all',
+        'w-[420px] min-h-[300px] shrink-0 overflow-hidden border border-espresso/15 bg-paper/90 p-0 transition-all',
         selected ? 'shadow-lift -translate-y-2' : 'shadow-paper',
         variant === 'create' && 'border-dashed'
       )}
     >
-      <div className="flex h-full flex-col gap-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-xl font-semibold text-espresso">{name}</h3>
-            <p className="text-sm text-espresso/70">{professor}</p>
-          </div>
-          {variant === 'class' && (
+      <div className="relative h-full min-h-[300px]">
+        {artUrl ? (
+          <img src={artUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-sand via-paper to-sage/30" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-espresso/90 via-espresso/30 to-transparent" />
+        {variant === 'class' && (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="absolute right-4 top-4 rounded-full border border-paper/40 bg-paper/80 p-2 text-espresso/80 shadow-paper transition hover:-translate-y-0.5 hover:text-espresso"
+          >
+            <PenLine className="h-4 w-4" />
+          </button>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 p-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h3 className="text-2xl font-semibold text-paper">{name}</h3>
+              <p className="text-sm text-paper/70">{professor}</p>
+            </div>
             <button
               type="button"
-              onClick={onEdit}
-              className="rounded-full border border-espresso/20 bg-sand p-2 text-espresso/70 transition hover:-translate-y-0.5 hover:text-espresso"
+              onClick={onOpen}
+              className={cn(
+                'rounded-full border border-paper/40 bg-paper/90 px-4 py-2 text-sm font-medium text-espresso shadow-paper transition',
+                'hover:-translate-y-0.5 hover:bg-paper'
+              )}
             >
-              <PenLine className="h-4 w-4" />
+              {variant === 'create' ? 'Create class' : 'Open'}
             </button>
-          )}
+          </div>
         </div>
-        <span className="inline-flex w-fit items-center rounded-full bg-sage/20 px-3 py-1 text-xs font-medium text-espresso">
-          Ready to study
-        </span>
-        <button
-          type="button"
-          onClick={onOpen}
-          className={cn(
-            'mt-auto rounded-full border border-espresso/20 px-4 py-2 text-sm font-medium text-espresso shadow-paper transition',
-            'hover:-translate-y-0.5 hover:bg-sand'
-          )}
-        >
-          {variant === 'create' ? 'Create class' : 'Open'}
-        </button>
       </div>
     </PaperCard>
   )

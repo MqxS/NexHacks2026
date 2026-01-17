@@ -67,7 +67,7 @@ export const api = {
     if (isDev) {
       const classID = devId()
       const Name = String(formData.get('Name') ?? 'Untitled class')
-      const Professor = String(formData.get('Professor') ?? 'Professor')
+      const Professor = String(formData.get('Professor') ?? 'Instructor')
       const next = [...loadDevClasses(), { classID, Name, Professor }]
       saveDevClasses(next)
       return Promise.resolve({ classID })

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
 
 export const CenteredCarousel = <T,>({
@@ -15,7 +15,7 @@ export const CenteredCarousel = <T,>({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(initialIndex)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = containerRef.current
     if (!container) return
 
@@ -23,7 +23,9 @@ export const CenteredCarousel = <T,>({
     const target = children[initialIndex]
     if (target) {
       const left = target.offsetLeft - container.clientWidth / 2 + target.clientWidth / 2
-      container.scrollTo({ left, behavior: 'auto' })
+      requestAnimationFrame(() => {
+        container.scrollTo({ left, behavior: 'auto' })
+      })
     }
   }, [initialIndex, items.length])
 

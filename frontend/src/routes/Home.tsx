@@ -13,10 +13,30 @@ import { UploadDropzone } from '../components/UploadDropzone'
 import { PaperCard } from '../components/PaperCard'
 import { cn } from '../lib/utils'
 import { useNavigate } from 'react-router-dom'
+import { classArt } from '../lib/classArt'
+
+const hashSeed = (value: string) => {
+  let hash = 0
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) >>> 0
+  }
+  return hash || 1
+}
+
+const shuffleArt = (seed: number) => {
+  const pool = [...classArt]
+  let value = seed >>> 0
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    value = (value * 1664525 + 1013904223) >>> 0
+    const j = Math.floor((value / 4294967296) * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  return pool
+}
 
 const createSchema = z.object({
   name: z.string().min(1, 'Class name is required'),
-  professor: z.string().min(1, 'Professor is required'),
+  professor: z.string().min(1, 'Instructor is required'),
   recommendations: z.string().optional()
 })
 
@@ -101,13 +121,22 @@ export const Home = () => {
       if (context?.previous) queryClient.setQueryData(['classCards'], context.previous)
       toast.error(error.message || 'Could not update professor')
     },
-    onSuccess: () => toast.success('Professor updated'),
+    onSuccess: () => toast.success('Instructor updated'),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['classCards'] })
   })
 
   const cards = useMemo(() => data ?? [], [data])
   const carouselItems = [...cards, { classID: 'create', Name: 'Create class', Professor: 'Start a fresh study space' }]
-  const initialIndex = cards.length >= 3 ? 1 : cards.length === 0 ? carouselItems.length - 1 : 0
+  const initialIndex = carouselItems.length === 1 ? 0 : 1
+  const artById = useMemo(() => {
+    if (classArt.length === 0) return {}
+    const ids = carouselItems.map((item) => item.classID)
+    const shuffled = shuffleArt(hashSeed(ids.join('|')))
+    return ids.reduce<Record<string, string>>((acc, id, index) => {
+      acc[id] = shuffled[index % shuffled.length]
+      return acc
+    }, {})
+  }, [carouselItems])
 
   return (
     <div className="space-y-10 min-h-[70vh] flex flex-col justify-center">
@@ -148,6 +177,7 @@ export const Home = () => {
                   selected={selected}
                   onOpen={() => setCreateOpen(true)}
                   variant="create"
+                  artUrl={artById[item.classID]}
                 />
               )
             }
@@ -158,6 +188,7 @@ export const Home = () => {
                 selected={selected}
                 onOpen={() => navigate(`/class/${item.classID}/session`)}
                 onEdit={() => setEditing(item)}
+                artUrl={artById[item.classID]}
               />
             )
           }}
@@ -189,7 +220,7 @@ export const Home = () => {
                 ) : null}
               </div>
               <div>
-                <label className="text-sm font-medium text-espresso">Professor</label>
+                <label className="text-sm font-medium text-espresso">Instructor</label>
                 <input
                   {...createForm.register('professor')}
                   className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
@@ -257,7 +288,7 @@ export const Home = () => {
                   onSave={(value) => editNameMutation.mutate({ classID: editing.classID, newName: value })}
                 />
                 <InlineEditField
-                  label="Professor"
+                  label="Instructor"
                   value={editing.Professor}
                   onSave={(value) => editProfMutation.mutate({ classID: editing.classID, newProf: value })}
                 />
