@@ -269,6 +269,20 @@ export const Home = () => {
         </Dialog.Portal>
       </Dialog.Root>
 
+      {createMutation.isPending ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-espresso/30 backdrop-blur-[2px]">
+          <div className="rounded-3xl border border-espresso/20 bg-paper/90 px-10 py-8 text-center shadow-lift">
+            <div className="mx-auto mb-4 orbit-loader">
+              <div className="orbit-ring" />
+              <div className="orbit-dot" />
+              <div className="orbit-dot secondary" />
+            </div>
+            <p className="text-sm font-medium text-espresso">Building your class workspace...</p>
+            <p className="mt-1 text-xs text-espresso/60">Indexing syllabus and materials</p>
+          </div>
+        </div>
+      ) : null}
+
       <Dialog.Root open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-espresso/40 backdrop-blur-sm" />

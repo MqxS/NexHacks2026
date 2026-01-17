@@ -76,3 +76,86 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.2s ease-in-out infinite;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gravity-dot {
+  0% {
+    transform: translate(-50%, -50%) rotate(70deg) translateX(var(--dot-offset));
+  }
+  60% {
+    transform: translate(-50%, -50%) rotate(-70deg) translateX(var(--dot-offset));
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(70deg) translateX(var(--dot-offset));
+  }
+}
+
+@keyframes gravity-dot-secondary {
+  0% {
+    transform: translate(-50%, -50%) rotate(250deg) translateX(var(--dot-offset));
+  }
+  60% {
+    transform: translate(-50%, -50%) rotate(110deg) translateX(var(--dot-offset));
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(250deg) translateX(var(--dot-offset));
+  }
+}
+
+.orbit-loader {
+  position: relative;
+  --orbit-size: 120px;
+  --orbit-radius: 60px;
+  --dot-size: 30px;
+  --dot-radius: 15px;
+  --dot-offset: calc(var(--orbit-radius) - var(--dot-radius));
+  width: var(--orbit-size);
+  height: var(--orbit-size);
+  box-sizing: border-box;
+}
+
+.orbit-loader .orbit-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px dashed rgba(103, 70, 54, 0.4);
+  animation: orbit 8s linear infinite;
+  box-sizing: border-box;
+}
+
+.orbit-loader .orbit-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 9999px;
+  background: #aab396;
+  animation: gravity-dot 3.4s cubic-bezier(0.2, 0.6, 0.2, 1) infinite;
+  box-shadow: 0 0 12px rgba(170, 179, 150, 0.6);
+}
+
+.orbit-loader .orbit-dot.secondary {
+  --dot-size: 10px;
+  --dot-radius: 5px;
+  background: #f7eed3;
+  animation-name: gravity-dot-secondary;
+  animation-duration: 4.2s;
+}
