@@ -6,6 +6,7 @@ import { ClassSettings } from './routes/ClassSettings'
 import { SessionPage } from './routes/SessionPage'
 import { cn } from './lib/utils'
 import { Settings } from 'lucide-react'
+import { InlineMath } from 'react-katex'
 import { AnimatePresence, motion } from 'framer-motion'
 
 const Breadcrumbs = () => {
@@ -74,7 +75,7 @@ const Shell = ({ children }: { children: ReactNode }) => {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <div className="rounded-2xl border border-espresso/20 bg-sand px-3 py-2 text-lg font-semibold text-espresso shadow-paper">
-              StudyDeck
+              <InlineMath>{'so\\varphi'}</InlineMath>
             </div>
             <Breadcrumbs />
           </div>
