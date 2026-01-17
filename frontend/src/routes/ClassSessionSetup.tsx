@@ -64,6 +64,9 @@ export const ClassSessionSetup = () => {
     mutationFn: async (sessionID: string) => {
       const params = await api.getSessionParams(sessionID)
       localStorage.setItem(`sessionParams:${sessionID}`, JSON.stringify(params))
+      if (classID) {
+        localStorage.setItem(`session:${sessionID}`, classID)
+      }
       return sessionID
     },
     onSuccess: (sessionID) => {
