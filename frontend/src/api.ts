@@ -72,7 +72,7 @@ const resolveApiBase = () => {
     }
     return window.location.origin
   }
-  return 'http://localhost:8080'
+  return 'http://localhost'
 }
 
 async function request<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
