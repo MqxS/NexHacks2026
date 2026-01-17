@@ -1,7 +1,43 @@
 import random
-from flask import Flask, jsonify
+from dataclasses import dataclass
+from typing import List
+
+from bson import ObjectId, Binary
+from flask import Flask, jsonify, request
+
+from backend.mongo import connect
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
+mongo = connect()
+
+@dataclass
+class Question:
+    questionId: ObjectId
+    content: str
+    userAnswer: str
+    aiAnswer: str
+    wasUserCorrect: bool
+
+@dataclass
+class Session:
+    sessionID: ObjectId
+    name: str
+    questions: List[Question]
+    adaptive: bool
+    difficulty: float
+    isCumulative : bool
+    focusedConcepts: List[str]
+    file: Binary
+
+@dataclass
+class Class:
+    classID: ObjectId
+    syllabus: Binary
+    styleFiles: List[Binary]
+    name: str
+    professor: str
+    topics: List[str]
+    sessions: List[Session]
 
 @server.route("/api/hello")
 def hello():
@@ -16,12 +52,29 @@ def get_class_cards():
     ]
     return jsonify(class_cards)
 
-@server.route("/api/getClass")
-def crease_class():
-    classes = [
-        {"id": 1}
-    ]
-    return jsonify(classes)
+@server.route("/api/createClass")
+def create_class():
+    #multipart/form-data
+    if "syllabus" not in request.files:
+        return jsonify({"error": "No syllabus file provided"}), 400
+
+    syllabus_file = request.files["syllabus"]
+    syllabus_bytes = syllabus_file.read()
+
+    class_doc = {
+        "syllabus": Binary(syllabus_bytes),
+        "styleFiles": [],
+        "name": request.form.get("name", "Untitled Class"),
+        "professor": request.form.get("professor", "Unknown"),
+        "topics": [],
+        "sessions": []
+    }
+
+    result = mongo.classes.insert_one(class_doc)
+
+    return jsonify({
+        "classID": str(result.inserted_id)
+    })
 
 @server.route("/api/createSession")
 def create_session():
