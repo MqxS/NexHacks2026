@@ -6,7 +6,7 @@ from typing import List
 
 from bson import ObjectId, Binary
 
-from backend.mongo import connect
+# from backend.mongo import connect
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
 # mongo = connect()
