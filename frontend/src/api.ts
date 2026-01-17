@@ -30,6 +30,12 @@ type BackendQuestion = {
   questionId: string
 }
 
+type BackendSession = {
+  sessionID: string
+  timestamp: string
+  topics: string[]
+}
+
 // const isDev = import.meta.env.DEV
 const isDev = false
 const devClassesKey = 'dev:classCards'
@@ -143,6 +149,10 @@ export const api = {
     request<BackendTopic[]>(`/api/getClassTopics/${encodeURIComponent(classID)}`).then((topics) =>
       topics.map((topic) => topic.title)
     ),
+  getRecentSessions: (classID: string) =>
+    request<BackendSession[]>(`/api/getRecentSessions/${encodeURIComponent(classID)}`),
+  getSessionParams: (sessionID: string) =>
+    request<Record<string, unknown>>(`/api/getSessionParams/${encodeURIComponent(sessionID)}`),
   createSession: () => request<{ sessionID: string }>(`/api/createSession`),
   deleteClass: (payload: { classID: string }) => {
     if (isDev) {

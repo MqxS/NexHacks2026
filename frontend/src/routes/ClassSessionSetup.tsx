@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -30,6 +30,12 @@ export const ClassSessionSetup = () => {
     enabled: Boolean(classID)
   })
 
+  const sessionsQuery = useQuery({
+    queryKey: ['recentSessions', classID],
+    queryFn: () => api.getRecentSessions(classID ?? ''),
+    enabled: Boolean(classID)
+  })
+
   const createSession = useMutation({
     mutationFn: async () => {
       return api.createSession()
@@ -43,15 +49,28 @@ export const ClassSessionSetup = () => {
     onError: (error: Error) => toast.error(error.message || 'Could not start session')
   })
 
-  const sessions = useMemo(
-    () =>
-      [] as Array<{
-        title: string
-        tags: string[]
-        onResume?: () => void
-      }>,
-    []
-  )
+  const sessions = sessionsQuery.data ?? []
+
+  const formatSessionTime = (timestamp: string) => {
+    const date = new Date(timestamp)
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      hour: 'numeric',
+      minute: '2-digit'
+    }).format(date)
+  }
+
+  const resumeSession = useMutation({
+    mutationFn: async (sessionID: string) => {
+      const params = await api.getSessionParams(sessionID)
+      localStorage.setItem(`sessionParams:${sessionID}`, JSON.stringify(params))
+      return sessionID
+    },
+    onSuccess: (sessionID) => {
+      navigate(`/session/${sessionID}`)
+    },
+    onError: (error: Error) => toast.error(error.message || 'Could not resume session')
+  })
 
   return (
     <div className="grid gap-10 lg:grid-cols-[2fr,1fr]">
@@ -207,7 +226,13 @@ export const ClassSessionSetup = () => {
             <h2 className="text-lg font-semibold text-espresso">Recent sessions</h2>
             <span className="text-xs text-espresso/60">Keep momentum going</span>
           </div>
-          {sessions.length === 0 ? (
+          {sessionsQuery.isLoading ? (
+            <div className="flex gap-4 overflow-hidden">
+              {[0, 1, 2].map((index) => (
+                <LoadingSkeleton key={index} className="h-[160px] w-[220px]" />
+              ))}
+            </div>
+          ) : sessionsQuery.isError || sessions.length === 0 ? (
             <PaperCard className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="rounded-full bg-sand p-2 text-espresso">
@@ -219,7 +244,12 @@ export const ClassSessionSetup = () => {
           ) : (
             <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-4">
               {sessions.map((session) => (
-                <SessionCard key={session.title} title={session.title} tags={session.tags} onResume={session.onResume} />
+                <SessionCard
+                  key={session.sessionID}
+                  title={formatSessionTime(session.timestamp)}
+                  tags={session.topics}
+                  onResume={() => resumeSession.mutate(session.sessionID)}
+                />
               ))}
             </div>
           )}

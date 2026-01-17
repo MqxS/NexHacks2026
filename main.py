@@ -38,6 +38,33 @@ def get_class_topics(classID):
     ]
     return jsonify(topics)
 
+@server.route("/api/getRecentSessions/<classID>")
+def get_recent_sessions(classID):
+    sessions = [
+        {
+            "sessionID": "S1",
+            "timestamp": "2026-01-17T14:10:00Z",
+            "topics": ["Algebra", "Geometry"]
+        },
+        {
+            "sessionID": "S2",
+            "timestamp": "2026-01-16T18:30:00Z",
+            "topics": ["Calculus"]
+        }
+    ]
+    return jsonify(sessions)
+
+@server.route("/api/getSessionParams/<sessionID>")
+def get_session_params(sessionID):
+    session_params = {
+        "difficulty": 0.6,
+        "topic": "Algebra",
+        "cumulative": False,
+        "customRequests": "",
+        "adaptive": True
+    }
+    return jsonify(session_params)
+
 @server.route("/api/requestQuestion/<sessionID>")
 def request_question(sessionID):
     question = {

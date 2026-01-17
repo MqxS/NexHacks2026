@@ -50,6 +50,22 @@ export const SessionPage = () => {
     enabled: Boolean(sessionID)
   })
 
+  useEffect(() => {
+    if (!sessionID) return
+    const stored = localStorage.getItem(`sessionParams:${sessionID}`)
+    if (!stored) return
+    try {
+      const parsed = JSON.parse(stored) as Partial<SessionParams> & { adaptive?: boolean }
+      setParams((prev) => ({ ...prev, ...parsed }))
+      setSavedParams((prev) => ({ ...prev, ...parsed }))
+      if (typeof parsed.adaptive === 'boolean') {
+        setAdaptive(parsed.adaptive)
+      }
+    } catch {
+      return
+    }
+  }, [sessionID])
+
   const topicsQuery = useQuery({
     queryKey: ['classTopics', classID],
     queryFn: () => api.getClassTopics(classID ?? ''),
