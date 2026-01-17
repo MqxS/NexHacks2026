@@ -14,9 +14,7 @@ import urllib.request
 from file_utils import FileUtils
 from wolfram_checker import WolframAlphaChecker
 
-
 JsonDict = dict[str, t.Any]
-
 
 @dataclasses.dataclass(frozen=True)
 class SessionParameters:

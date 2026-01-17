@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import os
-import typing as t
 import urllib.error
 import urllib.parse
 import urllib.request
-
 
 class WolframAlphaChecker:
     def __init__(

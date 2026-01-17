@@ -30,7 +30,7 @@ def create_session():
     return jsonify(session)
 
 @server.route("/api/getClassTopics/<classID>")
-def get_class_topics():
+def get_class_topics(classID):
     topics = [
         {"title": "Algebra"},
         {"title": "Geometry"},
@@ -39,7 +39,7 @@ def get_class_topics():
     return jsonify(topics)
 
 @server.route("/api/requestQuestion/<sessionID>")
-def request_question():
+def request_question(sessionID):
     question = {
         "questionId": "Q123",
         "content": "What is the capital of France?"
@@ -47,7 +47,7 @@ def request_question():
     return jsonify(question)
 
 @server.route("/api/submitAnswer/<questionID>", methods=["POST"])
-def submit_answer():
+def submit_answer(questionID):
     response = {
         "isCorrect": True,
         "correctAnswer": "Paris",
@@ -56,15 +56,15 @@ def submit_answer():
     return jsonify(response)
 
 @server.route("/api/updateSessionParams/<sessionID>", methods=["POST"])
-def update_session_params():
+def update_session_params(sessionID):
     return jsonify({"status": "Session parameters updated"})
 
 @server.route("/api/setAdaptive/<sessionID>", methods=["POST"])
-def set_adaptive():
+def set_adaptive(sessionID):
     return jsonify({"status": "Adaptive learning set"})
 
 @server.route("/api/requestHint/<questionID>")
-def request_hint():
+def request_hint(questionID):
     hint = {
         "hint": "It's also known as the city of lights."
     }
