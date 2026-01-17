@@ -1,3 +1,4 @@
+import random
 from flask import Flask, jsonify
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
@@ -67,20 +68,60 @@ def get_session_params(sessionID):
 
 @server.route("/api/requestQuestion/<sessionID>")
 def request_question(sessionID):
-    question = {
-        "questionId": "Q123",
-        "content": "What is the capital of France?"
-    }
-    return jsonify(question)
+    questions = [
+        {"questionId": "Q101", "content": "What is the capital of France?"},
+        {"questionId": "Q102", "content": "Solve for x: 2x + 5 = 17."},
+        {"questionId": "Q103", "content": "Compute the derivative of $f(x)=x^2$."},
+        {"questionId": "Q104", "content": "Evaluate the integral $\\int_0^1 3x^2\\,dx$."},
+        {"questionId": "Q105", "content": "If $a^2+b^2=c^2$ with $a=3$ and $b=4$, find $c$."},
+        {"questionId": "Q106", "content": "Simplify: $\\frac{2}{x} + \\frac{3}{x} = ?$"},
+        {"questionId": "Q107", "content": "What is the slope of the line through $(1,2)$ and $(3,6)$?"},
+        {"questionId": "Q108", "content": "Convert $0.75$ to a fraction."},
+        {"questionId": "Q109", "content": "Solve: $\\sin(\\pi/2)$ = ?"},
+        {"questionId": "Q110", "content": "Find the area of a circle with radius $r$."}
+    ]
+    return jsonify(random.choice(questions))
 
 @server.route("/api/submitAnswer/<questionID>", methods=["POST"])
 def submit_answer(questionID):
-    response = {
-        "isCorrect": True,
-        "correctAnswer": "Paris",
-        "whyIsWrong": "Paris is the capital and most populous city of France.",
-    }
-    return jsonify(response)
+    feedback_bank = [
+        {
+            "isCorrect": True,
+            "correctAnswer": "Paris",
+            "whyIsWrong": ""
+        },
+        {
+            "isCorrect": True,
+            "correctAnswer": "$x=6$",
+            "whyIsWrong": ""
+        },
+        {
+            "isCorrect": True,
+            "correctAnswer": "$f'(x)=2x$",
+            "whyIsWrong": ""
+        },
+        {
+            "isCorrect": False,
+            "correctAnswer": "$x=6$",
+            "whyIsWrong": "Isolate $x$ by subtracting 5 first, then divide by 2."
+        },
+        {
+            "isCorrect": False,
+            "correctAnswer": "$\\int_0^1 3x^2\\,dx = 1$",
+            "whyIsWrong": "Use the antiderivative $x^3$ and evaluate from 0 to 1."
+        },
+        {
+            "isCorrect": False,
+            "correctAnswer": "$c=5$",
+            "whyIsWrong": "Apply the Pythagorean theorem: $3^2+4^2=9+16=25$."
+        },
+        {
+            "isCorrect": False,
+            "correctAnswer": "$\\sin(\\pi/2)=1$",
+            "whyIsWrong": "On the unit circle, $\\pi/2$ corresponds to the point $(0,1)$."
+        }
+    ]
+    return jsonify(random.choice(feedback_bank))
 
 @server.route("/api/updateSessionParams/<sessionID>", methods=["POST"])
 def update_session_params(sessionID):
