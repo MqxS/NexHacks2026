@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -22,6 +22,7 @@ type SessionParams = {
 export const SessionPage = () => {
   const { sessionID } = useParams()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [answer, setAnswer] = useState('')
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [adaptive, setAdaptive] = useState(false)
@@ -66,11 +67,17 @@ export const SessionPage = () => {
     onError: (error: Error) => toast.error(error.message || 'Could not submit answer')
   })
 
-  const nextQuestion = () => {
-    setHints([])
-    setHintRequest('')
-    questionQuery.refetch()
-  }
+  const nextQuestionMutation = useMutation({
+    mutationFn: () => api.requestQuestion(sessionID ?? ''),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['session', sessionID], data)
+      setHints([])
+      setHintRequest('')
+      setFeedback(null)
+      setAnswer('')
+    },
+    onError: (error: Error) => toast.error(error.message || 'Could not load next question')
+  })
 
   const adaptiveMutation = useMutation({
     mutationFn: (value: boolean) => api.setAdaptive({ sessionID: sessionID ?? '', active: value }),
@@ -129,7 +136,7 @@ export const SessionPage = () => {
         </div>
 
         <PaperCard className="min-h-[220px]">
-          {questionQuery.isLoading ? (
+          {questionQuery.isLoading || nextQuestionMutation.isPending ? (
             <LoadingSkeleton className="h-40 w-full" />
           ) : questionQuery.isError ? (
             <div className="flex items-center justify-between">
@@ -203,10 +210,11 @@ export const SessionPage = () => {
               </div>
               <button
                 type="button"
-                onClick={nextQuestion}
+                onClick={() => nextQuestionMutation.mutate()}
+                disabled={nextQuestionMutation.isPending}
                 className="rounded-full bg-espresso px-3 py-1 text-xs font-medium text-paper"
               >
-                Next question
+                {nextQuestionMutation.isPending ? 'Loading...' : 'Next question'}
               </button>
             </div>
           </PaperCard>
@@ -339,13 +347,30 @@ export const SessionPage = () => {
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={params.cumulative}
-                  onChange={(event) => setParams({ ...params, cumulative: event.target.checked })}
-                />
-                <span className="text-sm text-espresso">Cumulative</span>
+              <div>
+                <label className="text-sm font-medium text-espresso">Session style</label>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setParams({ ...params, cumulative: false })}
+                    className={cn(
+                      'flex-1 rounded-full border border-espresso/20 px-3 py-2 text-sm',
+                      !params.cumulative ? 'bg-espresso text-paper' : 'bg-paper text-espresso'
+                    )}
+                  >
+                    Isolated
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setParams({ ...params, cumulative: true })}
+                    className={cn(
+                      'flex-1 rounded-full border border-espresso/20 px-3 py-2 text-sm',
+                      params.cumulative ? 'bg-espresso text-paper' : 'bg-paper text-espresso'
+                    )}
+                  >
+                    Cumulative
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-espresso">Custom requests</label>

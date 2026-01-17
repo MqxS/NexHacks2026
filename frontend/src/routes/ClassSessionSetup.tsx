@@ -154,6 +154,9 @@ export const ClassSessionSetup = () => {
                   Cumulative
                 </button>
               </div>
+              <p className="mt-2 text-xs text-espresso/60">
+                Isolated uses only the selected topic. Cumulative includes prerequisite topics too.
+              </p>
             </div>
 
             <div className="flex items-center justify-between rounded-2xl border border-espresso/15 bg-sand/50 p-4">
