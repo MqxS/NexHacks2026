@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom'
 
 const createSchema = z.object({
   name: z.string().min(1, 'Class name is required'),
-  professor: z.string().min(1, 'Professor is required'),
+  instructor: z.string().min(1, 'Instructor is required'),
   recommendations: z.string().optional()
 })
 
@@ -39,7 +39,7 @@ export const Home = () => {
     resolver: zodResolver(createSchema),
     defaultValues: {
       name: '',
-      professor: '',
+      instructor: '',
       recommendations: ''
     }
   })
@@ -48,7 +48,7 @@ export const Home = () => {
     mutationFn: async (payload: CreateValues) => {
       const formData = new FormData()
       formData.append('Name', payload.name)
-      formData.append('Professor', payload.professor)
+      formData.append('Professor', payload.instructor)
       formData.append('recommended', payload.recommendations ?? '')
       if (syllabus[0]) formData.append('syllabus', syllabus[0])
       attachments.forEach((file) => formData.append('files', file))
@@ -85,7 +85,7 @@ export const Home = () => {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['classCards'] })
   })
 
-  const editProfMutation = useMutation({
+  const editInstructorMutation = useMutation({
     mutationFn: api.editClassProf,
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: ['classCards'] })
@@ -99,9 +99,9 @@ export const Home = () => {
     },
     onError: (error: Error, _, context) => {
       if (context?.previous) queryClient.setQueryData(['classCards'], context.previous)
-      toast.error(error.message || 'Could not update professor')
+      toast.error(error.message || 'Could not update instructor')
     },
-    onSuccess: () => toast.success('Professor updated'),
+    onSuccess: () => toast.success('Instructor updated'),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['classCards'] })
   })
 
@@ -144,7 +144,7 @@ export const Home = () => {
               return (
                 <ClassCardUI
                   name="Create class"
-                  professor="Upload a syllabus to begin"
+                  instructor="Upload a syllabus to begin"
                   selected={selected}
                   onOpen={() => setCreateOpen(true)}
                   variant="create"
@@ -154,7 +154,7 @@ export const Home = () => {
             return (
               <ClassCardUI
                 name={item.Name}
-                professor={item.Professor}
+                instructor={item.Professor}
                 selected={selected}
                 onOpen={() => navigate(`/class/${item.classID}/session`)}
                 onEdit={() => setEditing(item)}
@@ -189,14 +189,14 @@ export const Home = () => {
                 ) : null}
               </div>
               <div>
-                <label className="text-sm font-medium text-espresso">Professor</label>
+                <label className="text-sm font-medium text-espresso">Instructor</label>
                 <input
-                  {...createForm.register('professor')}
+                  {...createForm.register('instructor')}
                   className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
                   placeholder="Dr. Gomez"
                 />
-                {createForm.formState.errors.professor ? (
-                  <p className="mt-1 text-xs text-red-600">{createForm.formState.errors.professor.message}</p>
+                {createForm.formState.errors.instructor ? (
+                  <p className="mt-1 text-xs text-red-600">{createForm.formState.errors.instructor.message}</p>
                 ) : null}
               </div>
               <div>
@@ -257,9 +257,9 @@ export const Home = () => {
                   onSave={(value) => editNameMutation.mutate({ classID: editing.classID, newName: value })}
                 />
                 <InlineEditField
-                  label="Professor"
+                  label="Instructor"
                   value={editing.Professor}
-                  onSave={(value) => editProfMutation.mutate({ classID: editing.classID, newProf: value })}
+                  onSave={(value) => editInstructorMutation.mutate({ classID: editing.classID, newProf: value })}
                 />
               </div>
             ) : null}

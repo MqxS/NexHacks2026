@@ -4,14 +4,14 @@ import { cn } from '../lib/utils'
 
 export const ClassCard = ({
   name,
-  professor,
+  instructor,
   selected,
   onOpen,
   onEdit,
   variant = 'class'
 }: {
   name: string
-  professor: string
+  instructor: string
   selected?: boolean
   onOpen?: () => void
   onEdit?: () => void
@@ -29,7 +29,7 @@ export const ClassCard = ({
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-xl font-semibold text-espresso">{name}</h3>
-            <p className="text-sm text-espresso/70">{professor}</p>
+            <p className="text-sm text-espresso/70">{instructor}</p>
           </div>
           {variant === 'class' && (
             <button
