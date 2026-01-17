@@ -14,7 +14,6 @@ mongo = connect()
 
 @dataclass
 class Question:
-    questionId: bson.ObjectId
     content: str
     userAnswer: str
     aiAnswer: str
@@ -22,7 +21,6 @@ class Question:
 
 @dataclass
 class Session:
-    sessionID: bson.ObjectId
     name: str
     questions: List[Question]
     adaptive: bool
@@ -33,7 +31,6 @@ class Session:
 
 @dataclass
 class Class:
-    classID: bson.ObjectId
     syllabus: Binary
     styleFiles: List[Binary]
     name: str
@@ -51,9 +48,22 @@ class_cards = [
 def hello():
     return jsonify({"message": "API Working!"})
 
-@server.route("/api/getClassCards")
+@server.route("/api/getClassCards", methods=["GET"])
 def get_class_cards():
-    return jsonify(class_cards)
+    classes = mongo.classes.find(
+        {},
+        {"name": 1, "professor": 1}
+    )
+
+    return jsonify([
+        {
+            "classID": str(doc["_id"]),
+            "name": doc.get("name", "Untitled Class"),
+            "professor": doc.get("professor", "Unknown")
+        }
+        for doc in classes
+        if "_id" in doc
+    ])
 
 @server.route("/api/createClass", methods=["POST"])
 def create_class():
