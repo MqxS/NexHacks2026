@@ -174,10 +174,19 @@ class GeminiClient:
 
     def _strip_code_fences(self, text: str) -> str:
         s = text.strip()
-        if s.startswith("```"):
-            s = re.sub(r"^```[a-zA-Z0-9_-]*\s*", "", s)
-            s = re.sub(r"\s*```$", "", s)
-        return s.strip()
+        # Find the first opening fence
+        start_fence = s.find("```")
+        if start_fence != -1:
+            # Check for language identifier (e.g., ```json)
+            match = re.search(r"```[a-zA-Z0-9_-]*\s*", s[start_fence:])
+            if match:
+                content_start = start_fence + match.end()
+                # Find the closing fence
+                end_fence = s.find("```", content_start)
+                if end_fence != -1:
+                    return s[content_start:end_fence].strip()
+                return s[content_start:].strip()
+        return s
 
     def _extract_json_candidate(self, text: str) -> str:
         s = self._strip_code_fences(text)
@@ -277,9 +286,12 @@ class GeminiClient:
         return s.strip()
 
     def _parse_model_json(self, text: str) -> JsonDict:
+        # Always try to strip code fences first, as Gemini often wraps JSON in markdown
+        cleaned = self._strip_code_fences(text)
         try:
-            return t.cast(JsonDict, json.loads(text))
+            return t.cast(JsonDict, json.loads(cleaned))
         except json.JSONDecodeError:
+            # Fallback to more aggressive repair
             repaired = self._repair_json_text(text)
             return t.cast(JsonDict, json.loads(repaired))
 
@@ -290,7 +302,7 @@ class GeminiClient:
         user_prompt: str,
         few_shots: list[tuple[str, JsonDict]] | None = None,
         temperature: float = 0.2,
-        max_output_tokens: int = 1024,
+        max_output_tokens: int = 8192,
         image_bytes: bytes | None = None,
         image_mime_type: str = "image/png",
         allow_json_fix: bool = True,
@@ -317,6 +329,12 @@ class GeminiClient:
         payload: JsonDict = {
             "systemInstruction": {"parts": [{"text": self._compress_text(system_instruction)}]},
             "contents": contents,
+            "safetySettings": [
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+            ],
             "generationConfig": {
                 "temperature": temperature,
                 "maxOutputTokens": max_output_tokens,
@@ -389,7 +407,9 @@ class GeminiClient:
         parts = content.get("parts") or []
         text_parts = [p.get("text") for p in parts if isinstance(p, dict) and p.get("text")]
         if not text_parts:
-            raise RuntimeError("Gemini returned no text parts.")
+            finish_reason = candidates[0].get("finishReason")
+            safety_ratings = candidates[0].get("safetyRatings")
+            raise RuntimeError(f"Gemini returned no text parts. Finish reason: {finish_reason}. Safety ratings: {safety_ratings}")
 
         text = "\n".join(t.cast(list[str], text_parts)).strip()
         try:
@@ -414,7 +434,7 @@ class GeminiClient:
                 user_prompt=fix_prompt,
                 few_shots=None,
                 temperature=0.0,
-                max_output_tokens=max(600, min(2400, max_output_tokens)),
+                max_output_tokens=max_output_tokens,
                 allow_json_fix=False,
             )
 
@@ -513,7 +533,7 @@ class SophiaAIUtil:
                 ),
                 few_shots=few_shots,
                 temperature=0.1,
-                max_output_tokens=450,
+                max_output_tokens=1024,
             )
             out_d = coerce_dict(out)
             if out_d is None:
@@ -684,7 +704,9 @@ class SophiaAIUtil:
             "Return JSON only, with concise, student-friendly wording. "
             "Always follow the provided output_contract. "
             "If must_be_solvable_in_wolfram_alpha=true, include a valid wolfram_query. "
-            "If must_be_solvable_in_wolfram_alpha=false, include a correct final answer in the answer field."
+            "If must_be_solvable_in_wolfram_alpha=false, include a correct final answer in the answer field. "
+            "CRITICAL: If 'history' or 'class_file' is provided, you MUST analyze the style, tone, and complexity of the previous questions "
+            "and generate the new question to MATCH that style exactly. Do not deviate from the established question format."
         )
         few_shots: list[tuple[str, JsonDict]] = [
             (
@@ -767,6 +789,7 @@ class SophiaAIUtil:
                     "question_should_not_repeat_recent": True,
                     "prefer_focus_concepts": effective_session.focus_concepts,
                     "cumulative_behavior": "If cumulative=true, combine 2+ concepts; else isolate 1 concept.",
+                    "style_enforcement": "MIMIC the style of questions in 'history' and 'class_file.practice_problems' exactly.",
                 },
                 "output_contract": {
                     "question": "string",
@@ -786,7 +809,7 @@ class SophiaAIUtil:
                 user_prompt=build_user_prompt({"attempt": attempt, "previous_issue": last_error}),
                 few_shots=few_shots,
                 temperature=0.2,
-                max_output_tokens=900,
+                max_output_tokens=6144,
             )
             out_d: JsonDict | None
             if isinstance(out, dict):
@@ -889,7 +912,7 @@ class SophiaAIUtil:
             user_prompt=json.dumps({"question": question, "output_contract": {"validation_prompt": "string"}}, ensure_ascii=False),
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=400,
+            max_output_tokens=6144,
         )
         return str(out.get("validation_prompt") or "").strip()
 
@@ -993,7 +1016,7 @@ class SophiaAIUtil:
                 user_prompt=build_user_prompt({"attempt": attempt, "previous_issue": last_issue}),
                 few_shots=few_shots,
                 temperature=0.2,
-                max_output_tokens=700,
+                max_output_tokens=6144,
                 image_bytes=status_image_bytes,
                 image_mime_type=status_image_mime_type,
             )
@@ -1034,11 +1057,13 @@ class SophiaAIUtil:
     def analyze_settings_request(self, *, request_text: str) -> JsonDict:
         system_instruction = (
             "You classify a user's request about a practice session into an action. "
+            "Available request types: regenerate_question, save_metadata, adjust_session_parameter, create_class_file. "
+            "Output contract: { \"request_type\": string, \"parameter_changes\": object, \"should_regenerate_question\": boolean, \"notes\": string } "
             "Return JSON only."
         )
         few_shots: list[tuple[str, JsonDict]] = [
             (
-                "Request: Can you make the next question harder and focus on chain rule?",
+                json.dumps({"request_text": "Can you make the next question harder and focus on chain rule?"}, ensure_ascii=False),
                 {
                     "request_type": "adjust_session_parameter",
                     "parameter_changes": {"difficulty_level_delta": 1, "focus_concepts_add": ["chain rule"]},
@@ -1047,7 +1072,7 @@ class SophiaAIUtil:
                 },
             ),
             (
-                "Request: Regenerate this question; I already did something like it.",
+                json.dumps({"request_text": "Regenerate this question; I already did something like it."}, ensure_ascii=False),
                 {
                     "request_type": "regenerate_question",
                     "parameter_changes": {},
@@ -1056,7 +1081,7 @@ class SophiaAIUtil:
                 },
             ),
             (
-                "Request: Remember that I struggle with factoring; give me more of that later.",
+                json.dumps({"request_text": "Remember that I struggle with factoring; give me more of that later."}, ensure_ascii=False),
                 {
                     "request_type": "save_metadata",
                     "parameter_changes": {"learner_profile_add": ["struggles_with_factoring"]},
@@ -1065,7 +1090,7 @@ class SophiaAIUtil:
                 },
             ),
             (
-                "Request: Create a class file for AP Calculus based on this syllabus and examples.",
+                json.dumps({"request_text": "Create a class file for AP Calculus based on this syllabus and examples."}, ensure_ascii=False),
                 {
                     "request_type": "create_class_file",
                     "parameter_changes": {},
@@ -1074,30 +1099,13 @@ class SophiaAIUtil:
                 },
             ),
         ]
-        user_prompt = json.dumps(
-            {
-                "request_text": request_text,
-                "request_types": [
-                    "regenerate_question",
-                    "save_metadata",
-                    "adjust_session_parameter",
-                    "create_class_file",
-                ],
-                "output_contract": {
-                    "request_type": "string",
-                    "parameter_changes": "object",
-                    "should_regenerate_question": "boolean",
-                    "notes": "string",
-                },
-            },
-            ensure_ascii=False,
-        )
+        user_prompt = json.dumps({"request_text": request_text}, ensure_ascii=False)
         return self.gemini.generate_json(
             system_instruction=system_instruction,
             user_prompt=user_prompt,
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=450,
+            max_output_tokens=6144,
         )
 
     def _generate_syllabus_section(self, syllabus_lines: list[str]) -> JsonDict:
@@ -1122,7 +1130,7 @@ class SophiaAIUtil:
             user_prompt=user_prompt,
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=8192,
+            max_output_tokens=6144,
         )
         return t.cast(JsonDict, out.get("syllabus") or {})
 
@@ -1140,7 +1148,7 @@ class SophiaAIUtil:
             system_instruction=system_instruction,
             user_prompt=user_prompt,
             temperature=0.2,
-            max_output_tokens=4096,
+            max_output_tokens=6144,
         )
         return list(out.get("concepts") or [])
 
@@ -1160,7 +1168,7 @@ class SophiaAIUtil:
             system_instruction=system_instruction,
             user_prompt=user_prompt,
             temperature=0.1,
-            max_output_tokens=8192,
+            max_output_tokens=6144,
         )
         return list(out.get("practice_problems") or [])
 

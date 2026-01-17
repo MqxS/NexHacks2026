@@ -123,6 +123,37 @@ class FileUtils:
         except Exception:
             return None
 
+    def _split_pdf_bytes(self, pdf_bytes: bytes, max_pages: int = 10) -> list[bytes]:
+        import io
+
+        try:
+            from PyPDF2 import PdfReader, PdfWriter  # type: ignore
+        except Exception:
+            try:
+                from pypdf import PdfReader, PdfWriter  # type: ignore
+            except Exception:
+                return [pdf_bytes]
+
+        try:
+            reader = PdfReader(io.BytesIO(pdf_bytes))
+            total_pages = len(reader.pages)
+            if total_pages <= max_pages:
+                return [pdf_bytes]
+
+            chunks: list[bytes] = []
+            for i in range(0, total_pages, max_pages):
+                writer = PdfWriter()
+                # Create a new writer for each chunk to avoid accumulation issues
+                for page in reader.pages[i : i + max_pages]:
+                    writer.add_page(page)
+
+                with io.BytesIO() as out:
+                    writer.write(out)
+                    chunks.append(out.getvalue())
+            return chunks
+        except Exception:
+            return [pdf_bytes]
+
     def _extract_text_with_pdftotext(self, pdf_path: str) -> str | None:
         candidates: list[list[str]] = [
             ["pdftotext", "-layout", pdf_path, "-"],
@@ -190,7 +221,7 @@ class FileUtils:
             ),
             few_shots=few_shots,
             temperature=0.2,
-            max_output_tokens=2400,
+            max_output_tokens=8192,
         )
         problems: t.Any
         if isinstance(out, list):
@@ -203,6 +234,11 @@ class FileUtils:
         return cleaned
 
     def _format_qa_with_gemini(self, extracted_text: str, *, gemini_client: t.Any) -> list[dict[str, str | None]]:
+        # Split text into chunks to ensure coverage and avoid output limits
+        chunk_size = 40000
+        chunks = [extracted_text[i : i + chunk_size] for i in range(0, len(extracted_text), chunk_size)]
+        all_items: list[dict[str, str | None]] = []
+
         system_instruction = (
             "You convert extracted PDF text into a list of practice items. Each item should have a question and, "
             "if an answer key is present, an answer. Preserve math as LaTeX using \\( ... \\) or \\[ ... \\]. "
@@ -231,40 +267,41 @@ class FileUtils:
                 },
             ),
         ]
-        out = gemini_client.generate_json(
-            system_instruction=system_instruction,
-            user_prompt=t.cast(
-                str,
-                self._json_dump(
-                    {
-                        "text": extracted_text,
-                        "max_items": 60,
-                        "output_contract": {"items": [{"question": "string", "answer": "string | null"}]},
-                    }
+
+        for chunk in chunks:
+            out = gemini_client.generate_json(
+                system_instruction=system_instruction,
+                user_prompt=t.cast(
+                    str,
+                    self._json_dump(
+                        {
+                            "text": chunk,
+                            "max_items": 60,
+                            "output_contract": {"items": [{"question": "string", "answer": "string | null"}]},
+                        }
+                    ),
                 ),
-            ),
-            few_shots=few_shots,
-            temperature=0.2,
-            max_output_tokens=8192,
-        )
-        items: t.Any
-        if isinstance(out, list):
-            items = out
-        else:
-            items = out.get("items") if isinstance(out, dict) else []
-        if not isinstance(items, list):
-            return []
-        cleaned: list[dict[str, str | None]] = []
-        for it in items:
-            if not isinstance(it, dict):
-                continue
-            q = str(it.get("question") or "").strip()
-            if not q:
-                continue
-            a_raw = it.get("answer")
-            a = None if a_raw is None else str(a_raw).strip()
-            cleaned.append({"question": q, "answer": a if a else None})
-        return cleaned
+                few_shots=few_shots,
+                temperature=0.2,
+                max_output_tokens=8192,
+            )
+            items: t.Any
+            if isinstance(out, list):
+                items = out
+            else:
+                items = out.get("items") if isinstance(out, dict) else []
+            if isinstance(items, list):
+                for it in items:
+                    if not isinstance(it, dict):
+                        continue
+                    q = str(it.get("question") or "").strip()
+                    if not q:
+                        continue
+                    a_raw = it.get("answer")
+                    a = None if a_raw is None else str(a_raw).strip()
+                    all_items.append({"question": q, "answer": a if a else None})
+
+        return self._dedupe_qa(all_items)
 
     def _extract_problems_from_image(self, image_bytes: bytes, *, gemini_client: t.Any) -> list[str]:
         system_instruction = (
@@ -284,7 +321,7 @@ class FileUtils:
             user_prompt=t.cast(str, self._json_dump({"max_items": 60, "output_contract": {"problems": "string[]"}})),
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=2400,
+            max_output_tokens=4096,
             image_bytes=image_bytes,
             image_mime_type="image/png",
         )
@@ -346,6 +383,10 @@ class FileUtils:
         gemini_client: t.Any,
         max_pages: int,
     ) -> list[dict[str, str | None]]:
+        # Split PDF into manageable chunks to avoid token limits and improve extraction yield
+        chunks = self._split_pdf_bytes(pdf_bytes, max_pages=10)
+        all_items: list[dict[str, str | None]] = []
+
         system_instruction = (
             "You read a PDF of a worksheet, practice exam, or textbook pages and extract practice items. "
             "Each item should have a question and, if an answer key is present, an answer. "
@@ -363,44 +404,43 @@ class FileUtils:
                 },
             )
         ]
-        out = gemini_client.generate_json(
-            system_instruction=system_instruction,
-            user_prompt=t.cast(
-                str,
-                self._json_dump(
-                    {
-                        "max_items": 100,
-                        "output_contract": {"items": [{"question": "string", "answer": "string | null"}]},
-                    }
+
+        for chunk in chunks:
+            out = gemini_client.generate_json(
+                system_instruction=system_instruction,
+                user_prompt=t.cast(
+                    str,
+                    self._json_dump(
+                        {
+                            "max_items": 100,
+                            "output_contract": {"items": [{"question": "string", "answer": "string | null"}]},
+                        }
+                    ),
                 ),
-            ),
-            few_shots=few_shots,
-            temperature=0.1,
-            max_output_tokens=8192,
-            image_bytes=pdf_bytes,
-            image_mime_type="application/pdf",
-        )
-        items: t.Any
-        if isinstance(out, list):
-            items = out
-        else:
-            items = out.get("items") if isinstance(out, dict) else None
-            if items is None and isinstance(out, dict):
-                items = out.get("output") or out.get("data")
-            items = items or []
-        if not isinstance(items, list):
-            return []
-        cleaned: list[dict[str, str | None]] = []
-        for it in items:
-            if not isinstance(it, dict):
-                continue
-            q = str(it.get("question") or "").strip()
-            if not q:
-                continue
-            a_raw = it.get("answer")
-            a = None if a_raw is None else str(a_raw).strip()
-            cleaned.append({"question": q, "answer": a if a else None})
-        return cleaned
+                few_shots=few_shots,
+                temperature=0.1,
+                max_output_tokens=8192,
+                image_bytes=chunk,
+                image_mime_type="application/pdf",
+            )
+            items: t.Any
+            if isinstance(out, list):
+                items = out
+            else:
+                items = out.get("items") if isinstance(out, dict) else None
+                if items is None and isinstance(out, dict):
+                    items = out.get("output") or out.get("data")
+                items = items or []
+            if isinstance(items, list):
+                for it in items:
+                    if isinstance(it, dict):
+                        q = str(it.get("question") or "").strip()
+                        if q:
+                            a_raw = it.get("answer")
+                            a = None if a_raw is None else str(a_raw).strip()
+                            all_items.append({"question": q, "answer": a if a else None})
+
+        return self._dedupe_qa(all_items)
 
     def _format_syllabus_with_gemini(self, extracted_text: str, *, gemini_client: t.Any) -> str:
         system_instruction = (
@@ -436,6 +476,9 @@ class FileUtils:
         gemini_client: t.Any,
         max_pages: int,
     ) -> str:
+        chunks = self._split_pdf_bytes(pdf_bytes, max_pages=10)
+        extracted_parts: list[str] = []
+
         system_instruction = (
             "You read a PDF course syllabus and extract the unit/topic outline. "
             "Be comprehensive. Return JSON only."
@@ -446,23 +489,29 @@ class FileUtils:
                 {"syllabus_text": "Unit 1: Limits\n- One-sided limits\n- Continuity\n\nUnit 2: Derivatives\n- Power rule\n- Chain rule"},
             )
         ]
-        out = gemini_client.generate_json(
-            system_instruction=system_instruction,
-            user_prompt=t.cast(
-                str,
-                self._json_dump({"output_contract": {"syllabus_text": "string"}}),
-            ),
-            few_shots=few_shots,
-            temperature=0.1,
-            max_output_tokens=8192,
-            image_bytes=pdf_bytes,
-            image_mime_type="application/pdf",
-        )
-        if isinstance(out, dict):
-            return str(out.get("syllabus_text") or "").strip()
-        if isinstance(out, str):
-            return out.strip()
-        return ""
+
+        for chunk in chunks:
+            out = gemini_client.generate_json(
+                system_instruction=system_instruction,
+                user_prompt=t.cast(
+                    str,
+                    self._json_dump({"output_contract": {"syllabus_text": "string"}}),
+                ),
+                few_shots=few_shots,
+                temperature=0.1,
+                max_output_tokens=8192,
+                image_bytes=chunk,
+                image_mime_type="application/pdf",
+            )
+            text = ""
+            if isinstance(out, dict):
+                text = str(out.get("syllabus_text") or "").strip()
+            elif isinstance(out, str):
+                text = out.strip()
+            if text:
+                extracted_parts.append(text)
+
+        return "\n\n".join(extracted_parts).strip()
 
     def _extract_syllabus_from_image(self, image_bytes: bytes, *, gemini_client: t.Any) -> str:
         system_instruction = (
