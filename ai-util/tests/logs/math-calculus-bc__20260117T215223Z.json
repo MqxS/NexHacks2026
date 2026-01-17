@@ -1,0 +1,191 @@
+{
+  "class_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc",
+  "is_math": true,
+  "use_wolfram": true,
+  "syllabus_chars": 1629,
+  "practice_items_count": 3,
+  "steps": {
+    "parse_syllabus": {
+      "name": "Parsing syllabus PDF",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "parse_practice": {
+      "name": "Parsing practice PDFs",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "create_class_file": {
+      "name": "Analyzing settings request (create_class_file)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "generate_question": {
+      "name": "Generating question",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_ok": {
+      "name": "Validating question (expected valid)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_bad": {
+      "name": "Validating question (expected invalid)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_hint": {
+      "name": "Validating hint against a step",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Metacognitive / Reflection": {
+      "name": "Generating hint (Metacognitive / Reflection)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Conceptual": {
+      "name": "Generating hint (Conceptual)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Strategic": {
+      "name": "Generating hint (Strategic)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Procedural / Subgoal": {
+      "name": "Generating hint (Procedural / Subgoal)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Bottom-Out / Explicit": {
+      "name": "Generating hint (Bottom-Out / Explicit)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "adjust_session_parameter": {
+      "name": "Analyzing settings request (adjust_session_parameter)",
+      "ok": false,
+      "skipped": false,
+      "error": "Gemini returned no text parts."
+    },
+    "regenerate_question": {
+      "name": "Analyzing settings request (regenerate_question)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "save_metadata": {
+      "name": "Analyzing settings request (save_metadata)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    }
+  },
+  "generated": {
+    "question": "Find the particular solution to the differential equation dy/dx = (1 + y^2) / x given the initial condition y(1) = 0.",
+    "answer": "\"No short answer available\"",
+    "wolfram_query": "Solve y'[x] = (1 + y[x]^2)/x, y(1) = 0",
+    "validation_prompt": "",
+    "metadata": {
+      "difficulty_level": 3,
+      "concepts": [
+        "Transcendental Functions",
+        "Differentiation and Integration of Functions with Bases other than e",
+        "Inverse Trigonometric Functions",
+        "Differential Equations",
+        "Separable Differential Equations"
+      ],
+      "unit": "math-calculus-bc",
+      "cumulative": true,
+      "adaptive": true,
+      "verified_with_wolfram": true,
+      "used_file_upload": true,
+      "used_class_file": true
+    }
+  },
+  "validation_ok": {
+    "ok": true,
+    "wolfram_query": "solve dy/dx = (1 + y^2) / x, y(1) = 0",
+    "wolfram_result": "\"No short answer available\"",
+    "details": null
+  },
+  "validation_bad": {
+    "ok": false,
+    "wolfram_query": "Here is the JSON requested:\n```json",
+    "wolfram_result": "\"Wolfram|Alpha did not understand your input\"",
+    "details": null
+  },
+  "hints": {
+    "Metacognitive / Reflection": {
+      "kind": "hint",
+      "text": "Take a look at the structure of the equation. Can you separate the terms involving y from the terms involving x to see if this fits a specific category of differential equations?",
+      "hint_type": "Metacognitive / Reflection",
+      "wolfram_query": "solve dy/dx = (1 + y^2) / x, y(1) = 0",
+      "wolfram_result": "\"No short answer available\""
+    },
+    "Conceptual": {
+      "kind": "hint",
+      "text": "This is a separable differential equation, which means you can rearrange the terms so that all y-terms (including dy) are on one side and all x-terms (including dx) are on the other.",
+      "hint_type": "Conceptual",
+      "wolfram_query": "solve dy/dx = (1 + y^2) / x, y(1) = 0",
+      "wolfram_result": "\"No short answer available\""
+    },
+    "Strategic": {
+      "kind": "hint",
+      "text": "Since the equation involves products of functions of x and y, try separating the variables so that all terms involving y are on one side and all terms involving x are on the other.",
+      "hint_type": "Strategic",
+      "wolfram_query": "solve dy/dx = (1 + y^2) / x, y(1) = 0",
+      "wolfram_result": "\"No short answer available\""
+    },
+    "Procedural / Subgoal": {
+      "kind": "hint",
+      "text": "Start by separating the variables: move all terms involving y to the left side with dy and all terms involving x to the right side with dx.",
+      "hint_type": "Procedural / Subgoal",
+      "wolfram_query": "solve dy/dx = (1 + y^2) / x, y(1) = 0",
+      "wolfram_result": "\"No short answer available\""
+    },
+    "Bottom-Out / Explicit": {
+      "kind": "hint",
+      "text": "Separate the variables to get dy/(1+y^2) = dx/x, integrate both sides to find arctan(y) = ln|x| + C, and use y(1)=0 to find C=0, resulting in y = tan(ln|x|).",
+      "hint_type": "Bottom-Out / Explicit",
+      "wolfram_query": "solve dy/dx = (1 + y^2) / x, y(1) = 0",
+      "wolfram_result": "\"No short answer available\""
+    }
+  },
+  "hint_validation": {
+    "ok": true,
+    "wolfram_query": null,
+    "wolfram_result": null,
+    "details": null
+  },
+  "settings_analyses": [
+    {
+      "request_type": "regenerate_question",
+      "parameter_changes": {},
+      "should_regenerate_question": true,
+      "notes": "User requested regeneration due to similarity with previous questions."
+    },
+    {
+      "request_": null
+    },
+    {
+      "request_": null
+    }
+  ],
+  "artifacts_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts"
+}

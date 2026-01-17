@@ -105,10 +105,10 @@ class FileUtils:
 
     def _extract_text_with_pypdf(self, pdf_path: str) -> str | None:
         try:
-            from pypdf import PdfReader  # type: ignore
+            from PyPDF2 import PdfReader  # type: ignore
         except Exception:
             try:
-                from PyPDF2 import PdfReader  # type: ignore
+                from pypdf import PdfReader  # type: ignore
             except Exception:
                 return None
 
@@ -245,7 +245,7 @@ class FileUtils:
             ),
             few_shots=few_shots,
             temperature=0.2,
-            max_output_tokens=2400,
+            max_output_tokens=8192,
         )
         items: t.Any
         if isinstance(out, list):
@@ -320,7 +320,7 @@ class FileUtils:
             ),
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=2400,
+            max_output_tokens=8192,
             image_bytes=image_bytes,
             image_mime_type="image/png",
         )
@@ -369,14 +369,14 @@ class FileUtils:
                 str,
                 self._json_dump(
                     {
-                        "max_items": 60,
+                        "max_items": 100,
                         "output_contract": {"items": [{"question": "string", "answer": "string | null"}]},
                     }
                 ),
             ),
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=2400,
+            max_output_tokens=8192,
             image_bytes=pdf_bytes,
             image_mime_type="application/pdf",
         )
@@ -405,7 +405,7 @@ class FileUtils:
     def _format_syllabus_with_gemini(self, extracted_text: str, *, gemini_client: t.Any) -> str:
         system_instruction = (
             "You convert messy syllabus text into a clean unit/topic outline. "
-            "Keep it compact. Preserve course-specific names. Return JSON only."
+            "Be comprehensive and include all units and topics found. Preserve course-specific names. Return JSON only."
         )
         few_shots = [
             (
@@ -418,7 +418,7 @@ class FileUtils:
             user_prompt=t.cast(str, self._json_dump({"text": extracted_text, "output_contract": {"syllabus_text": "string"}})),
             few_shots=few_shots,
             temperature=0.2,
-            max_output_tokens=1600,
+            max_output_tokens=8192,
         )
         if isinstance(out, dict):
             return str(out.get("syllabus_text") or "").strip()
@@ -438,7 +438,7 @@ class FileUtils:
     ) -> str:
         system_instruction = (
             "You read a PDF course syllabus and extract the unit/topic outline. "
-            "Return JSON only."
+            "Be comprehensive. Return JSON only."
         )
         few_shots = [
             (
@@ -454,7 +454,7 @@ class FileUtils:
             ),
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=1600,
+            max_output_tokens=8192,
             image_bytes=pdf_bytes,
             image_mime_type="application/pdf",
         )
@@ -467,7 +467,7 @@ class FileUtils:
     def _extract_syllabus_from_image(self, image_bytes: bytes, *, gemini_client: t.Any) -> str:
         system_instruction = (
             "You read an image of a course syllabus page and extract the unit/topic outline. "
-            "Return JSON only."
+            "Be comprehensive. Return JSON only."
         )
         few_shots = [
             (
@@ -480,7 +480,7 @@ class FileUtils:
             user_prompt=t.cast(str, self._json_dump({"output_contract": {"syllabus_text": "string"}})),
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=1600,
+            max_output_tokens=8192,
             image_bytes=image_bytes,
             image_mime_type="image/png",
         )

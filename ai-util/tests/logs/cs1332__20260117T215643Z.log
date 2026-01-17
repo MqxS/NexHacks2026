@@ -1,0 +1,29 @@
+2026-01-17 16:56:43,299 [INFO] Log file: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/cs1332__20260117T215643Z.log
+2026-01-17 16:56:43,300 [INFO] Environment status: {
+  "gemini_api_key_set": true,
+  "wolfram_app_id_set": true,
+  "tokenc_api_key_set": true
+}
+2026-01-17 16:56:43,339 [INFO] Repo root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026
+2026-01-17 16:56:43,339 [INFO] ai-util root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util
+2026-01-17 16:56:43,339 [INFO] Sophia module dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia
+2026-01-17 16:56:43,339 [INFO] Selected class dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/cs1332
+2026-01-17 16:56:43,339 [INFO] Class type: non-math (wolfram disabled)
+2026-01-17 16:56:43,339 [INFO] syllabus.pdf: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/cs1332/syllabus.pdf
+2026-01-17 16:56:43,339 [INFO] practice PDFs: 1
+2026-01-17 16:56:43,339 [INFO]  - CS 1332 - 2025Fall - Practice Exam 1.pdf
+2026-01-17 16:56:43,339 [INFO] Artifacts dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/cs1332__artifacts
+2026-01-17 16:56:43,339 [INFO] Parsing syllabus PDF...
+2026-01-17 16:56:49,099 [INFO] Syllabus extracted chars: 743
+2026-01-17 16:56:49,099 [INFO] Parsing practice PDFs...
+2026-01-17 16:57:02,159 [INFO] Practice items extracted: 16
+2026-01-17 16:57:02,160 [INFO] Sample practice items:
+What is the tightest Big-O bound for adding to the middle index of an ArrayList? Assume an optimal implementation and no amortized analysis.
+Options: \( O(1) \), \( O(\log n) \), \( O(n) \), \( O(n \log n) \), \( O(n^2) \)
+
+What is the tightest Big-O bound for adding to the back of a CircularSinglyLinkedList? Assume an optimal implementation and no amortized analysis.
+Options: \( O(1) \), \( O(\log n) \), \( O(n) \), \( O(n \log n) \), \( O(n^2) \)
+
+What is the tightest Big-O bound for adding to the third-to-last spot in a DoublyLinkedList? Assume an optimal implementation and no amortized analysis.
+Options: \( O(1) \), \( O(\log n) \), \( O(n) \), \( O(n \log n) \), \( O(n^2) \)
+2026-01-17 16:57:02,160 [INFO] Creating class file from PDFs...

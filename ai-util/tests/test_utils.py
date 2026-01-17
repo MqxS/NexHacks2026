@@ -286,20 +286,31 @@ def _run_for_class_dir(
             str(v_bad.wolfram_result),
         )
 
-    hint = None
-    step_hint = {"name": "Generating hint", "ok": False, "skipped": True, "error": "Skipped"}
+    hint_types = [
+        "Metacognitive / Reflection",
+        "Conceptual",
+        "Strategic",
+        "Procedural / Subgoal",
+        "Bottom-Out / Explicit",
+    ]
+    hint_results = {}
+    hint_steps = {}
+
     if generated is not None:
-        hint, step_hint = run_step(
-            name="Generating hint",
-            fn=lambda: ai.generate_hint(
-                status_prompt="I am stuck and unsure what to do next.",
-                problem=generated.question,
-                hint_type="Strategic",
-                use_wolfram=use_wolfram,
-            ),
-        )
-        if hint is not None:
-            logger.info("Hint kind=%s type=%s\n%s", hint.kind, str(hint.hint_type), hint.text)
+        for ht in hint_types:
+            h_res, h_step = run_step(
+                name=f"Generating hint ({ht})",
+                fn=lambda ht=ht: ai.generate_hint(
+                    status_prompt="I am stuck and unsure what to do next.",
+                    problem=generated.question,
+                    hint_type=ht,
+                    use_wolfram=use_wolfram,
+                ),
+            )
+            hint_steps[ht] = h_step
+            if h_res is not None:
+                hint_results[ht] = h_res
+                logger.info("Hint (%s) kind=%s type=%s\n%s", ht, h_res.kind, str(h_res.hint_type), h_res.text)
 
     v_hint, step_v_hint = run_step(
         name="Validating hint against a step",
@@ -314,24 +325,25 @@ def _run_for_class_dir(
     if v_hint is not None:
         logger.info("Hint validation ok=%s wolfram_query=%s", str(v_hint.ok), str(v_hint.wolfram_query))
 
-    s1, step_s1 = run_step(
-        name="Analyzing settings request 1",
-        fn=lambda: ai.analyze_settings_request(request_text="Can you make the next question harder and focus on chain rule?"),
-    )
-    s2, step_s2 = run_step(
-        name="Analyzing settings request 2",
-        fn=lambda: ai.analyze_settings_request(request_text="Regenerate this question; I already did something like it."),
-    )
-    s3, step_s3 = run_step(
-        name="Analyzing settings request 3",
-        fn=lambda: ai.analyze_settings_request(request_text="Remember that I struggle with factoring; give me more of that later."),
-    )
-    if s1 is not None:
-        logger.info("Settings analysis 1: %s", _safe_json(s1))
-    if s2 is not None:
-        logger.info("Settings analysis 2: %s", _safe_json(s2))
-    if s3 is not None:
-        logger.info("Settings analysis 3: %s", _safe_json(s3))
+    settings_requests = [
+        ("adjust_session_parameter", "Can you make the next question harder and focus on chain rule?"),
+        ("regenerate_question", "Regenerate this question; I already did something like it."),
+        ("save_metadata", "Remember that I struggle with factoring; give me more of that later."),
+        ("create_class_file", "Create a class file for AP Calculus based on this syllabus and examples."),
+    ]
+
+    settings_results = []
+    settings_steps = {}
+
+    for req_type, req_text in settings_requests:
+        s_res, s_step = run_step(
+            name=f"Analyzing settings request ({req_type})",
+            fn=lambda rt=req_text: ai.analyze_settings_request(request_text=rt),
+        )
+        settings_steps[req_type] = s_step
+        if s_res is not None:
+            logger.info("Settings analysis (%s): %s", req_type, _safe_json(s_res))
+        settings_results.append(s_res)
 
     return {
         "class_dir": str(class_dir),
@@ -346,18 +358,16 @@ def _run_for_class_dir(
             "generate_question": step_generate,
             "validate_ok": step_v_ok,
             "validate_bad": step_v_bad,
-            "generate_hint": step_hint,
             "validate_hint": step_v_hint,
-            "settings_1": step_s1,
-            "settings_2": step_s2,
-            "settings_3": step_s3,
+            **hint_steps,
+            **settings_steps,
         },
         "generated": dataclasses_asdict_safe(generated) if generated is not None else None,
         "validation_ok": dataclasses_asdict_safe(v_ok) if v_ok is not None else None,
         "validation_bad": dataclasses_asdict_safe(v_bad) if v_bad is not None else None,
-        "hint": dataclasses_asdict_safe(hint) if hint is not None else None,
+        "hints": {k: dataclasses_asdict_safe(v) for k, v in hint_results.items()},
         "hint_validation": dataclasses_asdict_safe(v_hint) if v_hint is not None else None,
-        "settings_analyses": [s for s in [s1, s2, s3] if s is not None],
+        "settings_analyses": [s for s in settings_results if s is not None],
         "artifacts_dir": str(artifacts_dir),
     }
 

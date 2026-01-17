@@ -1,0 +1,158 @@
+2026-01-17 16:52:23,627 [INFO] Log file: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__20260117T215223Z.log
+2026-01-17 16:52:23,627 [INFO] Environment status: {
+  "gemini_api_key_set": true,
+  "wolfram_app_id_set": true,
+  "tokenc_api_key_set": true
+}
+2026-01-17 16:52:23,676 [INFO] Repo root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026
+2026-01-17 16:52:23,676 [INFO] ai-util root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util
+2026-01-17 16:52:23,676 [INFO] Sophia module dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia
+2026-01-17 16:52:23,676 [INFO] Selected class dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc
+2026-01-17 16:52:23,676 [INFO] Class type: math (wolfram enabled)
+2026-01-17 16:52:23,676 [INFO] syllabus.pdf: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc/syllabus.pdf
+2026-01-17 16:52:23,676 [INFO] practice PDFs: 1
+2026-01-17 16:52:23,676 [INFO]  - AP-Calculus-BC-hw.pdf
+2026-01-17 16:52:23,676 [INFO] Artifacts dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts
+2026-01-17 16:52:23,676 [INFO] Parsing syllabus PDF...
+2026-01-17 16:52:42,009 [INFO] Syllabus extracted chars: 1629
+2026-01-17 16:52:42,010 [INFO] Parsing practice PDFs...
+2026-01-17 16:53:24,516 [INFO] Practice items extracted: 3
+2026-01-17 16:53:24,516 [INFO] Sample practice items:
+Find \(\lim_{x \to -1^+} \frac{x^2 - 1}{x^3 + 1}\). (A) 2 (B) 1 (C) 0 (D) -1 (E) Does not exist
+
+For what value(s) of \(k\), if any, is \(f(x) = \begin{cases} x^2 - k & \text{if } x < 2 \\ 2x + k & \text{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)? (A) -4, -2 (B) 2 (C) 4 (D) -2, 4 (E) Does not exist
+
+If \(f(x) = \sqrt{x^2 - 8x + 1}\), then \(f'(x)\) is: (A) \(\frac{x-8}{\sqrt{x^2-8x+1}}\) (B) \(\frac{8}{\sqrt{x^2-8x+1}}\) (C) \(\frac{2x-8}
+2026-01-17 16:53:24,516 [INFO] Creating class file from PDFs...
+2026-01-17 16:55:27,602 [INFO] Class file saved: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts/class_file.json
+2026-01-17 16:55:27,602 [INFO] Class file concepts: 43
+2026-01-17 16:55:27,603 [INFO] Adjusted session: {
+  "difficulty_level": 3,
+  "cumulative": true,
+  "adaptive": true,
+  "focus_concepts": [
+    "Transcendental Functions",
+    "Differentiation and Integration of Functions with Bases other than e",
+    "Inverse Trigonometric Functions",
+    "Differential Equations",
+    "Separable Differential Equations"
+  ],
+  "unit_focus": "math-calculus-bc"
+}
+2026-01-17 16:55:27,603 [INFO] Generating question...
+2026-01-17 16:55:36,805 [INFO] Generated question:
+Find the particular solution to the differential equation dy/dx = (1 + y^2) / x given the initial condition y(1) = 0.
+2026-01-17 16:55:36,805 [INFO] Generated answer:
+"No short answer available"
+2026-01-17 16:55:36,806 [INFO] Verified with wolfram: True
+2026-01-17 16:55:36,806 [INFO] Validation prompt length: 0
+2026-01-17 16:55:36,807 [INFO] Saved question record: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts/question_history.jsonl
+2026-01-17 16:55:36,808 [INFO] Validating question (expected valid)...
+2026-01-17 16:55:39,190 [INFO] Validation ok=True wolfram_query=solve dy/dx = (1 + y^2) / x, y(1) = 0
+2026-01-17 16:55:39,190 [INFO] Validating question (expected invalid)...
+2026-01-17 16:55:45,533 [INFO] Bad validation ok=False wolfram_query=Here is the JSON requested:
+```json wolfram_result="Wolfram|Alpha did not understand your input"
+2026-01-17 16:55:45,533 [INFO] Generating hint (Metacognitive / Reflection)...
+2026-01-17 16:55:49,456 [INFO] Hint (Metacognitive / Reflection) kind=hint type=Metacognitive / Reflection
+Take a look at the structure of the equation. Can you separate the terms involving y from the terms involving x to see if this fits a specific category of differential equations?
+2026-01-17 16:55:49,456 [INFO] Generating hint (Conceptual)...
+2026-01-17 16:55:52,879 [INFO] Hint (Conceptual) kind=hint type=Conceptual
+This is a separable differential equation, which means you can rearrange the terms so that all y-terms (including dy) are on one side and all x-terms (including dx) are on the other.
+2026-01-17 16:55:52,879 [INFO] Generating hint (Strategic)...
+2026-01-17 16:55:56,411 [INFO] Hint (Strategic) kind=hint type=Strategic
+Since the equation involves products of functions of x and y, try separating the variables so that all terms involving y are on one side and all terms involving x are on the other.
+2026-01-17 16:55:56,411 [INFO] Generating hint (Procedural / Subgoal)...
+2026-01-17 16:56:00,163 [INFO] Hint (Procedural / Subgoal) kind=hint type=Procedural / Subgoal
+Start by separating the variables: move all terms involving y to the left side with dy and all terms involving x to the right side with dx.
+2026-01-17 16:56:00,164 [INFO] Generating hint (Bottom-Out / Explicit)...
+2026-01-17 16:56:06,637 [INFO] Hint (Bottom-Out / Explicit) kind=hint type=Bottom-Out / Explicit
+Separate the variables to get dy/(1+y^2) = dx/x, integrate both sides to find arctan(y) = ln|x| + C, and use y(1)=0 to find C=0, resulting in y = tan(ln|x|).
+2026-01-17 16:56:06,638 [INFO] Validating hint against a step...
+2026-01-17 16:56:14,326 [INFO] Hint validation ok=True wolfram_query=None
+2026-01-17 16:56:14,326 [INFO] Analyzing settings request (adjust_session_parameter)...
+2026-01-17 16:56:24,063 [INFO] Analyzing settings request (adjust_session_parameter) FAILED: Gemini returned no text parts.
+2026-01-17 16:56:24,071 [INFO] Traceback:
+Traceback (most recent call last):
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia/sophia_ai.py", line 281, in _parse_model_json
+    return t.cast(JsonDict, json.loads(text))
+                            ~~~~~~~~~~^^^^^^
+  File "/opt/anaconda3/lib/python3.13/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/anaconda3/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/json/decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Unterminated string starting at: line 2 column 3 (char 4)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia/sophia_ai.py", line 396, in generate_json
+    return self._parse_model_json(text)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia/sophia_ai.py", line 284, in _parse_model_json
+    return t.cast(JsonDict, json.loads(repaired))
+                            ~~~~~~~~~~^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/anaconda3/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/json/decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ':' delimiter: line 2 column 5 (char 6)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/test_utils.py", line 165, in run_step
+    val = fn()
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/test_utils.py", line 341, in <lambda>
+    fn=lambda rt=req_text: ai.analyze_settings_request(request_text=rt),
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia/sophia_ai.py", line 1095, in analyze_settings_request
+    return self.gemini.generate_json(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        system_instruction=system_instruction,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        max_output_tokens=450,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia/sophia_ai.py", line 412, in generate_json
+    return self.generate_json(
+           ~~~~~~~~~~~~~~~~~~^
+        system_instruction=fix_system,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        allow_json_fix=False,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia/sophia_ai.py", line 392, in generate_json
+    raise RuntimeError("Gemini returned no text parts.")
+RuntimeError: Gemini returned no text parts.
+
+2026-01-17 16:56:24,072 [INFO] Analyzing settings request (regenerate_question)...
+2026-01-17 16:56:27,464 [INFO] Settings analysis (regenerate_question): {
+  "request_type": "regenerate_question",
+  "parameter_changes": {},
+  "should_regenerate_question": true,
+  "notes": "User requested regeneration due to similarity with previous questions."
+}
+2026-01-17 16:56:27,464 [INFO] Analyzing settings request (save_metadata)...
+2026-01-17 16:56:36,460 [INFO] Settings analysis (save_metadata): {
+  "request_": null
+}
+2026-01-17 16:56:36,461 [INFO] Analyzing settings request (create_class_file)...
+2026-01-17 16:56:43,219 [INFO] Settings analysis (create_class_file): {
+  "request_": null
+}
+2026-01-17 16:56:43,220 [INFO] Saved results JSON: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__20260117T215223Z.json
+2026-01-17 16:56:43,220 [INFO] Done.

@@ -1,0 +1,50 @@
+Unit 1: Transcendental Functions
+- Differentiation and Integration of Functions with Bases other than e & Applications
+- Differentiation & Integration of Inverse Trig Functions
+
+Unit 2: Differential Equations
+- Solving Separable Differential Equations
+- Growth & Decay
+- Newton’s Law of Cooling
+- Slope Fields
+- Euler’s Method
+
+Unit 3: Applications of Integration
+- Calculations of Volumes of Solids (Washer, Shell, and General Cross-section methods)
+- Arc Length
+- Areas of Surfaces of Revolution
+
+Unit 4: Advanced Integration Techniques
+- Trigonometric Integration
+- Integration Using Trig Substitution
+- Integration Using Partial Fractions
+- Integration by Tables
+- Integration by Parts
+- Improper Integrals
+
+Unit 5: Limits
+- L’Hopital’s Rule
+
+Unit 6: Parametric Equations, Vector-Valued Functions, and Polar Graphs
+- Differentiation of Parametric Functions
+- Differentiation of Vector-Valued Functions
+- Calculation of Speed
+- Area of a region bounded by a polar graph
+
+Unit 7: Infinite Series
+- Sequences, Series & Convergence
+- The Integral Test & p-series
+- Comparisons of Series
+- Alternating Series
+- Ratio & Root Tests
+- Taylor Polynomials & Approximations
+- Power Series
+- Taylor & Maclaurin Series
+- Maclaurin Series for functions e^x, sin x, cos x, and 1/(1-x)
+- LaGrange Error Bound for Taylor Polynomials
+
+Unit 8: AP Exam Review
+- In-depth Review of Selected AP Topics in Preparation for AP Exam
+
+Unit 9: Post AP Exam
+- Selected Topics

@@ -1100,6 +1100,70 @@ class SophiaAIUtil:
             max_output_tokens=450,
         )
 
+    def _generate_syllabus_section(self, syllabus_lines: list[str]) -> JsonDict:
+        system_instruction = (
+            "You convert a course syllabus text into a structured JSON outline. "
+            "Return a JSON object with a single key 'syllabus' containing 'units'. "
+            "Each unit has 'title' and 'topics'. "
+            "Be comprehensive. Include all units found."
+        )
+        few_shots = [
+            (
+                json.dumps({"syllabus_raw": ["Unit 1: Limits", "- One-sided limits", "- Continuity"]}, ensure_ascii=False),
+                {"syllabus": {"units": [{"title": "Limits", "topics": ["One-sided limits", "Continuity"]}]}},
+            )
+        ]
+        user_prompt = json.dumps(
+            {"syllabus_raw": syllabus_lines, "output_contract": {"syllabus": "object"}},
+            ensure_ascii=False,
+        )
+        out = self.gemini.generate_json(
+            system_instruction=system_instruction,
+            user_prompt=user_prompt,
+            few_shots=few_shots,
+            temperature=0.1,
+            max_output_tokens=8192,
+        )
+        return t.cast(JsonDict, out.get("syllabus") or {})
+
+    def _generate_concepts_section(self, syllabus_data: JsonDict) -> list[str]:
+        system_instruction = (
+            "You extract a list of core concepts from a syllabus structure. "
+            "Return a JSON object with 'concepts', a list of strings. "
+            "Be comprehensive."
+        )
+        user_prompt = json.dumps(
+            {"syllabus": syllabus_data, "output_contract": {"concepts": "string[]"}},
+            ensure_ascii=False,
+        )
+        out = self.gemini.generate_json(
+            system_instruction=system_instruction,
+            user_prompt=user_prompt,
+            temperature=0.2,
+            max_output_tokens=4096,
+        )
+        return list(out.get("concepts") or [])
+
+    def _generate_practice_problems_section(self, problems_lines: list[str]) -> list[str]:
+        if not problems_lines:
+            return []
+        system_instruction = (
+            "You clean and select practice problems from a list of raw problems. "
+            "Return a JSON object with 'practice_problems', a list of strings. "
+            "Include up to 50 high-quality problems."
+        )
+        user_prompt = json.dumps(
+            {"problems_raw": problems_lines, "output_contract": {"practice_problems": "string[]"}},
+            ensure_ascii=False,
+        )
+        out = self.gemini.generate_json(
+            system_instruction=system_instruction,
+            user_prompt=user_prompt,
+            temperature=0.1,
+            max_output_tokens=8192,
+        )
+        return list(out.get("practice_problems") or [])
+
     def create_class_file(
         self,
         *,
@@ -1110,55 +1174,15 @@ class SophiaAIUtil:
         scraped_syllabus = self.scrape_syllabus(syllabus_text)
         scraped_problems = self.scrape_practice_problems(practice_problems_text)
 
-        system_instruction = (
-            "You create a compact 'class file' JSON used to generate practice problems. "
-            "Syllabus is hierarchical. Produce a list of core concepts and a cleaned practice problem bank. "
-            "Constraints: syllabus max 8 units; each unit max 10 topics; concepts max 25; practice_problems max 30. "
-            "Return a single, complete JSON object with exactly the keys: syllabus, concepts, practice_problems. "
-            "No markdown. No extra keys."
-        )
-        few_shots: list[tuple[str, JsonDict]] = [
-            (
-                json.dumps(
-                    {
-                        "class_name": "Algebra I",
-                        "syllabus_raw": ["Unit 1: Linear Equations", "  - One-step equations", "  - Two-step equations"],
-                        "problems_raw": ["Solve 2x+3=11", "Graph y=2x-5"],
-                    },
-                    ensure_ascii=False,
-                ),
-                {
-                    "syllabus": {"units": [{"title": "Linear Equations", "topics": ["One-step equations", "Two-step equations"]}]},
-                    "concepts": ["solving linear equations", "graphing lines"],
-                    "practice_problems": ["Solve for x: 2x + 3 = 11.", "Graph the line y = 2x - 5."],
-                },
-            )
-        ]
-        user_prompt = json.dumps(
-            {
-                "class_name": class_name,
-                "syllabus_raw": scraped_syllabus,
-                "problems_raw": scraped_problems,
-                "output_contract": {
-                    "syllabus": "object",
-                    "concepts": "string[]",
-                    "practice_problems": "string[]",
-                },
-            },
-            ensure_ascii=False,
-        )
-        out = self.gemini.generate_json(
-            system_instruction=system_instruction,
-            user_prompt=user_prompt,
-            few_shots=few_shots,
-            temperature=0.2,
-            max_output_tokens=2400,
-        )
+        syllabus_json = self._generate_syllabus_section(scraped_syllabus)
+        concepts = self._generate_concepts_section(syllabus_json)
+        practice_problems = self._generate_practice_problems_section(scraped_problems)
+
         return ClassFile(
             class_name=class_name,
-            syllabus=t.cast(JsonDict, out.get("syllabus") or {}),
-            concepts=list(out.get("concepts") or []),
-            practice_problems=list(out.get("practice_problems") or []),
+            syllabus=syllabus_json,
+            concepts=concepts,
+            practice_problems=practice_problems,
             updated_at_iso=dt.datetime.now(dt.timezone.utc).isoformat(),
         )
 

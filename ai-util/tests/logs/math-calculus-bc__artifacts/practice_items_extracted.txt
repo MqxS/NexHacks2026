@@ -1,0 +1,18 @@
+Question: Find \(\lim_{x \to -1} \frac{x^2+3x+2}{x+1}\).
+(A) 2
+(B) 1
+(C) 0
+(D) -1
+(E) Does not exist
+Answer: (B) 1
+
+Question: For what value(s) of \(k\), if any, is \(f(x) = \begin{cases} x^2-k & \text{if } x < 2 \\ 2x+k & \text{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)?
+(A) -4, -2
+(B) 2
+(C) 4
+(D) -2, 4
+(E) Does not exist
+Answer: (B) 2
+
+If \(f(x) = \sqrt{x^2 - 8x + 1}\), then \(f'(x)\) is:
+(A) \(\frac{x-8}{\sqrt{x^2-8x+1}}
