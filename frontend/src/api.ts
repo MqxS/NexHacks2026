@@ -15,6 +15,21 @@ export type Feedback = {
   whyIsWrong: string
 }
 
+type BackendClassCard = {
+  id: number | string
+  name: string
+  professor: string
+}
+
+type BackendTopic = {
+  title: string
+}
+
+type BackendQuestion = {
+  content: string
+  questionId: string
+}
+
 const isDev = import.meta.env.DEV
 const devClassesKey = 'dev:classCards'
 
@@ -67,7 +82,13 @@ async function request<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
 export const api = {
   getClassCards: () => {
     if (isDev) return Promise.resolve(loadDevClasses())
-    return request<ClassCard[]>('/api/getClassCards')
+    return request<BackendClassCard[]>('/api/getClassCards').then((cards) =>
+      cards.map((card) => ({
+        classID: String(card.id),
+        Name: card.name,
+        Professor: card.professor
+      }))
+    )
   },
   createClass: (formData: FormData) => {
     if (isDev) {
@@ -112,12 +133,10 @@ export const api = {
     })
   },
   getClassTopics: (classID: string) =>
-    request<string[]>(`/api/getClassTopics(${encodeURIComponent(classID)})`),
-  createSession: (formData: FormData) =>
-    request<{ sessionID: string; classID?: string }>(`/api/createSession`, {
-      method: 'POST',
-      body: formData
-    }),
+    request<BackendTopic[]>(`/api/getClassTopics/${encodeURIComponent(classID)}`).then((topics) =>
+      topics.map((topic) => topic.title)
+    ),
+  createSession: () => request<{ sessionID: string }>(`/api/createSession`),
   deleteClass: (payload: { classID: string }) => {
     if (isDev) {
       const next = loadDevClasses().filter((card) => card.classID !== payload.classID)
@@ -147,21 +166,26 @@ export const api = {
       body: JSON.stringify(payload)
     }),
   requestQuestion: (sessionID: string) =>
-    request<Question>(`/api/requestQuestion(${encodeURIComponent(sessionID)})`),
+    request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
+      Content: question.content,
+      questionID: question.questionId
+    })),
   reportAnswer: (payload: { questionID: string; studentAnswer: string }) =>
-    request<Feedback>(
-      `/api/reportAnswer(${payload.questionID},${encodeURIComponent(payload.studentAnswer)})`,
-      { method: 'POST' }
-    ),
+    request<Feedback>(`/api/submitAnswer/${encodeURIComponent(payload.questionID)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ studentAnswer: payload.studentAnswer })
+    }),
   requestHint: (payload: { questionID: string; hintRequest: string }) =>
-    request<{ hint: string }>(
-      `/api/requestHint(${payload.questionID},${encodeURIComponent(payload.hintRequest)})`,
-      { method: 'POST' }
-    ),
+    request<{ hint: string }>(`/api/requestHint/${encodeURIComponent(payload.questionID)}`),
   setAdaptive: (payload: { sessionID: string; active: boolean }) =>
-    request(`/api/setAdaptive(${encodeURIComponent(payload.sessionID)},${payload.active})`, { method: 'POST' }),
+    request(`/api/setAdaptive/${encodeURIComponent(payload.sessionID)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active: payload.active })
+    }),
   updateSessionParams: (payload: { sessionID: string; sessionParams: Record<string, unknown> }) =>
-    request(`/api/updateSessionParams(${encodeURIComponent(payload.sessionID)})`, {
+    request(`/api/updateSessionParams/${encodeURIComponent(payload.sessionID)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload.sessionParams)

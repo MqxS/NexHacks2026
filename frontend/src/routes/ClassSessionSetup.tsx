@@ -32,18 +32,7 @@ export const ClassSessionSetup = () => {
 
   const createSession = useMutation({
     mutationFn: async () => {
-      const formData = new FormData()
-      const sessionParams = {
-        classID,
-        difficulty,
-        topic,
-        cumulative,
-        adaptive,
-        customRequests: custom
-      }
-      formData.append('sessionParams', JSON.stringify(sessionParams))
-      if (file[0]) formData.append('file', file[0])
-      return api.createSession(formData)
+      return api.createSession()
     },
     onSuccess: (data) => {
       if (classID) {
