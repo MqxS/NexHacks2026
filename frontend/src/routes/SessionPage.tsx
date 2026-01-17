@@ -31,7 +31,7 @@ export const SessionPage = () => {
   const [panelOpen, setPanelOpen] = useState(false)
   const [exitOpen, setExitOpen] = useState(false)
   const [topicSearch, setTopicSearch] = useState('')
-  const [questionSize, setQuestionSize] = useState<'text-lg' | 'text-base' | 'text-sm'>('text-lg')
+  const [questionFontSize, setQuestionFontSize] = useState(20)
   const questionRef = useRef<HTMLDivElement | null>(null)
   const [params, setParams] = useState<SessionParams>({
     difficulty: 0.5,
@@ -101,18 +101,17 @@ export const SessionPage = () => {
     const element = questionRef.current
     if (!element) return
 
-    const sizes: Array<'text-lg' | 'text-base' | 'text-sm'> = ['text-lg', 'text-base', 'text-sm']
+    const sizes = [30, 28, 26, 24, 22, 20, 18]
 
     const evaluate = () => {
       for (const size of sizes) {
-        element.classList.remove('text-lg', 'text-base', 'text-sm')
-        element.classList.add(size)
+        element.style.fontSize = `${size}px`
         if (element.scrollHeight <= element.clientHeight + 4) {
-          setQuestionSize(size)
+          setQuestionFontSize(size)
           return
         }
       }
-      setQuestionSize('text-sm')
+      setQuestionFontSize(14)
     }
 
     const raf = requestAnimationFrame(evaluate)
@@ -201,8 +200,8 @@ export const SessionPage = () => {
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-espresso/50">Question</p>
               <div className="mt-3 text-espresso">
-                <div ref={questionRef} className="max-h-[240px] overflow-hidden">
-                  <LatexRenderer content={questionQuery.data?.Content ?? ''} className={cn('leading-relaxed', questionSize)} />
+                <div ref={questionRef} className="max-h-[240px] overflow-hidden" style={{ fontSize: questionFontSize }}>
+                  <LatexRenderer content={questionQuery.data?.Content ?? ''} className="leading-relaxed" />
                 </div>
               </div>
             </div>
