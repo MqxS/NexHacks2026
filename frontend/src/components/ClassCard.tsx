@@ -20,7 +20,7 @@ export const ClassCard = ({
   return (
     <PaperCard
       className={cn(
-        'w-[280px] shrink-0 border border-espresso/15 bg-paper/90 transition-all',
+        'w-[420px] min-h-[300px] shrink-0 border border-espresso/15 bg-paper/90 transition-all',
         selected ? 'shadow-lift -translate-y-2' : 'shadow-paper',
         variant === 'create' && 'border-dashed'
       )}

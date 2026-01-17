@@ -13,7 +13,6 @@ import { UploadDropzone } from '../components/UploadDropzone'
 import { PaperCard } from '../components/PaperCard'
 import { cn } from '../lib/utils'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen } from 'lucide-react'
 
 const createSchema = z.object({
   name: z.string().min(1, 'Class name is required'),
@@ -107,10 +106,11 @@ export const Home = () => {
   })
 
   const cards = useMemo(() => data ?? [], [data])
-  const carouselItems = [...cards, { classID: 'create', Name: 'Create new class', Professor: 'Start a fresh study space' }]
+  const carouselItems = [...cards, { classID: 'create', Name: 'Create class', Professor: 'Start a fresh study space' }]
+  const initialIndex = cards.length >= 3 ? 1 : cards.length === 0 ? carouselItems.length - 1 : 0
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 min-h-[70vh] flex flex-col justify-center">
       <div>
         <h1 className="text-3xl font-semibold text-espresso">Your classes</h1>
         <p className="mt-2 text-sm text-espresso/70">
@@ -138,12 +138,12 @@ export const Home = () => {
       ) : (
         <CenteredCarousel
           items={carouselItems}
-          initialIndex={cards.length === 0 ? carouselItems.length - 1 : 0}
-          renderItem={(item, index, selected) => {
+          initialIndex={initialIndex}
+          renderItem={(item, _index, selected) => {
             if (item.classID === 'create') {
               return (
                 <ClassCardUI
-                  name="Create new class"
+                  name="Create class"
                   professor="Upload a syllabus to begin"
                   selected={selected}
                   onOpen={() => setCreateOpen(true)}
@@ -164,28 +164,11 @@ export const Home = () => {
         />
       )}
 
-      {cards.length === 0 && !isLoading && !isError ? (
-        <PaperCard className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="rounded-full bg-sand p-2 text-espresso">
-              <BookOpen className="h-4 w-4" />
-            </span>
-            <p className="text-sm text-espresso/70">No classes yet. Create your first class to begin.</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setCreateOpen(true)}
-            className="rounded-full border border-espresso/20 px-4 py-2 text-sm font-medium text-espresso"
-          >
-            Create class
-          </button>
-        </PaperCard>
-      ) : null}
 
       <Dialog.Root open={createOpen} onOpenChange={setCreateOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-espresso/40 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-espresso/40 backdrop-blur-sm" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift max-h-[85vh] overflow-y-auto">
             <Dialog.Title className="text-xl font-semibold text-espresso">Create new class</Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-espresso/70">
               Upload a syllabus and any helpful materials to prepare the course space.
@@ -263,8 +246,8 @@ export const Home = () => {
 
       <Dialog.Root open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-espresso/40 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-espresso/40 backdrop-blur-sm" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift max-h-[85vh] overflow-y-auto">
             <Dialog.Title className="text-xl font-semibold text-espresso">Edit class</Dialog.Title>
             {editing ? (
               <div className="mt-4 space-y-4">

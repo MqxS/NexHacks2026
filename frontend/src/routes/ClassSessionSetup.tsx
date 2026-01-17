@@ -54,7 +54,15 @@ export const ClassSessionSetup = () => {
     onError: (error: Error) => toast.error(error.message || 'Could not start session')
   })
 
-  const sessions = useMemo(() => [], [])
+  const sessions = useMemo(
+    () =>
+      [] as Array<{
+        title: string
+        tags: string[]
+        onResume?: () => void
+      }>,
+    []
+  )
 
   return (
     <div className="grid gap-10 lg:grid-cols-[2fr,1fr]">

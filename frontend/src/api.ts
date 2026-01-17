@@ -15,6 +15,33 @@ export type Feedback = {
   whyIsWrong: string
 }
 
+const isDev = import.meta.env.DEV
+const devClassesKey = 'dev:classCards'
+
+const loadDevClasses = (): ClassCard[] => {
+  if (typeof localStorage === 'undefined') return []
+  try {
+    const raw = localStorage.getItem(devClassesKey)
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as ClassCard[]
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+const saveDevClasses = (classes: ClassCard[]) => {
+  if (typeof localStorage === 'undefined') return
+  localStorage.setItem(devClassesKey, JSON.stringify(classes))
+}
+
+const devId = () => {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return `class_${Date.now()}`
+}
+
 async function request<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init)
   if (!response.ok) {
@@ -32,24 +59,52 @@ async function request<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  getClassCards: () => request<ClassCard[]>('/api/getClassCards'),
-  createClass: (formData: FormData) =>
-    request<{ classID: string }>('/api/createClass', {
+  getClassCards: () => {
+    if (isDev) return Promise.resolve(loadDevClasses())
+    return request<ClassCard[]>('/api/getClassCards')
+  },
+  createClass: (formData: FormData) => {
+    if (isDev) {
+      const classID = devId()
+      const Name = String(formData.get('Name') ?? 'Untitled class')
+      const Professor = String(formData.get('Professor') ?? 'Professor')
+      const next = [...loadDevClasses(), { classID, Name, Professor }]
+      saveDevClasses(next)
+      return Promise.resolve({ classID })
+    }
+    return request<{ classID: string }>('/api/createClass', {
       method: 'POST',
       body: formData
-    }),
-  editClassName: (payload: { classID: string; newName: string }) =>
-    request('/api/editClassName', {
+    })
+  },
+  editClassName: (payload: { classID: string; newName: string }) => {
+    if (isDev) {
+      const next = loadDevClasses().map((card) =>
+        card.classID === payload.classID ? { ...card, Name: payload.newName } : card
+      )
+      saveDevClasses(next)
+      return Promise.resolve({})
+    }
+    return request('/api/editClassName', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    }),
-  editClassProf: (payload: { classID: string; newProf: string }) =>
-    request('/api/editClassProf', {
+    })
+  },
+  editClassProf: (payload: { classID: string; newProf: string }) => {
+    if (isDev) {
+      const next = loadDevClasses().map((card) =>
+        card.classID === payload.classID ? { ...card, Professor: payload.newProf } : card
+      )
+      saveDevClasses(next)
+      return Promise.resolve({})
+    }
+    return request('/api/editClassProf', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    }),
+    })
+  },
   getClassTopics: (classID: string) =>
     request<string[]>(`/api/getClassTopics(${encodeURIComponent(classID)})`),
   createSession: (formData: FormData) =>
@@ -57,12 +112,18 @@ export const api = {
       method: 'POST',
       body: formData
     }),
-  deleteClass: (payload: { classID: string }) =>
-    request('/api/deleteClass', {
+  deleteClass: (payload: { classID: string }) => {
+    if (isDev) {
+      const next = loadDevClasses().filter((card) => card.classID !== payload.classID)
+      saveDevClasses(next)
+      return Promise.resolve({})
+    }
+    return request('/api/deleteClass', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    }),
+    })
+  },
   replaceSyllabus: (formData: FormData) =>
     request('/api/replaceSyllabus', {
       method: 'POST',

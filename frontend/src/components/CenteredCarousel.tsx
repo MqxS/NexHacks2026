@@ -31,11 +31,11 @@ export const CenteredCarousel = <T,>({
     const container = containerRef.current
     if (!container) return
 
-    let timeout: number | undefined
+    let raf = 0
 
     const handle = () => {
-      if (timeout) window.clearTimeout(timeout)
-      timeout = window.setTimeout(() => {
+      if (raf) cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
         const children = Array.from(container.children) as HTMLElement[]
         const center = container.scrollLeft + container.clientWidth / 2
         let nearestIndex = 0
@@ -51,27 +51,27 @@ export const CenteredCarousel = <T,>({
         setSelectedIndex(nearestIndex)
         const item = items[nearestIndex]
         if (item && onSelect) onSelect(item, nearestIndex)
-      }, 120)
+      })
     }
 
     container.addEventListener('scroll', handle, { passive: true })
     return () => {
       container.removeEventListener('scroll', handle)
-      if (timeout) window.clearTimeout(timeout)
+      if (raf) cancelAnimationFrame(raf)
     }
   }, [items, onSelect])
 
   return (
     <div
       ref={containerRef}
-      className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto pb-8 pt-4"
+      className="scrollbar-hide flex w-full snap-x snap-mandatory gap-10 overflow-x-auto px-[calc(50%-210px)] pb-10 pt-6"
     >
       {items.map((item, index) => (
         <div
           key={index}
           className={cn(
-            'snap-center transition-transform duration-200',
-            index === selectedIndex ? 'scale-[1.05]' : 'scale-95'
+            'shrink-0 snap-center transition-transform duration-200',
+            index === selectedIndex ? 'scale-[1.10]' : 'scale-95'
           )}
         >
           {renderItem(item, index, index === selectedIndex)}
