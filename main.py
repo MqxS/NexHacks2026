@@ -21,6 +21,7 @@ class Question:
 @dataclass
 class Session:
     name: str
+    classID: bson.ObjectId
     questions: List[Question]
     adaptive: bool
     difficulty: float
@@ -87,7 +88,7 @@ def create_class():
         "classID": str(result.inserted_id)
     })
 
-@server.route("/api/createSession/<classID>")
+@server.route("/api/createSession/<classID>", methods=["POST"])
 def create_session(classID):
     file_storage = request.files.get("file")
     if file_storage and file_storage.filename:
@@ -95,9 +96,15 @@ def create_session(classID):
     else:
         file_bin = None
 
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
     session = Session(
         name=request.form.get("name", "New Session"),
         questions=[],
+        classID=obj_id,
         adaptive=request.form.get("adaptive", "false").lower() == "true",
         difficulty=float(request.form.get("difficulty", 0.5)),
         isCumulative=request.form.get("cumulative", "false").lower() == "true",
@@ -111,7 +118,7 @@ def create_session(classID):
         "sessionID": str(result.inserted_id)
     })
 
-@server.route("/api/getClassTopics/<classID>")
+@server.route("/api/getClassTopics/<classID>", methods=["GET"])
 def get_class_topics(classID):
     try:
         obj_id = ObjectId(classID)
@@ -130,7 +137,7 @@ def get_class_topics(classID):
 
     return jsonify(topics_out)
 
-@server.route("/api/getRecentSessions/<classID>")
+@server.route("/api/getRecentSessions/<classID>", methods=["GET"])
 def get_recent_sessions(classID):
     try:
         obj_id = ObjectId(classID)
@@ -153,7 +160,7 @@ def get_recent_sessions(classID):
         if "_id" in doc
     ])
 
-@server.route("/api/getSessionParams/<sessionID>")
+@server.route("/api/getSessionParams/<sessionID>", methods=["GET"])
 def get_session_params(sessionID):
     try:
         obj_id = ObjectId(sessionID)
@@ -162,13 +169,14 @@ def get_session_params(sessionID):
 
     doc = mongo.sessions.find_one(
         {"_id": obj_id},
-        {"name": 1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
+        {"name": 1, "classID":1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
     )
     if not doc:
         return jsonify({"error": "Session not found"}), 404
     session = Session(
         name=doc.get("name", "New Session"),
         difficulty=doc.get("difficulty", 0.5),
+        classID=doc.get("classID"),
         isCumulative=doc.get("isCumulative", False),
         adaptive=doc.get("adaptive", True),
         focusedConcepts=doc.get("focusedConcepts", []),
@@ -179,7 +187,7 @@ def get_session_params(sessionID):
     return jsonify(asdict(session))
 
 #TODO: KARTHIK #1
-@server.route("/api/requestQuestion/<sessionID>")
+@server.route("/api/requestQuestion/<sessionID>", methods=["GET"])
 def request_question(sessionID):
     questions = [
         {"questionId": "Q101", "content": "What is the capital of France?"},
