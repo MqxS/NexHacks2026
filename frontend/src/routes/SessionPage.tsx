@@ -448,6 +448,7 @@ export const SessionPage = () => {
                     <input
                       value={topicSearch}
                       onChange={(event) => setTopicSearch(event.target.value)}
+                      onKeyDown={(event) => event.stopPropagation()}
                       className="mb-2 w-full rounded-lg border border-espresso/20 bg-paper px-2 py-1 text-xs"
                       placeholder="Search topics"
                     />

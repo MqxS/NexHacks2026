@@ -7,44 +7,17 @@ import {LoadingSkeleton} from '../components/LoadingSkeleton'
 import {CenteredCarousel} from '../components/CenteredCarousel'
 import {cn} from '../lib/utils'
 
-type TopicMetric = {
-  topic: string
-  progress: number
-  questions: number
-}
-
-const randomInt = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min
-
-const chooseStudiedTopics = (topics: string[]) => {
-  if (topics.length === 0) return []
-  const target = Math.max(0, Math.round(topics.length * 0.5))
-  const shuffled = [...topics].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, target)
-}
-
-const buildMetrics = (topics: string[]) =>
-  topics.map((topic) => ({
-    topic,
-    progress: randomInt(35, 95),
-    questions: randomInt(8, 60)
-  }))
-
 export const StudentTopicMetrics = () => {
   const navigate = useNavigate()
   const { classID } = useParams()
   const [search, setSearch] = useState('')
-  const topicsQuery = useQuery({
-    queryKey: ['classTopics', classID],
-    queryFn: () => api.getClassTopics(classID ?? ''),
+  const metricsQuery = useQuery({
+    queryKey: ['classMetrics', classID],
+    queryFn: () => api.getMetrics(classID ?? ''),
     enabled: Boolean(classID)
   })
 
-  const metrics = useMemo<TopicMetric[]>(() => {
-    const topics = topicsQuery.data ?? []
-    const studied = chooseStudiedTopics(topics)
-    return buildMetrics(studied)
-  }, [topicsQuery.data])
+  const metrics = metricsQuery.data ?? []
 
   const filteredMetrics = useMemo(() => {
     if (!search.trim()) return metrics
@@ -87,7 +60,7 @@ export const StudentTopicMetrics = () => {
         />
       </div>
 
-      {topicsQuery.isLoading ? (
+      {metricsQuery.isLoading ? (
         <div className="flex gap-4 overflow-hidden">
           {[0, 1, 2].map((index) => (
             <LoadingSkeleton key={index} className="h-[320px] w-[220px]" />

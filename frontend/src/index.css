@@ -11,6 +11,26 @@ body {
   font-family: 'Manrope', ui-sans-serif, system-ui;
 }
 
+body {
+  scrollbar-color: #7D9B79 rgba(103, 70, 54, 0.12);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #7D9B79;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 248, 232, 0.9);
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(103, 70, 54, 0.12);
+  border-radius: 999px;
+}
+
 *:focus-visible {
   outline: 2px solid #7D9B79;
   outline-offset: 2px;

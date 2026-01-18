@@ -15,6 +15,12 @@ export type Feedback = {
   whyIsWrong: string
 }
 
+export type TopicMetric = {
+  topic: string
+  progress: number
+  questions: number
+}
+
 type BackendClassCard = {
   classID: number | string
   name: string
@@ -225,6 +231,8 @@ export const api = {
     ),
   getStyleDocs: (classID: string) =>
     request<Array<{ filename: string }>>(`/api/getStyleDocs/${encodeURIComponent(classID)}`),
+  getMetrics: (classID: string) =>
+    request<TopicMetric[]>(`/api/getMetrics/${encodeURIComponent(classID)}`),
   requestQuestion: (sessionID: string) =>
     request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
       Content: question.content,
