@@ -256,7 +256,7 @@ export const Home = () => {
                 type="submit"
                 disabled={createMutation.isPending || syllabus.length === 0}
                 className={cn(
-                  'w-full rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper transition',
+                  'w-full rounded-full bg-sage px-4 py-2 text-sm font-medium text-paper transition hover:-translate-y-0.5',
                   'disabled:cursor-not-allowed disabled:opacity-60'
                 )}
               >

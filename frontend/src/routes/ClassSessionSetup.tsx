@@ -84,6 +84,20 @@ export const ClassSessionSetup = () => {
       }
     : null
 
+  const blendColor = (start: [number, number, number], end: [number, number, number], t: number) => {
+    const mix = (a: number, b: number) => Math.round(a + (b - a) * t)
+    return `rgb(${mix(start[0], end[0])}, ${mix(start[1], end[1])}, ${mix(start[2], end[2])})`
+  }
+
+  const cold = [156, 183, 213] as [number, number, number]
+  const edge = Math.min(1, Math.max(0, difficulty))
+  const cool = blendColor(cold, [176, 196, 222], edge)
+  const hotStart = Math.min(100, Math.max(0, ((edge - 0.45) / 0.55) * 100))
+  const gradient =
+    edge < 0.45
+      ? `linear-gradient(90deg, #9CB7D5 0%, ${cool} 100%)`
+      : `linear-gradient(90deg, #9CB7D5 0%, #9CB7D5 ${100 - hotStart}%, #C98B6A 100%)`
+
   return (
     <>
       <ProcessingOverlay active={Boolean(processingMessage)} title={processingMessage?.title} subtitle={processingMessage?.subtitle} />
@@ -119,8 +133,14 @@ export const ClassSessionSetup = () => {
                   step={0.01}
                   onValueChange={(value) => setDifficulty(value[0])}
                 >
-                  <Slider.Track className="relative h-2 w-full rounded-full bg-sand">
-                    <Slider.Range className="absolute h-full rounded-full bg-sage" />
+                  <Slider.Track className="relative h-2 w-full rounded-full bg-espresso/15 overflow-hidden">
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: gradient,
+                        width: `${Math.max(0, Math.min(1, difficulty)) * 100}%`
+                      }}
+                    />
                   </Slider.Track>
                   <Slider.Thumb className="block h-5 w-5 rounded-full border border-espresso/30 bg-paper shadow-paper" />
                 </Slider.Root>
@@ -198,7 +218,7 @@ export const ClassSessionSetup = () => {
                       key={item}
                       type="button"
                       onClick={() => setTopicsSelected((prev) => prev.filter((topicItem) => topicItem !== item))}
-                      className="rounded-full border border-espresso/20 bg-sand px-3 py-1 text-xs text-espresso"
+                      className="rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
                     >
                       {item}
                     </button>
@@ -244,7 +264,7 @@ export const ClassSessionSetup = () => {
               <Switch.Root
                 checked={adaptive}
                 onCheckedChange={(value) => setAdaptive(value)}
-                className="relative h-6 w-11 rounded-full bg-espresso/20 data-[state=checked]:bg-espresso"
+                className="relative h-6 w-11 rounded-full bg-espresso/20 data-[state=checked]:bg-sage"
               >
                 <Switch.Thumb className="block h-5 w-5 translate-x-1 rounded-full bg-paper shadow transition data-[state=checked]:translate-x-5" />
               </Switch.Root>
@@ -270,7 +290,7 @@ export const ClassSessionSetup = () => {
               type="button"
               onClick={() => createSession.mutate()}
               className={cn(
-                'mt-4 w-full rounded-full bg-espresso px-4 py-3 text-sm font-medium text-paper transition',
+                'mt-4 w-full rounded-full bg-sage px-4 py-3 text-sm font-medium text-paper transition hover:-translate-y-0.5',
                 'hover:-translate-y-0.5'
               )}
             >
@@ -326,7 +346,7 @@ export const ClassSessionSetup = () => {
           onClick={() => navigate(`/class/${classID}/settings`)}
           className="flex items-center justify-between rounded-2xl border border-espresso/20 bg-paper px-4 py-3 text-sm font-medium text-espresso shadow-paper transition hover:-translate-y-0.5"
         >
-          <span>Class files & settings</span>
+          <span>Class files & settings </span>
           <Settings className="h-4 w-4" />
         </button>
       </div>

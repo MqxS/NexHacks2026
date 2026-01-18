@@ -23,7 +23,7 @@ export const SessionCard = ({
           {tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-sand px-2 py-1 text-[11px] font-medium text-espresso/70"
+              className="rounded-full bg-sage/20 px-2 py-1 text-[11px] font-medium text-espresso/70"
             >
               {tag}
             </span>

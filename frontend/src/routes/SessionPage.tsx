@@ -182,7 +182,7 @@ export const SessionPage = () => {
                 setAdaptive(value)
                 adaptiveMutation.mutate(value)
               }}
-              className="relative h-6 w-11 rounded-full bg-espresso/20 data-[state=checked]:bg-espresso"
+              className="relative h-6 w-11 rounded-full bg-espresso/20 data-[state=checked]:bg-sage"
             >
               <Switch.Thumb className="block h-5 w-5 translate-x-1 rounded-full bg-paper shadow transition data-[state=checked]:translate-x-5" />
             </Switch.Root>
@@ -233,7 +233,7 @@ export const SessionPage = () => {
               onClick={() => answerMutation.mutate()}
               disabled={!questionQuery.data || answer.trim().length === 0 || answerMutation.isPending}
               className={cn(
-                'rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper',
+                'rounded-full bg-sand px-4 py-2 text-sm font-medium text-paper',
                 'disabled:cursor-not-allowed disabled:opacity-60'
               )}
             >
@@ -323,7 +323,7 @@ export const SessionPage = () => {
             onClick={() => hintMutation.mutate()}
             disabled={!questionQuery.data || hintRequest.trim().length === 0}
             className={cn(
-              'mt-4 w-full rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper',
+              'mt-4 w-full rounded-full bg-sage px-4 py-2 text-sm font-medium text-paper',
               'disabled:cursor-not-allowed disabled:opacity-60'
             )}
           >
@@ -438,7 +438,7 @@ export const SessionPage = () => {
                             topics: prev.topics.filter((topicItem) => topicItem !== item)
                           }))
                         }
-                        className="rounded-full border border-espresso/20 bg-sand px-3 py-1 text-xs text-espresso"
+                      className="rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
                       >
                         {item}
                       </button>
@@ -485,7 +485,7 @@ export const SessionPage = () => {
                 disabled={!hasUnsaved}
                 onClick={() => saveParams.mutate()}
                 className={cn(
-                  'w-full rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper',
+                  'w-full rounded-full bg-sage px-4 py-2 text-sm font-medium text-paper',
                   'disabled:cursor-not-allowed disabled:opacity-60'
                 )}
               >

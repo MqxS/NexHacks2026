@@ -12,7 +12,7 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px solid #AAB396;
+  outline: 2px solid #7D9B79;
   outline-offset: 2px;
 }
 
@@ -141,7 +141,7 @@ body {
   width: var(--dot-size);
   height: var(--dot-size);
   border-radius: 9999px;
-  background: #aab396;
+  background: #7D9B79;
   animation: orbit-dot 3.6s linear infinite;
-  box-shadow: 0 0 12px rgba(170, 179, 150, 0.6);
+  box-shadow: 0 0 12px rgba(125, 155, 121, 0.6);
 }
