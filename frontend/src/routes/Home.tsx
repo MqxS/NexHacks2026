@@ -129,7 +129,7 @@ export const Home = () => {
 
   const cards = useMemo(() => data ?? [], [data])
   const carouselItems = [...cards, { classID: 'create', Name: 'Create class', Professor: 'Start a fresh study space' }]
-  const initialIndex = carouselItems.length === 1 ? 0 : 1
+  const initialIndex = cards.length === 0 ? 0 : Math.min(1, cards.length - 1)
   const artById = useMemo(() => {
     return carouselItems.reduce<Record<string, string>>((acc, item) => {
       if (item.classID === 'create') return acc
