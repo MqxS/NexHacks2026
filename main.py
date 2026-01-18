@@ -88,7 +88,7 @@ def create_class():
         "classID": str(result.inserted_id)
     })
 
-@server.route("/api/createSession/<classID>")
+@server.route("/api/createSession/<classID>", methods=["POST"])
 def create_session(classID):
     file_storage = request.files.get("file")
     if file_storage and file_storage.filename:
@@ -118,7 +118,7 @@ def create_session(classID):
         "sessionID": str(result.inserted_id)
     })
 
-@server.route("/api/getClassTopics/<classID>")
+@server.route("/api/getClassTopics/<classID>", methods=["GET"])
 def get_class_topics(classID):
     try:
         obj_id = ObjectId(classID)
@@ -137,7 +137,7 @@ def get_class_topics(classID):
 
     return jsonify(topics_out)
 
-@server.route("/api/getRecentSessions/<classID>")
+@server.route("/api/getRecentSessions/<classID>", methods=["GET"])
 def get_recent_sessions(classID):
     try:
         obj_id = ObjectId(classID)
@@ -160,7 +160,7 @@ def get_recent_sessions(classID):
         if "_id" in doc
     ])
 
-@server.route("/api/getSessionParams/<sessionID>")
+@server.route("/api/getSessionParams/<sessionID>", methods=["GET"])
 def get_session_params(sessionID):
     try:
         obj_id = ObjectId(sessionID)
@@ -187,7 +187,7 @@ def get_session_params(sessionID):
     return jsonify(asdict(session))
 
 #TODO: KARTHIK #1
-@server.route("/api/requestQuestion/<sessionID>")
+@server.route("/api/requestQuestion/<sessionID>", methods=["GET"])
 def request_question(sessionID):
     questions = [
         {"questionId": "Q101", "content": "What is the capital of France?"},
