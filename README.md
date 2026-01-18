@@ -1,6 +1,6 @@
 # $so\varphi$: the golden ratio of practice
 
-$so\varphi$ / Sophi (pronounced *Sophie*), named after the word for *wisdom* in Greek, aims to bridge the gap between traditional practice tests and personalized, adaptive learning. By leveraging instructor-offered practice problems, Sophi not only adapts the difficulty and content to match the student's current level, but also ensures that the questions are aligned with the professor's teaching style. Through Sophi, students achieve the "golden ratio of practice" (get it? because $\varphi$), maximizing their efficiency and retention within their time constraints.
+$so\varphi$ / Sophi (pronounced *Sophie*), named after the word for *wisdom* in Greek, aims to bridge the gap between traditional practice tests and personalized, adaptive learning. By leveraging instructor-offered practice problems, Sophi not only adapts the difficulty and content to match the student's current level, but also ensures that the questions are aligned with the professor's teaching style. It also employs symbolic learning and token compression to combat hallucination at lightning fast speeds. Through Sophi, students achieve the "golden ratio of practice" (get it? because $\varphi$), maximizing their efficiency and retention within their time constraints.
 
 ## External Tools / Libraries Used
 
@@ -17,12 +17,12 @@ Sophi was inspired by the following problems:
     *   As a result, students end up memorizing the answers to the practice problems, rather than understanding the underlying concepts. Studies (Roediger & Karpicke (2006)) show that this reduces performance by up to 20% in extreme scenarios.
 *   As a student, we have little other choice than to view the practice solutions - there are currently no autonomous ways to check whether we're on the right track apart from a binary all or nothing response.
     *   Anderson, Corbett, Koedinger, and Pelletier (1995) found that students who received step-level hints instead of full solutions achieved learning gains about 10–20% higher on post-tests, showing that targeted hints are substantially more effective than simply revealing answers.
-*   Finally, students get a random distribution of difficulty thrown at them when practicing, and often have trouble dialing in the exact skills they need to succeed.
+*   Students get a random distribution of difficulty thrown at them when practicing, and often have trouble dialing in the exact skills they need to succeed.
     *   Dunlosky et al. (2013) found that students who rely on passive study methods such as rereading and highlighting—common but low-utility techniques—spend substantial time studying yet retain far less information over the long term, suggesting that a large portion of study time is effectively wasted when these ineffective strategies are used.
 
-Each of us faced variations of this same set of problems in our first semester of college, with limited resources offered by professors in the interest of test integrity, and limited access to a one-on-one tutor when we needed it most, on those 3-AM crams before the final exam. While LLMs like ChatGPT, Claude, and Gemini are publically available and solid for about 85% of performance, they lack grounded knowledge of the class material and aren't built from the ground-up for the features we mention.
+Each of us faced variations of this same set of problems in our first semester of college, with limited resources offered by professors in the interest of test integrity, and limited access to a one-on-one tutor when we needed it most, on those 3-AM crams before the final exam. While LLMs like ChatGPT, Claude, and Gemini are publically available and solid for about 85% of performance, they lack grounded knowledge of the class material, aren't built from the ground-up for the features we mention, and are prone to hallucinating.
 
-We know this market is saturated, but we pride ourselves on the ability to leverage LLMs and their unique propositions of customization to mimic instructor-style problem generation, while providing a hint generation pipeline deeply rooted in years of educational research.
+We know this market is saturated, but we pride ourselves on the ability to leverage LLMs and their unique propositions of customization to mimic instructor-style problem generation, while providing a hint generation pipeline deeply rooted in years of educational research. We also integrate symbolic learning via Wolfram Alpha and use textbook citations to ensure that our generated questions are accurate and representative of the class material.
 
 ## What it does
 Sophi is an adaptive practice platform that generates personalized free-response questions tailored to a specific class. Its value propositions, designed to solve the three aforementioned problems, can be summarized as follows:
@@ -52,7 +52,7 @@ The frontend is a React application that provides a user-friendly interface for 
 
 ### Backend
 
-The backend is a Flask application that handles user authentication, class and session management, question generation, and interaction with the AI utilities. We use Flask-Login for user authentication, and Flask-SQLAlchemy for database management. Additionally, we leverage MongoDB for storing all Class File JSONs, as well as session-specific data like question history, performance metrics, and adaptivity parameters.
+The backend is a Flask application that handles user authentication, class and session management, question generation, and interaction with the AI utilities. Additionally, we leverage MongoDB for storing all Class File JSONs, as well as session-specific data like question history, performance metrics, and adaptivity parameters.
 
 ### AI Stack
 
@@ -66,7 +66,7 @@ We make a LOT of LLM calls :D. To allow for fast and succinct prompting, we leve
 
 Again, we fully acknowledge that this space is extremely saturated, and that there are many other platforms that offer similar features. However, after careful market research, Sophi is the only service to offer stylistic customization of the generated questions, a feature of invaluable gain according to numerous research studies. The aforementioned studies reference the importance of a feature like this, citing a ~5.2% decrease in performance and a ~15% increase in time spent studying when students use resources apart from those of their own professor.
 
-| Platform                                    | Instructor-Aligned Questions |  Adaptive Difficulty  |     Personalized Hints    | Style-Mimicking (Professor) | Continuous Student Model |
+| Platform                                    | Instructor-Aligned Questions |  Adaptive Difficulty  |     Personalized Hints    | Symbolic Learning (no hallucination) | Continuous Student Model |
 | ------------------------------------------- | :--------------------------: | :-------------------: | :-----------------------: | :-------------------------: | :----------------------: |
 | **Sophi**                                   |              ✅              |           ✅          |             ✅            |              ✅             |            ✅            |
 | **Quizlet AI**                              |               ❌              |   ⚠️ (topic tagging)  |             ❌             |              ❌              |  ⚠️ (progress tracking)  |
@@ -88,7 +88,7 @@ It was quite hard to brainstorm an idea for NexHacks - we wanted to do something
 
 Between the ripe hours of 1 AM and 3 AM, our team commenced the hardest integration we've all participated in. We had to work together to ensure that the frontend, backend, and AI utilities all worked seamlessly with each other. This was a challenge that we overcame with a lot of perseverance and collaboration.
 
-This was the first hackathon where we came in with a well-refined idea. Our 
+This was the first hackathon where we came in with a well-refined idea. 
 
 Needless to say, all of our team can agree that this is without a doubt the most difficult project we've ever worked on. However, we persevered and overcame all obstacles, and we're incredibly proud of the result, and we can all honestly say that with another week's worth of finetuning and perahps some 
 

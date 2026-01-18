@@ -1,4 +1,3 @@
 .venv
-set_env_vars.py
 .env
 __pycache__/
