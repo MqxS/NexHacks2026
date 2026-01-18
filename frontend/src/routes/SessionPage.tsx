@@ -461,7 +461,7 @@ export const SessionPage = () => {
                             <DropdownMenu.Item
                               key={item}
                               className={cn(
-                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm outline-none hover:bg-sand',
+                                'flex cursor-pointer items-center justify-between px-3 py-2 text-sm outline-none hover:bg-espresso/10',
                                 active ? 'bg-sand text-espresso' : 'text-espresso'
                               )}
                               onSelect={(event) => {
