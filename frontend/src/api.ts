@@ -173,22 +173,23 @@ export const api = {
       method: 'DELETE'
     })
   },
-  replaceSyllabus: (formData: FormData) =>
-    request('/api/replaceSyllabus', {
+  replaceSyllabus: (classID: string, formData: FormData) =>
+    request(`/api/replaceSyllabus/${encodeURIComponent(classID)}`, {
       method: 'POST',
       body: formData
     }),
-  uploadStyleDocs: (formData: FormData) =>
-    request('/api/uploadStyleDocs', {
+  uploadStyleDocs: (classID: string, formData: FormData) =>
+    request(`/api/uploadStyleDocs/${encodeURIComponent(classID)}`, {
       method: 'POST',
       body: formData
     }),
   deleteStyleDoc: (payload: { classID: string; docID: string }) =>
-    request('/api/deleteStyleDoc', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }),
+    request(
+      `/api/deleteStyleDoc/${encodeURIComponent(payload.classID)}?docID=${encodeURIComponent(payload.docID)}`,
+      {
+      method: 'DELETE'
+      }
+    ),
   requestQuestion: (sessionID: string) =>
     request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
       Content: question.content,

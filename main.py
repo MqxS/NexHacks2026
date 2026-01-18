@@ -407,6 +407,21 @@ def upload_style_docs(classID):
         return jsonify({"error": "Class not found"}), 404
     return jsonify({"status": "Style documents uploaded"})
 
+@server.route("/api/deleteStyleDoc/<classID>", methods=["DELETE"])
+def delete_style_doc(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$pull": {"styleFiles": request.args.get("docID", "")}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Style doc deleted"})
+
 @server.route("/api/getStyleDocs/<classID>", methods=["GET"])
 def get_style_docs(classID):
     try:

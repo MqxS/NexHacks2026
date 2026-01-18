@@ -29,9 +29,8 @@ export const ClassSettings = () => {
   const replaceSyllabus = useMutation({
     mutationFn: async () => {
       const formData = new FormData()
-      if (classID) formData.append('classID', classID)
       if (syllabus[0]) formData.append('syllabus', syllabus[0])
-      return api.replaceSyllabus(formData)
+      return api.replaceSyllabus(classID ?? '', formData)
     },
     onSuccess: () => {
       toast.success('Syllabus updated')
@@ -43,9 +42,8 @@ export const ClassSettings = () => {
   const uploadDocs = useMutation({
     mutationFn: async () => {
       const formData = new FormData()
-      if (classID) formData.append('classID', classID)
-      styleDocs.forEach((file) => formData.append('files', file))
-      return api.uploadStyleDocs(formData)
+      styleDocs.forEach((file) => formData.append('styleFiles', file))
+      return api.uploadStyleDocs(classID ?? '', formData)
     },
     onSuccess: () => {
       toast.success('Style docs updated')

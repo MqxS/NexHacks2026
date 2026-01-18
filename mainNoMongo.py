@@ -88,18 +88,18 @@ def create_session(classID):
     }
     return jsonify(session)
 
-@server.route("/api/replaceSyllabus", methods=["POST"])
-def replace_syllabus():
+@server.route("/api/replaceSyllabus/<classID>", methods=["POST"])
+def replace_syllabus(classID):
     time.sleep(1.2)
     return jsonify({"status": "Syllabus replaced"})
 
-@server.route("/api/uploadStyleDocs", methods=["POST"])
-def upload_style_docs():
+@server.route("/api/uploadStyleDocs/<classID>", methods=["POST"])
+def upload_style_docs(classID):
     time.sleep(1.4)
     return jsonify({"status": "Style docs uploaded"})
 
-@server.route("/api/deleteStyleDoc", methods=["POST"])
-def delete_style_doc():
+@server.route("/api/deleteStyleDoc/<classID>", methods=["DELETE"])
+def delete_style_doc(classID):
     time.sleep(0.8)
     return jsonify({"status": "Style doc deleted"})
 
