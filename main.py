@@ -538,7 +538,7 @@ def request_hint(questionID):
             hint_history=hint_history,
             hint_type=req_hint_type,
             use_wolfram=True,
-            status_image=image_bytes if "photo" in request.files else None,
+            status_image_bytes=image_bytes,
             status_image_mime_type=image_file.mimetype if image_file else None
         )
 

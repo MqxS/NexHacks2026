@@ -1100,8 +1100,11 @@ class SophiAIUtil:
         system_instruction = (
             "You are a tutoring hint generator. "
             "You must either ask a single clarifying follow-up question, or provide a hint. "
-            "If an image is provided, you MUST analyze it to understand exactly where the user is in the problem "
-            "and identify any specific errors or misconceptions visible in their work. "
+            "CRITICAL: If an image is provided (has_work_image=true), it is the PRIMARY source of truth. "
+            "You MUST analyze the image to identify exactly what the user has written, including specific algebraic errors, "
+            "sign mistakes, diagram issues, or partial steps. "
+            "Your hint MUST be directly tailored to the visual evidence in the image. "
+            "Do not give a generic hint if the image reveals the specific blocker. "
             "Use this visual understanding to classify the best hint type and generate the optimal hint. "
             "If you provide a hint, keep it short and aligned with one of the hint types. "
             "Use LaTeX for math delimited by $$ ... $$. "
@@ -1115,6 +1118,7 @@ class SophiAIUtil:
                     {
                         "problem": "Solve for x: 2x + 3 = 11",
                         "status_prompt": "I don't know what to do first.",
+                        "has_work_image": False,
                         "hint_type": "Strategic",
                     },
                     ensure_ascii=False,
@@ -1131,6 +1135,7 @@ class SophiAIUtil:
                     {
                         "problem": "Evaluate the limit: lim_{x->0} (sin x)/x",
                         "status_prompt": "I wrote sin(0)/0 and got 0/0. Is that bad?",
+                        "has_work_image": False,
                         "hint_type": None,
                     },
                     ensure_ascii=False,
@@ -1147,6 +1152,7 @@ class SophiAIUtil:
                     {
                         "problem": "Find the derivative of f(x)=x^2",
                         "status_prompt": "My work is: derivative is 2x. Still not sure why.",
+                        "has_work_image": False,
                         "hint_type": None,
                     },
                     ensure_ascii=False,
@@ -1156,6 +1162,40 @@ class SophiAIUtil:
                     "hint_type": None,
                     "text": "Which rule did you use (power rule, definition of derivative, or something else)?",
                     "wolfram_query": None,
+                },
+            ),
+            (
+                json.dumps(
+                    {
+                        "problem": "Solve the system: x + y = 10, x - y = 2",
+                        "status_prompt": "I'm stuck. See my work.",
+                        "has_work_image": True,
+                        "hint_type": "Procedural / Subgoal",
+                    },
+                    ensure_ascii=False,
+                ),
+                {
+                    "kind": "hint",
+                    "hint_type": "Procedural / Subgoal",
+                    "text": "In your second line written in the image, you added the equations but forgot to cancel out the 'y' terms correctly. Check the signs: +y and -y should sum to 0.",
+                    "wolfram_query": "Solve {x+y=10, x-y=2}",
+                },
+            ),
+            (
+                json.dumps(
+                    {
+                        "problem": "Find sin(theta) if cos(theta) = 3/5 and theta is in Quadrant IV.",
+                        "status_prompt": "I drew the triangle.",
+                        "has_work_image": True,
+                        "hint_type": None,
+                    },
+                    ensure_ascii=False,
+                ),
+                {
+                    "kind": "hint",
+                    "hint_type": "Conceptual",
+                    "text": "Your diagram shows the triangle in Quadrant I. Remember that in Quadrant IV, the y-coordinate (opposite side) must be negative.",
+                    "wolfram_query": "sin(theta) where cos(theta)=3/5 and -pi/2 < theta < 0",
                 },
             ),
         ]
