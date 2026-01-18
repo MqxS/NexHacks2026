@@ -482,6 +482,35 @@ class SophiAIUtil:
             raise RuntimeError("Wolfram Alpha is disabled or WOLFRAM_APP_ID is missing.")
         return self.wolfram
 
+    def _is_math_related(self, context_text: str) -> bool:
+        """
+        Determines if the subject context is suitable for Wolfram Alpha (Math, Physics, etc.).
+        """
+        if not context_text or not context_text.strip():
+            return False
+
+        system_instruction = (
+            "You are a subject classifier. Determine if the provided text (topics, question, class name) "
+            "relates to a subject where Wolfram Alpha is useful (Mathematics, Physics, Chemistry, Engineering, etc.). "
+            "Return JSON only: {\"is_math\": boolean}."
+            "Examples:"
+            "Input: 'Class: History. Topic: World War II' -> {\"is_math\": false}"
+            "Input: 'Class: Calculus. Topic: Derivatives' -> {\"is_math\": true}"
+            "Input: 'Question: Solve 2x+5=10' -> {\"is_math\": true}"
+            "Input: 'Question: Analyze the theme of Hamlet' -> {\"is_math\": false}"
+        )
+        try:
+            out = self.gemini.generate_json(
+                system_instruction=system_instruction,
+                user_prompt=json.dumps({"text": context_text}, ensure_ascii=False),
+                temperature=0.0,
+                max_output_tokens=128,
+            )
+            return bool(out.get("is_math"))
+        except Exception as e:
+            print(f"Error classifying subject: {e}")
+            return False
+
     def adjust_session_parameters(
         self,
         session: SessionParameters,
@@ -517,6 +546,9 @@ class SophiAIUtil:
         file_upload_text: str | None = None,
         use_wolfram: bool = True,
     ) -> ValidationResult:
+        if use_wolfram and not self._is_math_related(question):
+            use_wolfram = False
+
         def coerce_dict(obj: t.Any) -> JsonDict | None:
             if isinstance(obj, dict):
                 return t.cast(JsonDict, obj)
@@ -531,6 +563,7 @@ class SophiAIUtil:
             system_instruction = (
                 "You determine if a question is well-posed and has a valid answer. "
                 "If yes, provide a concise final answer. Return JSON only. "
+                "Use LaTeX for math delimited by $$ ... $$. "
                 "Do not include any preamble, markdown, or code fences."
             )
             few_shots = [
@@ -634,9 +667,13 @@ class SophiAIUtil:
         hint_type: str | None = None,
         use_wolfram: bool = True,
     ) -> ValidationResult:
+        if use_wolfram and not self._is_math_related(question):
+            use_wolfram = False
+
         system_instruction = (
             "You verify whether a hint is consistent with a student's current step for a math problem. "
             "If possible, emit a Wolfram Alpha query that checks the key claim as a boolean or computation. "
+            "Use LaTeX for math delimited by $$ ... $$. "
             "Return JSON only. Do not include any preamble, markdown, or code fences."
         )
         few_shots = [
@@ -742,9 +779,23 @@ class SophiAIUtil:
             focus_concepts=list(necessary_concepts or session.focus_concepts),
         ).normalized()
 
+        if use_wolfram:
+            parts = []
+            if class_file and class_file.class_name:
+                parts.append(f"Class: {class_file.class_name}")
+            if effective_session.unit_focus:
+                parts.append(f"Unit: {effective_session.unit_focus}")
+            if effective_session.focus_concepts:
+                parts.append(f"Concepts: {', '.join(effective_session.focus_concepts)}")
+            
+            context_str = " ".join(parts)
+            if context_str and not self._is_math_related(context_str):
+                use_wolfram = False
+
         system_instruction = (
             "You generate practice questions for a tutoring system. "
             "Return JSON only, with concise, student-friendly wording. "
+            "Use LaTeX for math delimited by $$ ... $$. "
             "Do not include any preamble, markdown, or code fences. "
             "Always follow the provided output_contract. "
             "If must_be_solvable_in_wolfram_alpha=true, include a valid wolfram_query. "
@@ -810,7 +861,7 @@ class SophiAIUtil:
                     ensure_ascii=False,
                 ),
                 {
-                    "question": "Evaluate the definite integral \\(\\int_{0}^{1} 2x\\,e^{x^2}\\,dx\\).",
+                    "question": "Evaluate the definite integral $$\\int_{0}^{1} 2x\\,e^{x^2}\\,dx$$.",
                     "wolfram_query": "Integrate 2x*Exp[x^2] from 0 to 1",
                     "answer": "e-1",
                     "metadata": {"difficulty_level": 5, "concepts": ["definite integrals", "substitution"], "unit": "Calculus"},
@@ -1006,10 +1057,14 @@ class SophiAIUtil:
         max_attempts: int = 2,
         use_wolfram: bool = True,
     ) -> HintResponse:
+        if use_wolfram and not self._is_math_related(problem):
+            use_wolfram = False
+
         system_instruction = (
             "You are a tutoring hint generator. "
             "You must either ask a single clarifying follow-up question, or provide a hint. "
             "If you provide a hint, keep it short and aligned with one of the hint types. "
+            "Use LaTeX for math delimited by $$ ... $$. "
             "Whenever possible, supply a Wolfram Alpha query that can validate the key claim. "
             "Return JSON only."
         )
@@ -1192,7 +1247,9 @@ class SophiAIUtil:
             "You convert a course syllabus text into a structured JSON outline. "
             "Return a JSON object with a single key 'syllabus' containing 'units'. "
             "Each unit has 'title' and 'topics'. "
-            "Be comprehensive. Include all units found."
+            "STRICTLY process only the topic structure (units, modules, chapters, and their sub-topics). "
+            "IGNORE all administrative details such as grading policies, attendance, office hours, exam dates, plagiarism policies, etc. "
+            "Be comprehensive with the topics. Include all units found."
         )
         few_shots = [
             (
@@ -1217,6 +1274,8 @@ class SophiAIUtil:
         system_instruction = (
             "You extract a list of core concepts from a syllabus structure. "
             "Return a JSON object with 'concepts', a list of strings. "
+            "Focus ONLY on subject matter concepts (e.g., 'Integration', 'Photosynthesis'). "
+            "Do NOT include administrative terms (e.g., 'Midterm', 'Grading'). "
             "Be comprehensive."
         )
         user_prompt = json.dumps(
@@ -1396,6 +1455,7 @@ class SophiAIUtil:
     def _latex_to_plain_text(self, s: str) -> str:
         s = re.sub(r"\\\((.*?)\\\)", r"\1", s)
         s = re.sub(r"\\\[(.*?)\\\]", r"\1", s)
+        s = re.sub(r"\$\$([^$]+)\$\$", r"\1", s)
         s = re.sub(r"\$([^$]+)\$", r"\1", s)
         s = s.replace("\\cdot", "*")
         s = s.replace("\\times", "*")

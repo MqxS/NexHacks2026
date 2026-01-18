@@ -58,7 +58,7 @@ The backend is a Flask application that handles user authentication, class and s
 
 ### AI Stack
 
-We used Google Gemini Flash Lite 2.5 as the primary LLM for question generation and hint provision. Gemini 3 Flash is a state-of-the-art language model that is designed to be fast, efficient, and accurate, and our expansive prompting workflow allowed for robust results in near-real-time.
+We used Google Gemini Flash Lite 2.5 as the primary LLM for question generation and hint provision. Gemini is a state-of-the-art language model that is designed to be fast, efficient, and accurate, and our expansive prompting workflow allowed for robust results in near-real-time.
 
 To mitigate hallucination, we utilize a combination of fact-checking mechanisms and post-processing filters. We leverage the Wolfram Alpha API and its use of symbolic learning, translating questions to a primitive form that allows for more accurate fact-checking. Additionally, we leverage entries from the textbook citation, retrieved via a FAISS Vector-Store database also hosted by MongoDB, to ensure that the generated questions are aligned with the class material.
 
