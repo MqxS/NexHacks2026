@@ -134,13 +134,8 @@ def get_class_topics(classID):
 
 @server.route("/api/getRecentSessions/<classID>", methods=["GET"])
 def get_recent_sessions(classID):
-    try:
-        obj_id = ObjectId(classID)
-    except bson.errors.InvalidId:
-        return jsonify({"error": "Invalid classID"}), 400
-
     sessions = mongo.sessions.find(
-        {"classID": obj_id},
+        {"classID": classID},
         {"name": 1, "focusedConcepts": 1}
     ).sort("_id", -1).limit(5)
 
@@ -168,18 +163,18 @@ def get_session_params(sessionID):
     )
     if not doc:
         return jsonify({"error": "Session not found"}), 404
-    session = Session(
-        name=doc.get("name", "New Session"),
-        difficulty=doc.get("difficulty", 0.5),
-        classID=doc.get("classID"),
-        isCumulative=doc.get("isCumulative", False),
-        adaptive=doc.get("adaptive", True),
-        focusedConcepts=doc.get("focusedConcepts", []),
-        questions=[],
-        file=Binary(b"")
-    )
 
-    return jsonify(asdict(session))
+    session = {
+        "name": doc.get("name", "New Session"),
+        "difficulty": doc.get("difficulty", 0.5),
+        "classID": doc.get("classID", ""),
+        "isCumulative": doc.get("isCumulative", False),
+        "adaptive": doc.get("adaptive", True),
+        "focusedConcepts": doc.get("focusedConcepts", []),
+        "questions": []
+    }
+
+    return jsonify(session)
 
 #TODO: KARTHIK #1
 @server.route("/api/requestQuestion/<sessionID>", methods=["GET"])
