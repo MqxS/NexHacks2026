@@ -1,3 +1,4 @@
+import traceback
 import sys
 import os
 import tempfile
@@ -137,6 +138,7 @@ def create_class():
                     
         except Exception as e:
             print(f"Error generating class file: {e}")
+            traceback.print_exc()
 
     class_doc = Class(
         syllabus=syllabus_file_obj,

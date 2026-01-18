@@ -109,7 +109,8 @@ class FileUtils:
         except Exception:
             try:
                 from pypdf import PdfReader  # type: ignore
-            except Exception:
+            except Exception as e:
+                print(f"[WARN] Failed to import PyPDF2 or pypdf: {e}")
                 return None
 
         try:
@@ -120,7 +121,8 @@ class FileUtils:
                 if t0.strip():
                     texts.append(t0)
             return "\n\n".join(texts)
-        except Exception:
+        except Exception as e:
+            print(f"[WARN] pypdf extraction failed: {e}")
             return None
 
     def _split_pdf_bytes(self, pdf_bytes: bytes, max_pages: int = 10) -> list[bytes]:
@@ -163,19 +165,24 @@ class FileUtils:
             try:
                 p = subprocess.run(cmd, check=False, capture_output=True, text=True)
             except FileNotFoundError:
+                print(f"[WARN] pdftotext not found (command: {cmd[0]})")
                 return None
             if p.returncode == 0 and p.stdout and p.stdout.strip():
                 return p.stdout
+            if p.returncode != 0:
+                 print(f"[WARN] pdftotext failed (returncode {p.returncode}): {p.stderr}")
 
         try:
             with tempfile.TemporaryDirectory() as td:
                 out_path = os.path.join(td, "out.txt")
                 p = subprocess.run(["pdftotext", "-layout", pdf_path, out_path], check=False, capture_output=True, text=True)
                 if p.returncode != 0:
+                    print(f"[WARN] pdftotext to file failed (returncode {p.returncode}): {p.stderr}")
                     return None
                 with open(out_path, "r", encoding="utf-8", errors="ignore") as f:
                     return f.read()
         except FileNotFoundError:
+            print("[WARN] pdftotext not found during file output attempt")
             return None
 
     def _pdf_to_png_pages(self, pdf_path: str, *, max_pages: int) -> list[bytes]:
@@ -185,6 +192,7 @@ class FileUtils:
                 cmd = ["pdftoppm", "-png", "-r", "200", "-f", "1", pdf_path, prefix]
                 p = subprocess.run(cmd, check=False, capture_output=True)
                 if p.returncode != 0:
+                    print(f"[WARN] pdftoppm failed (returncode {p.returncode}): {p.stderr}")
                     return []
                 files = sorted([os.path.join(td, f) for f in os.listdir(td) if f.endswith(".png")])
                 out: list[bytes] = []
@@ -193,6 +201,7 @@ class FileUtils:
                         out.append(f.read())
                 return out
         except FileNotFoundError:
+            print("[WARN] pdftoppm not found")
             return []
 
     def _format_problems_with_gemini(self, extracted_text: str, *, gemini_client: t.Any) -> list[str]:
