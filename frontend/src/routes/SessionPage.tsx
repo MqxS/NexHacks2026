@@ -385,11 +385,11 @@ export const SessionPage = () => {
           <PaperCard className="border border-sage/40 bg-sand/40">
             <p className="text-xs font-semibold uppercase tracking-wide text-espresso/50">Hints</p>
             <div className="mt-3 space-y-3 text-sm text-espresso">
-              {hints.map((item, index) => (
-                <div key={`${item}-${index}`} className="rounded-xl border border-espresso/10 bg-paper/70 p-3">
-                  <LatexRenderer content={item} className="text-sm" />
-                </div>
-              ))}
+                {[...hints].reverse().map((item, index) => (
+                  <div key={`${item}-${index}`} className="rounded-xl border border-espresso/10 bg-paper/70 p-3">
+                    <LatexRenderer content={item} className="text-sm" />
+                  </div>
+                ))}
             </div>
           </PaperCard>
         ) : null}

@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { api } from '../api'
 import { PaperCard } from '../components/PaperCard'
 import { LoadingSkeleton } from '../components/LoadingSkeleton'
+import { CenteredCarousel } from '../components/CenteredCarousel'
 import { UploadDropzone } from '../components/UploadDropzone'
 import { SessionCard } from '../components/SessionCard'
 import { cn } from '../lib/utils'
@@ -335,16 +336,20 @@ export const ClassSessionSetup = () => {
               </div>
             </PaperCard>
           ) : (
-            <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-4">
-              {sessions.map((session) => (
-                <SessionCard
-                  key={session.sessionID}
-                  title={session.name || 'Session'}
-                  tags={session.topics}
-                  onResume={() => resumeSession.mutate(session.sessionID)}
-                  onDelete={() => deleteSession.mutate(session.sessionID)}
-                />
-              ))}
+            <div className="h-[240px]">
+              <CenteredCarousel
+                items={sessions}
+                initialIndex={sessions.length === 1 ? 0 : 1}
+                className="pt-6 pb-10 px-[calc(50%-120px)]"
+                renderItem={(session) => (
+                  <SessionCard
+                    title={session.name || 'Session'}
+                    tags={session.topics}
+                    onResume={() => resumeSession.mutate(session.sessionID)}
+                    onDelete={() => deleteSession.mutate(session.sessionID)}
+                  />
+                )}
+              />
             </div>
           )}
         </div>

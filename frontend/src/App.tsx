@@ -7,7 +7,7 @@ import {SessionPage} from './routes/SessionPage'
 import {InstructorInsights} from './routes/InstructorInsights'
 import {StudentTopicMetrics} from './routes/StudentTopicMetrics'
 import {cn} from './lib/utils'
-import { Home as HomeIcon, Settings } from 'lucide-react'
+import { Home as HomeIcon, Settings, Moon } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import appIcon from './assets/icons/icon-nobg.png'
 import geminiLogo from './assets/logos/gemini.svg'
@@ -106,8 +106,10 @@ const Shell = ({ children }: { children: ReactNode }) => {
       <main className="relative mx-auto w-full max-w-6xl flex-1 px-6 pb-16 pt-10">{children}</main>
       <footer className="border-t border-espresso/10 bg-paper/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4 text-xs text-espresso/70">
-          <div>
-            Made with ❤️ at{' '}
+          <div className="flex items-center gap-2">
+            <span>Made with 1.5 hours of</span>
+            <Moon className="h-4 w-4 text-espresso" />
+            <span>at</span>
             <a
               href="https://nexhacks.com"
               className="font-medium text-espresso underline underline-offset-4"
@@ -116,7 +118,7 @@ const Shell = ({ children }: { children: ReactNode }) => {
             >
               NexHacks
             </a>
-            .
+            <span>.</span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-espresso/60">Powered by</span>

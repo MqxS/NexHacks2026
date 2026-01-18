@@ -347,8 +347,15 @@ def set_adaptive_legacy(sessionID, setting):
 
 @server.route("/api/requestHint/<questionID>", methods=["GET", "POST"])
 def request_hint(questionID):
+    hints = [
+        {"hint": "It's the largest planet in our solar system."},
+        {"hint": "It's the process by which plants make food using sunlight."},
+        {"hint": "It's the formula to calculate the area of a triangle."},
+        {"hint": "It's the chemical symbol for water."},
+        {"hint": "It's the term for animals that eat only plants."}
+    ]
     hint = {
-        "hint": "It's also known as the city of lights."
+        "hint": random.choice(hints)["hint"]
     }
     return jsonify(hint)
 
