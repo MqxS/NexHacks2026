@@ -63,7 +63,7 @@ export const Home = () => {
       formData.append('name', payload.name)
       formData.append('professor', payload.professor)
       if (syllabus[0]) formData.append('syllabus', syllabus[0])
-      attachments.forEach((file) => formData.append('files', file))
+      attachments.forEach((file) => formData.append('styleFiles', file))
       return api.createClass(formData)
     },
     onSuccess: () => {
@@ -244,7 +244,7 @@ export const Home = () => {
                 ) : null}
               </div>
               <div>
-                <label className="text-sm font-medium text-espresso">Additional files, like homework or study guides (optional)</label>
+                <label className="text-sm font-medium text-espresso">Additional files, like homework or study guides to guide question style (optional)</label>
                 <UploadDropzone
                   files={attachments}
                   onFiles={setAttachments}

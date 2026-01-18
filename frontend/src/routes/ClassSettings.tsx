@@ -113,7 +113,7 @@ export const ClassSettings = () => {
 
         <PaperCard>
           <h2 className="text-lg font-semibold text-espresso">Style documents</h2>
-          <p className="mt-1 text-sm text-espresso/70">Upload or remove style docs to guide question tone.</p>
+          <p className="mt-1 text-sm text-espresso/70">Upload or remove style docs, like homeworks or study guides, to guide question tone.</p>
           <div className="mt-4">
             <UploadDropzone files={styleDocs} onFiles={setStyleDocs} multiple />
             <button
