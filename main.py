@@ -109,7 +109,7 @@ def create_session(classID):
     else:
         file_bin = None
 
-    fileDoc = FileUpload(
+    file_doc = FileUpload(
         filename=file_storage.filename if file_storage else "",
         data=file_bin
     )
@@ -122,7 +122,7 @@ def create_session(classID):
         difficulty=float(request.form.get("difficulty", 0.5)),
         isCumulative=request.form.get("cumulative", "false").lower() == "true",
         focusedConcepts=[],
-        file=fileDoc
+        file=file_doc
     )
 
     result = mongo.sessions.insert_one(asdict(session))
@@ -427,8 +427,8 @@ def upload_style_docs(classID):
         return jsonify({"error": "Class not found"}), 404
     return jsonify({"status": "Style docs uploaded"})
 
-@server.route("/api/deleteStyleDoc/<classID>", methods=["DELETE"])
-def delete_style_doc(classID):
+@server.route("/api/deleteStyleDoc/<classID>/<docName>", methods=["DELETE"])
+def delete_style_doc(classID, docName):
     try:
         obj_id = ObjectId(classID)
     except bson.errors.InvalidId:
@@ -436,7 +436,7 @@ def delete_style_doc(classID):
 
     result = mongo.classes.update_one(
         {"_id": obj_id},
-        {"$pull": {"styleFiles": request.args.get("docID", "")}}
+        {"$pull": {"styleFiles": {"filename": docName}}}
     )
     if result.matched_count == 0:
         return jsonify({"error": "Class not found"}), 404
@@ -455,10 +455,9 @@ def get_style_docs(classID):
     style_files = doc.get("styleFiles", [])
     return jsonify([
         {
-            "docID": str(i),
-            "filename": sf.filename if hasattr(sf, 'filename') else "unknown"
+            "filename": sf.get("filename", ""),
         }
-        for i, sf in enumerate(style_files)
+        for sf in style_files
     ])
 
 
