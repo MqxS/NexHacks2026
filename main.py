@@ -316,6 +316,18 @@ def request_question(sessionID):
         print(f"Error generating question: {e}")
         return jsonify({"error": f"Failed to generate question: {str(e)}"}), 500
 
+    evaluated_topics = []
+    if class_doc:
+        class_topics = class_doc.get("topics", [])
+        if class_topics:
+            try:
+                evaluated_topics = ai_util.evaluate_question_topics(
+                    question=generated_q.question,
+                    class_topics=class_topics
+                )
+            except Exception as e:
+                print(f"Topic evaluation failed: {e}")
+
     q_id = str(ObjectId())
 
     pending_q = {
@@ -326,12 +338,14 @@ def request_question(sessionID):
         "wolfram_query": generated_q.wolfram_query,
         "validation_prompt": generated_q.validation_prompt,
         "metadata": generated_q.metadata,
+        "topics": evaluated_topics,
     }
     mongo.pending_questions.insert_one(pending_q)
 
     return jsonify({
         "questionId": q_id,
-        "content": generated_q.question
+        "content": generated_q.question,
+        "topics": evaluated_topics
     })
 
 

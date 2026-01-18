@@ -10,7 +10,7 @@
 
 **\\(so\varphi\\)** (pronounced *Sophie*), named after the Greek word for *wisdom*, is an intelligent, adaptive practice platform designed to bridge the gap between static course materials and personalized learning. In the high-stakes environment of university STEM courses, generic study tools often fail to capture the nuance of a professor's specific teaching style. Sophi solves this by ingesting course-specific "DNA"—syllabi, past exams, and notes—to generate an infinite stream of high-quality, stylistically accurate practice problems.
 
-By employing **symbolic verification** (via Wolfram Alpha) and **contextual compression** (via The Token Company), Sophi eliminates the hallucinations common in LLMs while maintaining lightning-fast performance. It helps students achieve the "golden ratio of practice" (referencing $\varphi$): maximizing retention and understanding while minimizing the time spent on passive study.
+By employing **symbolic verification** (via Wolfram Alpha and RAG) and **contextual compression** (via The Token Company), Sophi eliminates the hallucinations common in LLMs while maintaining lightning-fast performance. It helps students achieve the "golden ratio of practice" (referencing $\varphi$): maximizing retention and understanding while minimizing the time spent on passive study.
 
 ## 🛠️ Tech Stack
 

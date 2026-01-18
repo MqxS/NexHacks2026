@@ -507,6 +507,46 @@ class SophiAIUtil:
             print(f"Error classifying subject: {e}")
             return False
 
+    def evaluate_question_topics(
+        self,
+        *,
+        question: str,
+        class_topics: list[str],
+    ) -> list[str]:
+        if not class_topics:
+            return []
+
+        system_instruction = (
+            "You are an expert curriculum evaluator. "
+            "Given a question and a list of class topics, identify which of the class topics are present or tested in the question. "
+            "Return JSON only: {\"topics\": [list of strings]}. "
+            "The topics in the list must be exact matches from the provided class topics list."
+        )
+
+        user_prompt = json.dumps(
+            {
+                "question": question,
+                "class_topics": class_topics,
+            },
+            ensure_ascii=False,
+        )
+
+        try:
+            out = self.gemini.generate_json(
+                system_instruction=system_instruction,
+                user_prompt=user_prompt,
+                temperature=0.0,
+                max_output_tokens=512,
+            )
+            topics = out.get("topics")
+            if isinstance(topics, list):
+                # Filter to ensure they are actually in the class_topics list
+                return [str(t) for t in topics if str(t) in class_topics]
+            return []
+        except Exception as e:
+            print(f"Error evaluating topics: {e}")
+            return []
+
     def adjust_session_parameters(
         self,
         session: SessionParameters,
