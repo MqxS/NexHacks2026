@@ -128,7 +128,7 @@ export const ClassSessionSetup = () => {
               <input
                 value={sessionName}
                 onChange={(event) => setSessionName(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+                className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
                 placeholder="Midterm review"
               />
             </div>
@@ -230,10 +230,10 @@ export const ClassSessionSetup = () => {
                       key={item}
                       type="button"
                       onClick={() => setTopicsSelected((prev) => prev.filter((topicItem) => topicItem !== item))}
-                      className="group inline-flex items-center gap-2 rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
+                      className="group relative inline-flex items-center rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
                     >
                       <span>{item}</span>
-                      <span className="opacity-0 transition group-hover:opacity-100">
+                      <span className="pointer-events-none absolute right-2 opacity-0 transition group-hover:opacity-100">
                         <X className="h-3 w-3 text-espresso/70" />
                       </span>
                     </button>
@@ -290,7 +290,7 @@ export const ClassSessionSetup = () => {
               <textarea
                 value={custom}
                 onChange={(event) => setCustom(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+                className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
                 rows={3}
                 placeholder="Only word problems, focus on proofs, etc."
               />

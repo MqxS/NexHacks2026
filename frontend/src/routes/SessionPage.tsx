@@ -237,7 +237,7 @@ export const SessionPage = () => {
           <textarea
             value={answer}
             onChange={(event) => setAnswer(event.target.value)}
-            className="mt-3 h-28 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+            className="mt-3 h-28 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
             placeholder="Type your answer here..."
           />
           <div className="mt-3 flex items-center justify-between">
@@ -332,7 +332,7 @@ export const SessionPage = () => {
           <textarea
             value={hintRequest}
             onChange={(event) => setHintRequest(event.target.value)}
-            className="mt-3 h-24 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+            className="mt-3 h-24 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
             placeholder="Where are you stuck? What have you tried?"
           />
           <div className="mt-3 rounded-2xl border border-espresso/15 bg-sand/40 p-3">
@@ -499,10 +499,10 @@ export const SessionPage = () => {
                             topics: prev.topics.filter((topicItem) => topicItem !== item)
                           }))
                         }
-                      className="group inline-flex items-center gap-2 rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
+                      className="group relative inline-flex items-center rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
                       >
                         <span>{item}</span>
-                        <span className="opacity-0 transition group-hover:opacity-100">
+                        <span className="pointer-events-none absolute right-2 opacity-0 transition group-hover:opacity-100">
                           <X className="h-3 w-3 text-espresso/70" />
                         </span>
                       </button>
