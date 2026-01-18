@@ -357,8 +357,10 @@ export const ClassSessionSetup = () => {
           onClick={() => navigate(`/class/${classID}/settings`)}
           className="flex items-center justify-between rounded-2xl border border-espresso/20 bg-paper px-4 py-3 text-sm font-medium text-espresso shadow-paper transition hover:-translate-y-0.5"
         >
-          <span>Class files & settings </span>
-          <Settings className="h-4 w-4" />
+          <span>Class files & settings</span>
+          <span className="ml-1 flex items-center">
+            <Settings className="h-4 w-4" />
+          </span>
         </button>
       </div>
       </div>

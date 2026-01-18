@@ -300,15 +300,16 @@ export const SessionPage = () => {
       </div>
 
       <div className="space-y-4">
-        <PaperCard className="flex items-center justify-between gap-8 pr-4">
+        <PaperCard className="pr-4 pb-6">
           <div>
             <p className="text-sm font-medium text-espresso">Session parameters</p>
-            <p className="text-xs text-espresso/60">Adjust without leaving the question.</p>
+            <p className="mt-1 text-xs text-espresso/60">Adjust without leaving the question.</p>
           </div>
+          <div className="h-6" aria-hidden />
           <button
             type="button"
             onClick={() => setPanelOpen(true)}
-            className="rounded-full border border-espresso/20 px-3 py-1 text-xs"
+            className="w-fit rounded-full border border-espresso/20 px-3 py-1 text-sm"
           >
             <span className="inline-flex items-center gap-2">
               <Sliders className="h-3 w-3" />
@@ -340,7 +341,7 @@ export const SessionPage = () => {
                 <p className="text-[11px] text-espresso/60">Optional. We will attach it to your hint request.</p>
               </div>
               <label className="cursor-pointer rounded-full border border-espresso/20 bg-paper px-3 py-1 text-xs text-espresso">
-                Choose file
+                Upload
                 <input
                   type="file"
                   accept="image/*"
