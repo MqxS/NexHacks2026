@@ -338,7 +338,7 @@ def edit_class_prof(classID):
         return jsonify({"error": "Class not found"}), 404
     return jsonify({"status": "Class professor updated"})
 
-@server.route("/api/deleteClass/<classID>", methods=["DELETE"])
+@server.route("/api/deleteClass/<classID>", methods=["DELETE", "POST"])
 def delete_class(classID):
     try:
         obj_id = ObjectId(classID)

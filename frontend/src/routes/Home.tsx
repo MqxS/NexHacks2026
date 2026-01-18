@@ -93,7 +93,12 @@ export const Home = () => {
       if (context?.previous) queryClient.setQueryData(['classCards'], context.previous)
       toast.error(error.message || 'Could not update class')
     },
-    onSuccess: () => toast.success('Class updated'),
+    onSuccess: (_, payload) => {
+      toast.success('Class updated')
+      setEditing((prev) =>
+        prev && prev.classID === payload.classID ? { ...prev, Name: payload.newName } : prev
+      )
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['classCards'] })
   })
 
@@ -113,7 +118,12 @@ export const Home = () => {
       if (context?.previous) queryClient.setQueryData(['classCards'], context.previous)
       toast.error(error.message || 'Could not update professor')
     },
-    onSuccess: () => toast.success('Instructor updated'),
+    onSuccess: (_, payload) => {
+      toast.success('Instructor updated')
+      setEditing((prev) =>
+        prev && prev.classID === payload.classID ? { ...prev, Professor: payload.newProf } : prev
+      )
+    },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['classCards'] })
   })
 

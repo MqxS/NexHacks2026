@@ -214,6 +214,56 @@ def request_hint(questionID):
     }
     return jsonify(hint)
 
+@server.route("/api/editClassName/<classID>", methods=["POST"])
+def edit_class_name(classID):
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    new_name = request.form.get("name")
+    if not new_name:
+        return jsonify({"error": "No name provided"}), 400
+
+    for card in class_cards:
+        if card["classID"] == class_id:
+            card["name"] = new_name
+            return jsonify({"status": "Class name updated"})
+
+    return jsonify({"error": "Class not found"}), 404
+
+@server.route("/api/editClassProf/<classID>", methods=["POST"])
+def edit_class_prof(classID):
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    new_professor = request.form.get("professor")
+    if not new_professor:
+        return jsonify({"error": "No professor name provided"}), 400
+
+    for card in class_cards:
+        if card["classID"] == class_id:
+            card["professor"] = new_professor
+            return jsonify({"status": "Class professor updated"})
+
+    return jsonify({"error": "Class not found"}), 404
+
+@server.route("/api/deleteClass/<classID>", methods=["DELETE", "POST"])
+def delete_class(classID):
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    for index, card in enumerate(class_cards):
+        if card["classID"] == class_id:
+            class_cards.pop(index)
+            return jsonify({"status": "Class deleted"})
+
+    return jsonify({"error": "Class not found"}), 404
+
 @server.route("/", defaults={"path": ""})
 @server.route("/<path:path>")
 def spa(path):
