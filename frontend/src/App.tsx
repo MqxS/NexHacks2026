@@ -4,6 +4,8 @@ import {Home} from './routes/Home'
 import {ClassSessionSetup} from './routes/ClassSessionSetup'
 import {ClassSettings} from './routes/ClassSettings'
 import {SessionPage} from './routes/SessionPage'
+import {InstructorInsights} from './routes/InstructorInsights'
+import {StudentTopicMetrics} from './routes/StudentTopicMetrics'
 import {cn} from './lib/utils'
 import { Home as HomeIcon, Settings } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -92,13 +94,7 @@ const Shell = ({ children }: { children: ReactNode }) => {
       <header className="sticky top-0 z-20 border-b border-espresso/10 bg-paper/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-24 overflow-hidden rounded-3xl">
-              <img
-                src={appIcon}
-                alt="Sophi"
-                className="h-full w-full object-cover object-[center_50%] shadow-paper"
-              />
-            </div>
+            <LogoButton />
             <Breadcrumbs />
           </div>
           <div className="flex items-center gap-3">
@@ -167,6 +163,24 @@ const Shell = ({ children }: { children: ReactNode }) => {
   )
 }
 
+const LogoButton = () => {
+  const navigate = useNavigate()
+  return (
+    <button
+      type="button"
+      onClick={() => navigate('/')}
+      aria-label="Home"
+      className="h-16 w-24 overflow-hidden rounded-3xl"
+    >
+      <img
+        src={appIcon}
+        alt="Sophi"
+        className="h-full w-full object-cover object-[center_50%] shadow-paper"
+      />
+    </button>
+  )
+}
+
 export default function App() {
   const location = useLocation()
   return (
@@ -174,8 +188,10 @@ export default function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Page><Home /></Page>} />
+          <Route path="/instructor" element={<Page><InstructorInsights /></Page>} />
           <Route path="/class/:classID/session" element={<Page><ClassSessionSetup /></Page>} />
           <Route path="/class/:classID/settings" element={<Page><ClassSettings /></Page>} />
+          <Route path="/class/:classID/metrics" element={<Page><StudentTopicMetrics /></Page>} />
           <Route path="/session/:sessionID" element={<Page><SessionPage /></Page>} />
         </Routes>
       </AnimatePresence>

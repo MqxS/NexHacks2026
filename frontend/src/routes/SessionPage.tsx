@@ -51,10 +51,11 @@ export const SessionPage = () => {
   const cold = [156, 183, 213] as [number, number, number]
   const difficultyValue = Number.isFinite(params.difficulty) ? params.difficulty : 0
   const edge = Math.min(1, Math.max(0, difficultyValue))
-  const cool = blendColor(cold, [176, 196, 222], edge)
-  const hotStart = Math.min(100, Math.max(0, ((edge - 0.45) / 0.55) * 100))
+  const coolT = Math.min(1, edge / 0.5)
+  const cool = blendColor(cold, [200, 214, 232], coolT)
+  const hotStart = Math.min(100, Math.max(0, ((edge - 0.5) / 0.5) * 100))
   const gradient =
-    edge < 0.45
+    edge <= 0.5
       ? `linear-gradient(90deg, #9CB7D5 0%, ${cool} 100%)`
       : `linear-gradient(90deg, #9CB7D5 0%, #9CB7D5 ${100 - hotStart}%, #C98B6A 100%)`
 
@@ -447,6 +448,7 @@ export const SessionPage = () => {
                     <input
                       value={topicSearch}
                       onChange={(event) => setTopicSearch(event.target.value)}
+                      onKeyDown={(event) => event.stopPropagation()}
                       className="mb-2 w-full rounded-lg border border-espresso/20 bg-paper px-2 py-1 text-xs"
                       placeholder="Search topics"
                     />
@@ -459,7 +461,7 @@ export const SessionPage = () => {
                             <DropdownMenu.Item
                               key={item}
                               className={cn(
-                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm outline-none hover:bg-sand',
+                                'flex cursor-pointer items-center justify-between px-3 py-2 text-sm outline-none hover:bg-espresso/10',
                                 active ? 'bg-sand text-espresso' : 'text-espresso'
                               )}
                               onSelect={(event) => {
