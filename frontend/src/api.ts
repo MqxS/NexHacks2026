@@ -234,7 +234,7 @@ export const api = {
     request<Feedback>(`/api/submitAnswer/${encodeURIComponent(payload.questionID)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ studentAnswer: payload.studentAnswer })
+      body: JSON.stringify({ answer: payload.studentAnswer })
     }),
   requestHint: (payload: { questionID: string; hintRequest: string }) =>
     request<{ hint: string }>(`/api/requestHint/${encodeURIComponent(payload.questionID)}`),
