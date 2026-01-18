@@ -44,7 +44,7 @@ This allows for Sophi to generate questions that are aligned with the professor'
 
 ## How we built it
 
-We divided our work into managing the frontend, backend, and AI utilities.
+We divided our work into managing the frontend, backend, and AI utilities. As we had three 
 
 ### Frontend
 
@@ -86,9 +86,15 @@ Joseph:
 
 It was quite hard to brainstorm an idea for NexHacks - we wanted to do something big and unique, and attempt to contribute to a problem we all had firsthand experience with.
 
+Between the ripe hours of 1 AM and 3 AM, our team commenced the hardest integration we've all participated in. We had to work together to ensure that the frontend, backend, and AI utilities all worked seamlessly with each other. This was a challenge that we overcame with a lot of perseverance and collaboration.
+
+This was the first hackathon where we came in with a well-refined idea. Our 
+
+Needless to say, all of our team can agree that this is without a doubt the most difficult project we've ever worked on. However, we persevered and overcame all obstacles, and we're incredibly proud of the result, and we can all honestly say that with another week's worth of finetuning and perahps some 
+
 ## What we learned
 
-Karthik: When I first embarked on this project, I was quite surprised by the amount of progress LLMs have made in the past three years. As a researcher leaning more on the traditional AI side, I was compelled by how old AI architecture design meshed with modern LLM solutions, resulting in strong and cohesive 
+Karthik: When I first embarked on this project, I was quite surprised by the amount of progress LLMs have made in the past three years. As a researcher leaning more on the traditional AI side, I was compelled by how old AI architecture design meshed with modern LLM solutions, resulting in strong and cohesive solutions. I'm also incredibly grateful for the various tools we had access to, especially The Token Company's models (which were so cool to use and inspect).
 
 Max:
 
@@ -98,9 +104,11 @@ Joseph:
 ## What's next for Sophi
 
 Sophi is far from finished. Our alpha iteration is strong and our value propositions stronger, but our hope is that Sophi can become a tool for both teachers and students. Most notably, our next steps are as follows:
-
-
-
+*   **Instructor Admin:** Create a dashboard for instructors to manage their classes, view student progress, and adjust settings.
+*   **Image / Voice Control:** Allow students to interact with the platform using images of their work thus far or voice commands, enhancing accessibility for those with disabilities and providing a more seamless, futuristic training setup.
+*   **Proprietary Model Finetuning:** Finetune the proprietary model on a dataset of style transfer, allowing for more personalized and effective learning.
+*   **Student Progress Tracking:** Implement a system for both students and teachers to track student progress per unit, allowing instructors to monitor individual students' performance and identify areas for improvement.
+*   **Collaborative Learning:** Enable students to work together on assignments, fostering a sense of community and collaboration.
 
 # Citations
 
