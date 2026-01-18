@@ -1,19 +1,19 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {useEffect, useMemo, useState} from 'react'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import * as Dialog from '@radix-ui/react-dialog'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { api, type ClassCard } from '../api'
-import { CenteredCarousel } from '../components/CenteredCarousel'
-import { ClassCard as ClassCardUI } from '../components/ClassCard'
-import { LoadingSkeleton } from '../components/LoadingSkeleton'
-import { UploadDropzone } from '../components/UploadDropzone'
-import { PaperCard } from '../components/PaperCard'
-import { cn } from '../lib/utils'
-import { useNavigate } from 'react-router-dom'
-import { classArt, createClassArt } from '../lib/classArt'
+import {z} from 'zod'
+import {useForm} from 'react-hook-form'
+import {zodResolver} from '@hookform/resolvers/zod'
+import {toast} from 'sonner'
+import {api, type ClassCard} from '../api'
+import {CenteredCarousel} from '../components/CenteredCarousel'
+import {ClassCard as ClassCardUI} from '../components/ClassCard'
+import {LoadingSkeleton} from '../components/LoadingSkeleton'
+import {UploadDropzone} from '../components/UploadDropzone'
+import {PaperCard} from '../components/PaperCard'
+import {cn} from '../lib/utils'
+import {useNavigate} from 'react-router-dom'
+import {classArt, createClassArt} from '../lib/classArt'
 
 const hashSeed = (value: string) => {
   let hash = 0
@@ -31,8 +31,7 @@ const artForId = (id: string) => {
 
 const createSchema = z.object({
   name: z.string().min(1, 'Class name is required'),
-  professor: z.string().min(1, 'Instructor is required'),
-  recommendations: z.string().optional()
+  professor: z.string().min(1, 'Instructor is required')
 })
 
 type CreateValues = z.infer<typeof createSchema>
@@ -54,17 +53,15 @@ export const Home = () => {
     resolver: zodResolver(createSchema),
     defaultValues: {
       name: '',
-      professor: '',
-      recommendations: ''
+      professor: ''
     }
   })
 
   const createMutation = useMutation({
     mutationFn: async (payload: CreateValues) => {
       const formData = new FormData()
-      formData.append('Name', payload.name)
-      formData.append('Professor', payload.professor)
-      formData.append('recommended', payload.recommendations ?? '')
+      formData.append('name', payload.name)
+      formData.append('professor', payload.professor)
       if (syllabus[0]) formData.append('syllabus', syllabus[0])
       attachments.forEach((file) => formData.append('files', file))
       return api.createClass(formData)
@@ -237,21 +234,12 @@ export const Home = () => {
                 ) : null}
               </div>
               <div>
-                <label className="text-sm font-medium text-espresso">Additional files (optional)</label>
+                <label className="text-sm font-medium text-espresso">Additional files, like homework or study guides (optional)</label>
                 <UploadDropzone
                   files={attachments}
                   onFiles={setAttachments}
                   multiple
                   helper="Don't worry - you can upload more later."
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-espresso">Recommended homework or guides (optional)</label>
-                <textarea
-                  {...createForm.register('recommendations')}
-                  className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
-                  rows={3}
-                  placeholder="Chapter 1 review, problem set 2, study guide"
                 />
               </div>
               <button
@@ -275,7 +263,6 @@ export const Home = () => {
             <div className="mx-auto mb-4 orbit-loader">
               <div className="orbit-ring" />
               <div className="orbit-dot" />
-              <div className="orbit-dot secondary" />
             </div>
             <p className="text-sm font-medium text-espresso">Building your class workspace...</p>
             <p className="mt-1 text-xs text-espresso/60">Indexing syllabus and materials</p>
@@ -291,7 +278,7 @@ export const Home = () => {
             {editing ? (
               <div className="mt-4 space-y-4">
                 <InlineEditField
-                  label="Class name asd"
+                  label="Class name"
                   value={editing.Name}
                   onSave={(value) => editNameMutation.mutate({ classID: editing.classID, newName: value })}
                 />

@@ -1,5 +1,5 @@
 import 'katex/dist/katex.min.css'
-import { InlineMath, BlockMath } from 'react-katex'
+import {BlockMath, InlineMath} from 'react-katex'
 
 const tokenize = (input: string) => {
   const tokens: Array<{ type: 'text' | 'inline' | 'block'; value: string }> = []

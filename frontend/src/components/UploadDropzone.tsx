@@ -1,6 +1,6 @@
-import { useDropzone } from 'react-dropzone'
-import { UploadCloud, X } from 'lucide-react'
-import { cn } from '../lib/utils'
+import {useDropzone} from 'react-dropzone'
+import {UploadCloud, X} from 'lucide-react'
+import {cn} from '../lib/utils'
 
 export const UploadDropzone = ({
   onFiles,

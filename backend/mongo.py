@@ -1,10 +1,11 @@
 import os
 from typing import Any
+
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from pymongo.server_api import ServerApi
 
-_client: MongoClient | None = None
+_client = None
 
 def connect(timeout_ms: int = 5000) -> Any:
     global _client
@@ -19,10 +20,8 @@ def connect(timeout_ms: int = 5000) -> Any:
     if _client is None:
         _client = MongoClient(
             uri,
-            tls=True,
-            tlsAllowInvalidCertificates=True,
-            serverSelectionTimeoutMS=timeout_ms,
-            server_api=ServerApi('1')
+            server_api=ServerApi('1'),
+            serverSelectionTimeoutMS=timeout_ms
         )
         try:
             _client.admin.command("ping")

@@ -1,19 +1,18 @@
 import random
-import time
-from flask import Flask, jsonify, request
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import List
 
-from bson import ObjectId, Binary
+import bson
+from bson import Binary, ObjectId
+from flask import Flask, jsonify, request
 
-# from backend.mongo import connect
+from backend.mongo import connect
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
-# mongo = connect()
+mongo = connect()
 
 @dataclass
 class Question:
-    questionId: ObjectId
     content: str
     userAnswer: str
     aiAnswer: str
@@ -21,92 +20,163 @@ class Question:
 
 @dataclass
 class Session:
-    sessionID: ObjectId
     name: str
     questions: List[Question]
     adaptive: bool
     difficulty: float
     isCumulative : bool
-    focusedConcepts: List[str]
-    file: Binary
+    focusedConcepts: List[str] #optional
+    file: Binary #optional
 
 @dataclass
 class Class:
-    classID: ObjectId
     syllabus: Binary
-    styleFiles: List[Binary]
+    styleFiles: List[Binary] #optional
     name: str
     professor: str
     topics: List[str]
     sessions: List[Session]
 
-class_cards = [
-    {"id": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
-    {"id": 2, "name": "Science", "professor": "Dr. Joseph"},
-    {"id": 3, "name": "History", "professor": "Dr. Max"}
-]
-
 @server.route("/api/hello")
 def hello():
     return jsonify({"message": "API Working!"})
 
-@server.route("/api/getClassCards")
+@server.route("/api/getClassCards", methods=["GET"])
 def get_class_cards():
-    return jsonify(class_cards)
+    classes = mongo.classes.find(
+        {},
+        {"name": 1, "professor": 1}
+    )
+
+    return jsonify([
+        {
+            "classID": str(doc["_id"]),
+            "name": doc.get("name", "Untitled Class"),
+            "professor": doc.get("professor", "Unknown")
+        }
+        for doc in classes
+        if "_id" in doc
+    ])
 
 @server.route("/api/createClass", methods=["POST"])
 def create_class():
-    time.sleep(7.71)
-    name = request.form.get("Name", "Untitled class")
-    professor = request.form.get("Professor", "Instructor")
-    next_id = max(card["id"] for card in class_cards) + 1 if class_cards else 1
-    class_cards.append({"id": next_id, "name": name, "professor": professor})
-    return jsonify({"classID": str(next_id)})
+    #multipart/form-data
+    if "syllabus" not in request.files:
+        return jsonify({"error": "No syllabus file provided"}), 400
 
-@server.route("/api/createSession")
-def create_session():
-    time.sleep(7.71)
-    session = {
-        "sessionID": "ABC123",
-    }
-    return jsonify(session)
+    syllabus_file = request.files["syllabus"]
+    syllabus_bytes = syllabus_file.read()
+
+    style_files = []
+    for sf in request.files.getlist("styleFiles"):
+        if sf and sf.filename:
+            style_files.append(Binary(sf.read()))
+
+    class_doc = Class(
+        syllabus=Binary(syllabus_bytes),
+        styleFiles=style_files,
+        name=request.form.get("name", "Untitled Class"),
+        professor=request.form.get("professor", "Unknown"),
+        topics=[],
+        sessions=[]
+    )
+
+    result = mongo.classes.insert_one(asdict(class_doc))
+
+    return jsonify({
+        "classID": str(result.inserted_id)
+    })
+
+@server.route("/api/createSession/<classID>")
+def create_session(classID):
+    file_storage = request.files.get("file")
+    if file_storage and file_storage.filename:
+        file_bin = Binary(file_storage.read())
+    else:
+        file_bin = None
+
+    session = Session(
+        name=request.form.get("name", "New Session"),
+        questions=[],
+        adaptive=request.form.get("adaptive", "false").lower() == "true",
+        difficulty=float(request.form.get("difficulty", 0.5)),
+        isCumulative=request.form.get("cumulative", "false").lower() == "true",
+        focusedConcepts=[],
+        file=file_bin
+    )
+
+    result = mongo.sessions.insert_one(asdict(session))
+
+    return jsonify({
+        "sessionID": str(result.inserted_id)
+    })
 
 @server.route("/api/getClassTopics/<classID>")
 def get_class_topics(classID):
-    topics = [
-        {"title": "Algebra"},
-        {"title": "Geometry"},
-        {"title": "Calculus"}
-    ]
-    return jsonify(topics)
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    doc = mongo.classes.find_one({"_id": obj_id}, {"topics": 1})
+    if not doc:
+        return jsonify({"error": "Class not found"}), 404
+
+    topics = doc.get("topics", [])
+    if topics and all(isinstance(t, str) for t in topics):
+        topics_out = [{"title": t} for t in topics]
+    else:
+        topics_out = topics
+
+    return jsonify(topics_out)
 
 @server.route("/api/getRecentSessions/<classID>")
 def get_recent_sessions(classID):
-    sessions = [
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    sessions = mongo.sessions.find(
+        {"classID": obj_id},
+        {"name": 1}
+    ).sort("_id", -1).limit(5)
+
+    return jsonify([
         {
-            "sessionID": "S1",
-            "timestamp": "2026-01-17T14:10:00Z",
-            "topics": ["Algebra", "Geometry"]
-        },
-        {
-            "sessionID": "S2",
-            "timestamp": "2026-01-16T18:30:00Z",
-            "topics": ["Calculus"]
+            "sessionID": str(doc["_id"]),
+            "name": doc.get("name", "Untitled Session")
         }
-    ]
-    return jsonify(sessions)
+        for doc in sessions
+        if "_id" in doc
+    ])
 
 @server.route("/api/getSessionParams/<sessionID>")
 def get_session_params(sessionID):
-    session_params = {
-        "difficulty": 0.6,
-        "topic": "Algebra",
-        "cumulative": False,
-        "customRequests": "",
-        "adaptive": True
-    }
-    return jsonify(session_params)
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
 
+    doc = mongo.sessions.find_one(
+        {"_id": obj_id},
+        {"name": 1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
+    )
+    if not doc:
+        return jsonify({"error": "Session not found"}), 404
+    session = Session(
+        name=request.form.get("name", "New Session"),
+        difficulty=doc.get("difficulty", 0.5),
+        isCumulative=doc.get("isCumulative", False),
+        adaptive=doc.get("adaptive", True),
+        focusedConcepts=doc.get("focusedConcepts", []),
+        questions=[],
+        file=Binary(b"")
+    )
+
+    return jsonify(asdict(session))
+
+#TODO: KARTHIK #1
 @server.route("/api/requestQuestion/<sessionID>")
 def request_question(sessionID):
     questions = [
@@ -123,6 +193,7 @@ def request_question(sessionID):
     ]
     return jsonify(random.choice(questions))
 
+#TODO: KARTHIK #2
 @server.route("/api/submitAnswer/<questionID>", methods=["POST"])
 def submit_answer(questionID):
     feedback_bank = [
@@ -168,10 +239,24 @@ def submit_answer(questionID):
 def update_session_params(sessionID):
     return jsonify({"status": "Session parameters updated"})
 
-@server.route("/api/setAdaptive/<sessionID>", methods=["POST"])
-def set_adaptive(sessionID):
-    return jsonify({"status": "Adaptive learning set"})
+@server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
+def set_adaptive(sessionID, setting):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
 
+    adaptive = setting.lower() == "true"
+
+    result = mongo.sessions.update_one(
+        {"_id": obj_id},
+        {"$set": {"adaptive": adaptive}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Adaptive setting updated"})
+
+#TODO: KARTHIK #3
 @server.route("/api/requestHint/<questionID>")
 def request_hint(questionID):
     hint = {

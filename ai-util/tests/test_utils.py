@@ -5,12 +5,10 @@ import dataclasses
 import datetime as dt
 import json
 import logging
-import os
 import pathlib
 import sys
 import traceback
 import typing as t
-
 
 JsonDict = dict[str, t.Any]
 
