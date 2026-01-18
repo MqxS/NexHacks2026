@@ -358,7 +358,7 @@ def delete_session(sessionID):
         return jsonify({"error": "Session not found"}), 404
     return jsonify({"status": "Session deleted"})
 
-@server.route("replaceSyllabus/<classID>", methods=["POST"])
+@server.route("/api/replaceSyllabus/<classID>", methods=["POST"])
 def replace_syllabus(classID):
     try:
         obj_id = ObjectId(classID)
