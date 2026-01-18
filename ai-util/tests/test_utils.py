@@ -255,6 +255,25 @@ def _run_for_class_dir(
         ai.save_question_record_jsonl(path=str(history_path), record=record)
         logger.info("Saved question record: %s", str(history_path))
 
+    generated_with_suggestion = None
+    step_generate_suggestion = {"name": "Generating question with suggestions", "ok": False, "skipped": True, "error": "Skipped due to earlier failures"}
+    if loaded_class_file is not None and not step_class_file.get("skipped"):
+        generated_with_suggestion, step_generate_suggestion = run_step(
+            name="Generating question with suggestions",
+            fn=lambda: ai.generate_question(
+                session=adjusted,
+                question_answer_history=history,
+                file_upload_text=None,
+                class_file=loaded_class_file,
+                user_suggestions="Make the question involve space travel or dinosaurs.",
+                use_wolfram=use_wolfram,
+            ),
+        )
+
+    if generated_with_suggestion is not None:
+        logger.info("Generated question (with suggestions):\n%s", generated_with_suggestion.question)
+        logger.info("Generated answer (with suggestions):\n%s", generated_with_suggestion.answer)
+
     v_ok = None
     step_v_ok = {"name": "Validating question (expected valid)", "ok": False, "skipped": True, "error": "Skipped"}
     if generated is not None:
@@ -356,6 +375,7 @@ def _run_for_class_dir(
             "parse_practice": step_practice,
             "create_class_file": step_class_file,
             "generate_question": step_generate,
+            "generate_question_with_suggestion": step_generate_suggestion,
             "validate_ok": step_v_ok,
             "validate_bad": step_v_bad,
             "validate_hint": step_v_hint,
@@ -363,6 +383,7 @@ def _run_for_class_dir(
             **settings_steps,
         },
         "generated": dataclasses_asdict_safe(generated) if generated is not None else None,
+        "generated_with_suggestion": dataclasses_asdict_safe(generated_with_suggestion) if generated_with_suggestion is not None else None,
         "validation_ok": dataclasses_asdict_safe(v_ok) if v_ok is not None else None,
         "validation_bad": dataclasses_asdict_safe(v_bad) if v_bad is not None else None,
         "hints": {k: dataclasses_asdict_safe(v) for k, v in hint_results.items()},

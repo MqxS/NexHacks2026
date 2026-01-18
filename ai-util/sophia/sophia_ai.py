@@ -106,7 +106,7 @@ class GeminiClient:
         base_url: str = "https://generativelanguage.googleapis.com/v1beta",
         timeout_s: float = 60.0,
         tokenc_api_key: str | None = None,
-        tokenc_aggressiveness: float = 0.5,
+        tokenc_aggressiveness: float = 0.3,
     ) -> None:
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not self.api_key:
@@ -140,6 +140,14 @@ class GeminiClient:
             return text
         try:
             resp = client.compress_input(input=text, aggressiveness=self.tokenc_aggressiveness)
+            
+            # Log compression stats
+            print(f"Compressed text: {getattr(resp, 'output', '')}")
+            print(f"Original tokens: {getattr(resp, 'original_input_tokens', 0)}")
+            print(f"Compressed tokens: {getattr(resp, 'output_tokens', 0)}")
+            print(f"Tokens saved: {getattr(resp, 'tokens_saved', 0)}")
+            print(f"Compression ratio: {getattr(resp, 'compression_ratio', 0.0):.2f}x")
+
             out = getattr(resp, "output", None)
             if isinstance(out, str) and out.strip():
                 return out
@@ -279,8 +287,8 @@ class GeminiClient:
     def _repair_json_text(self, text: str) -> str:
         s = self._extract_json_candidate(text)
         s = self._escape_newlines_in_json_strings(s)
-        s = re.sub(r",\s*([}\]])", r"\1", s)
         s = self._close_unbalanced_json(s)
+        s = re.sub(r",\s*([}\]])", r"\1", s)
         return s.strip()
 
     def _parse_model_json(self, text: str) -> JsonDict:
@@ -371,45 +379,60 @@ class GeminiClient:
                 return float(m2.group(1))
             return None
 
-        raw = None
-        last_http_error: urllib.error.HTTPError | None = None
-        last_body: str | None = None
+        text = ""
+        last_error: Exception | None = None
+        
         for attempt in range(3):
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout_s) as resp:
                     raw = resp.read().decode("utf-8")
+                
+                # Parse and validate immediately to trigger retry if empty
+                try:
+                    data = t.cast(JsonDict, json.loads(raw))
+                except json.JSONDecodeError:
+                    raise RuntimeError(f"Gemini returned invalid JSON: {raw[:1000]}")
+
+                candidates = data.get("candidates") or []
+                if not candidates:
+                    raise RuntimeError("Gemini returned no candidates.")
+
+                content = candidates[0].get("content") or {}
+                parts = content.get("parts") or []
+                text_parts = [p.get("text") for p in parts if isinstance(p, dict) and p.get("text")]
+                
+                if not text_parts:
+                    finish_reason = candidates[0].get("finishReason")
+                    safety_ratings = candidates[0].get("safetyRatings")
+                    raise RuntimeError(f"Gemini returned no text parts. Finish reason: {finish_reason}. Safety ratings: {safety_ratings}")
+                
+                text = "\n".join(t.cast(list[str], text_parts)).strip()
                 break
+
             except urllib.error.HTTPError as e:
                 body = None
                 try:
                     body = e.read().decode("utf-8")
                 except Exception:
                     body = None
-                last_http_error = e
-                last_body = body
+                last_error = e
                 if e.code == 429 and attempt < 2:
                     delay = retry_delay_seconds(body) or float(2 ** attempt) * 2.0
                     time.sleep(min(65.0, max(1.0, delay)))
                     continue
                 raise RuntimeError(f"Gemini HTTPError {e.code}: {body}") from e
+            
+            except RuntimeError as e:
+                last_error = e
+                if attempt < 2:
+                    # Retry on transient model errors (empty output, etc.)
+                    time.sleep(float(2 ** attempt) * 1.0)
+                    continue
+                raise e
 
-        if raw is None:
-            raise RuntimeError(f"Gemini HTTPError {getattr(last_http_error, 'code', None)}: {last_body}") from last_http_error
-
-        data = t.cast(JsonDict, json.loads(raw))
-        candidates = data.get("candidates") or []
-        if not candidates:
-            raise RuntimeError("Gemini returned no candidates.")
-
-        content = candidates[0].get("content") or {}
-        parts = content.get("parts") or []
-        text_parts = [p.get("text") for p in parts if isinstance(p, dict) and p.get("text")]
-        if not text_parts:
-            finish_reason = candidates[0].get("finishReason")
-            safety_ratings = candidates[0].get("safetyRatings")
-            raise RuntimeError(f"Gemini returned no text parts. Finish reason: {finish_reason}. Safety ratings: {safety_ratings}")
-
-        text = "\n".join(t.cast(list[str], text_parts)).strip()
+        if not text:
+             # Should have raised in loop, but just in case
+             raise RuntimeError("Gemini extraction failed.") from last_error
         try:
             return self._parse_model_json(text)
         except json.JSONDecodeError as e:
@@ -507,7 +530,8 @@ class SophiaAIUtil:
         if not use_wolfram:
             system_instruction = (
                 "You determine if a math question is well-posed and has a valid answer. "
-                "If yes, provide a concise final answer. Return JSON only."
+                "If yes, provide a concise final answer. Return JSON only. "
+                "Do not include any preamble, markdown, or code fences."
             )
             few_shots = [
                 (
@@ -552,7 +576,7 @@ class SophiaAIUtil:
 
         system_instruction = (
             "You convert a math question into a single Wolfram Alpha query. "
-            "Return JSON only."
+            "Return JSON only. Do not include any preamble, markdown, or code fences."
         )
         few_shots = [
             (
@@ -609,7 +633,7 @@ class SophiaAIUtil:
         system_instruction = (
             "You verify whether a hint is consistent with a student's current step for a math problem. "
             "If possible, emit a Wolfram Alpha query that checks the key claim as a boolean or computation. "
-            "Return JSON only."
+            "Return JSON only. Do not include any preamble, markdown, or code fences."
         )
         few_shots = [
             (
@@ -688,6 +712,7 @@ class SophiaAIUtil:
         unit_to_focus: str | None = None,
         file_upload_text: str | None = None,
         class_file: ClassFile | None = None,
+        user_suggestions: str | None = None,
         max_attempts: int = 3,
         use_wolfram: bool = True,
     ) -> GeneratedQuestion:
@@ -700,6 +725,7 @@ class SophiaAIUtil:
         system_instruction = (
             "You generate practice questions for a tutoring system. "
             "Return JSON only, with concise, student-friendly wording. "
+            "Do not include any preamble, markdown, or code fences. "
             "Always follow the provided output_contract. "
             "If must_be_solvable_in_wolfram_alpha=true, include a valid wolfram_query. "
             "If must_be_solvable_in_wolfram_alpha=false, include a correct final answer in the answer field. "
@@ -775,18 +801,48 @@ class SophiaAIUtil:
         history_tail = (question_answer_history or [])[-8:]
         class_file_payload = class_file.to_dict() if class_file else None
 
+        # Determine adaptive behavior instruction
+        adaptive_instruction = "None"
+        if effective_session.adaptive and history_tail:
+            last_q = history_tail[-1]
+            was_correct = bool(last_q.get("correct"))
+            if was_correct:
+                adaptive_instruction = "The user answered the previous question CORRECTLY. Make this new question SLIGHTLY HARDER or more complex than the last one."
+            else:
+                adaptive_instruction = "The user answered the previous question INCORRECTLY. Make this new question SLIGHTLY EASIER or simpler than the last one."
+
+        # Determine cumulative behavior instruction
+        cumulative_instruction = "If cumulative=true, combine 2+ concepts; else isolate 1 concept."
+        background_concepts: list[str] = []
+        if effective_session.cumulative:
+            if class_file:
+                # Use concepts from class_file that are NOT in the current focus
+                all_concepts = set(class_file.concepts)
+                current_focus = set(effective_session.focus_concepts)
+                background_concepts = list(all_concepts - current_focus)
+                cumulative_instruction = (
+                    "Cumulative is TRUE. You MUST combine the 'focus_concepts' with one or more 'background_concepts' "
+                    "(older concepts provided in the payload). Do not rely ONLY on focus_concepts."
+                )
+            else:
+                 cumulative_instruction = "Cumulative is TRUE. Integrate multiple concepts, including foundational ones implied by the difficulty level."
+
         def build_user_prompt(extra: JsonDict | None = None) -> str:
             payload: JsonDict = {
                 "session": dataclasses.asdict(effective_session),
                 "class_file": class_file_payload,
                 "file_upload_text": file_upload_text,
+                "user_suggestions": user_suggestions,
                 "history": history_tail,
+                "background_concepts": background_concepts,
                 "requirements": {
                     "must_be_solvable_in_wolfram_alpha": bool(use_wolfram),
                     "if_not_using_wolfram_include_final_answer": True,
                     "question_should_not_repeat_recent": True,
                     "prefer_focus_concepts": effective_session.focus_concepts,
-                    "cumulative_behavior": "If cumulative=true, combine 2+ concepts; else isolate 1 concept.",
+                    "cumulative_behavior": cumulative_instruction,
+                    "adaptive_adjustment": adaptive_instruction,
+                    "user_suggestions_instruction": "If 'user_suggestions' are provided, prioritize them highly in the question topic/style generation.",
                     "style_enforcement": "MIMIC the style of questions in 'history' and 'class_file.practice_problems' exactly.",
                 },
                 "output_contract": {
