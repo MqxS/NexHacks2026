@@ -722,6 +722,20 @@ def get_style_docs(classID):
         for sf in style_files
     ])
 
+@server.route("/api/getMetrics/<classID>", methods=["GET"])
+def get_metrics(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    doc = mongo.classes.find_one({"_id": obj_id}, {"metrics": 1})
+    if not doc:
+        return jsonify({"error": "Class not found"}), 404
+    metrics = doc.get("metrics", {})
+    return jsonify(metrics)
+
+
 @server.route("/", defaults={"path": ""})
 @server.route("/<path:path>")
 def spa(path):
