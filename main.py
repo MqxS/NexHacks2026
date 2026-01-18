@@ -213,7 +213,7 @@ def get_class_topics(classID):
 def get_recent_sessions(classID):
     sessions = mongo.sessions.find(
         {"classID": classID},
-        {"name": 1, "focusedConcepts": 1} # Note: focusedConcepts might not be in Session dataclass yet, assuming it maps to selectedTopics or similar
+        {"name": 1, "selectedTopics": 1}
     ).sort("_id", -1).limit(5)
 
     return jsonify([
