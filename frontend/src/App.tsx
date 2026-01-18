@@ -1,13 +1,13 @@
-import type { ReactNode } from 'react'
-import { Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Home } from './routes/Home'
-import { ClassSessionSetup } from './routes/ClassSessionSetup'
-import { ClassSettings } from './routes/ClassSettings'
-import { SessionPage } from './routes/SessionPage'
-import { cn } from './lib/utils'
-import { Settings } from 'lucide-react'
-import { InlineMath } from 'react-katex'
-import { AnimatePresence, motion } from 'framer-motion'
+import type {ReactNode} from 'react'
+import {Route, Routes, useLocation, useNavigate, useParams} from 'react-router-dom'
+import {Home} from './routes/Home'
+import {ClassSessionSetup} from './routes/ClassSessionSetup'
+import {ClassSettings} from './routes/ClassSettings'
+import {SessionPage} from './routes/SessionPage'
+import {cn} from './lib/utils'
+import {Settings} from 'lucide-react'
+import {InlineMath} from 'react-katex'
+import {AnimatePresence, motion} from 'framer-motion'
 
 const Breadcrumbs = () => {
   const location = useLocation()
