@@ -130,7 +130,7 @@ export const Home = () => {
       <div>
         <h1 className="text-3xl font-semibold text-espresso">Your classes</h1>
         <p className="mt-2 text-sm text-espresso/70">
-          Pick a class to start a new session or keep your materials organized.
+          Pick a class to start or continue a session.
         </p>
       </div>
 

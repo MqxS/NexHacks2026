@@ -124,22 +124,42 @@ const Shell = ({ children }: { children: ReactNode }) => {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-espresso/60">Powered by</span>
-            <div className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1">
+            <a
+              href="https://deepmind.google/technologies/gemini/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
               <img src={geminiLogo} alt="Google Gemini" className="h-5 w-5" />
               <span className="text-espresso">Google Gemini</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1">
+            </a>
+            <a
+              href="https://www.wolframalpha.com/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
               <img src={wolframLogo} alt="WolframAlpha" className="h-5 w-5" />
               <span className="text-espresso">WolframAlpha</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1">
+            </a>
+            <a
+              href="https://thetokencompany.com/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
               <img src={tokenLogo} alt="The Token Company" className="h-5 w-5" />
               <span className="text-espresso">The Token Company</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1">
+            </a>
+            <a
+              href="https://www.trae.ai/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
               <img src={traeLogo} alt="TRAE" className="h-5 w-5" />
               <span className="text-espresso">TRAE</span>
-            </div>
+            </a>
           </div>
         </div>
       </footer>
