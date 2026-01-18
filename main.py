@@ -516,8 +516,11 @@ def request_hint(questionID):
     existing_hints_data = pending.get("hints", [])
     hint_history = [h.get("text", "") for h in existing_hints_data if h.get("text")]
 
-    image_file = request.files["photo"]
-    image_bytes = image_file.read()
+    image_file = None
+    image_bytes = None
+    if "photo" in request.files:
+        image_file = request.files["photo"]
+        image_bytes = image_file.read()
 
     status_prompt = (
         request.form.get("hintRequest")
@@ -535,7 +538,7 @@ def request_hint(questionID):
             hint_history=hint_history,
             hint_type=req_hint_type,
             use_wolfram=True,
-            status_image=image_bytes,
+            status_image=image_bytes if "photo" in request.files else None,
             status_image_mime_type=image_file.mimetype if image_file else None
         )
 
