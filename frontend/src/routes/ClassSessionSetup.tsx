@@ -37,6 +37,15 @@ export const ClassSessionSetup = () => {
     enabled: Boolean(classID)
   })
 
+  const deleteSession = useMutation({
+    mutationFn: (sessionID: string) => api.deleteSession({ sessionID }),
+    onSuccess: () => {
+      toast.success('Session deleted')
+      sessionsQuery.refetch()
+    },
+    onError: (error: Error) => toast.error(error.message || 'Could not delete session')
+  })
+
   const createSession = useMutation({
     mutationFn: async () => {
       if (!classID) {
@@ -328,6 +337,7 @@ export const ClassSessionSetup = () => {
                   title={session.name || 'Session'}
                   tags={session.topics}
                   onResume={() => resumeSession.mutate(session.sessionID)}
+                  onDelete={() => deleteSession.mutate(session.sessionID)}
                 />
               ))}
             </div>
