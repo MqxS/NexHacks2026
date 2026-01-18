@@ -237,6 +237,35 @@ def submit_answer(questionID):
 
 @server.route("/api/updateSessionParams/<sessionID>", methods=["POST"])
 def update_session_params(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    update_fields = {}
+    if "name" in request.form:
+        update_fields["name"] = request.form["name"]
+    if "difficulty" in request.form:
+        try:
+            update_fields["difficulty"] = float(request.form["difficulty"])
+        except ValueError:
+            return jsonify({"error": "Invalid difficulty value"}), 400
+    if "cumulative" in request.form:
+        update_fields["isCumulative"] = request.form["cumulative"].lower() == "true"
+    if "focusedConcepts" in request.form:
+        concepts = request.form.getlist("focusedConcepts")
+        update_fields["focusedConcepts"] = concepts
+
+    if not update_fields:
+        return jsonify({"error": "No valid fields to update"}), 400
+
+    result = mongo.sessions.update_one(
+        {"_id": obj_id},
+        {"$set": update_fields}
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Session not found"}), 404
     return jsonify({"status": "Session parameters updated"})
 
 @server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
