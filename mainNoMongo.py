@@ -189,7 +189,11 @@ def get_class_topics(classID):
     topics = [
         {"title": "Algebra"},
         {"title": "Geometry"},
-        {"title": "Calculus"}
+        {"title": "Calculus"},
+        {"title": "Alpha"},
+        {"title": "Beta"},
+        {"title": "Gamma"},
+        {"title": "Delta"}
     ]
     return jsonify(topics)
 
