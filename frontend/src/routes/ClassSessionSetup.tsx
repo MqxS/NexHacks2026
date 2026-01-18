@@ -11,7 +11,7 @@ import { cn } from '../lib/utils'
 import * as Slider from '@radix-ui/react-slider'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { ChevronDown, Flame, Snowflake, Clock } from 'lucide-react'
+import { ChevronDown, Flame, Snowflake, Clock, Settings } from 'lucide-react'
 
 export const ClassSessionSetup = () => {
   const navigate = useNavigate()
@@ -75,9 +75,16 @@ export const ClassSessionSetup = () => {
     onError: (error: Error) => toast.error(error.message || 'Could not resume session')
   })
 
+  const processingMessage = createSession.isPending
+    ? {
+        title: 'Preparing your session...',
+        subtitle: 'Setting up topics and pacing'
+      }
+    : null
+
   return (
     <>
-      <SessionLoadingOverlay active={createSession.isPending} />
+      <ProcessingOverlay active={Boolean(processingMessage)} title={processingMessage?.title} subtitle={processingMessage?.subtitle} />
       <div className="grid gap-10 lg:grid-cols-[2fr,1fr]">
       <div className="space-y-8">
         <PaperCard className="p-8">
@@ -260,21 +267,37 @@ export const ClassSessionSetup = () => {
           )}
         </div>
       </div>
-      <div className="space-y-6">
-        <PaperCard className="sticky top-28">
+      <div className="sticky top-28 space-y-6">
+        <PaperCard>
           <h3 className="text-lg font-semibold text-espresso">Setup notes</h3>
           <p className="mt-2 text-sm text-espresso/70">
             We will remember these choices for this class. You can adjust difficulty and topics at any time during the
             session.
           </p>
         </PaperCard>
+        <button
+          type="button"
+          onClick={() => navigate(`/class/${classID}/settings`)}
+          className="flex items-center justify-between rounded-2xl border border-espresso/20 bg-paper px-4 py-3 text-sm font-medium text-espresso shadow-paper transition hover:-translate-y-0.5"
+        >
+          <span>Class files & settings</span>
+          <Settings className="h-4 w-4" />
+        </button>
       </div>
       </div>
     </>
   )
 }
 
-const SessionLoadingOverlay = ({ active }: { active: boolean }) => {
+const ProcessingOverlay = ({
+  active,
+  title,
+  subtitle
+}: {
+  active: boolean
+  title?: string
+  subtitle?: string
+}) => {
   if (!active) return null
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-espresso/30 backdrop-blur-[2px]">
@@ -283,8 +306,8 @@ const SessionLoadingOverlay = ({ active }: { active: boolean }) => {
           <div className="orbit-ring" />
           <div className="orbit-dot" />
         </div>
-        <p className="text-sm font-medium text-espresso">Preparing your session...</p>
-        <p className="mt-1 text-xs text-espresso/60">Setting up topics and pacing</p>
+        <p className="text-sm font-medium text-espresso">{title}</p>
+        {subtitle ? <p className="mt-1 text-xs text-espresso/60">{subtitle}</p> : null}
       </div>
     </div>
   )

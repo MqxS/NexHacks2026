@@ -56,7 +56,7 @@ def get_class_cards():
 
 @server.route("/api/createClass", methods=["POST"])
 def create_class():
-    time.sleep(7.71)
+    time.sleep(1.5)
     payload = request.get_json(silent=True) or {}
     name = (
         request.form.get("Name")
@@ -78,11 +78,26 @@ def create_class():
 
 @server.route("/api/createSession")
 def create_session():
-    time.sleep(7.71)
+    time.sleep(1.2)
     session = {
         "sessionID": "ABC123",
     }
     return jsonify(session)
+
+@server.route("/api/replaceSyllabus", methods=["POST"])
+def replace_syllabus():
+    time.sleep(1.2)
+    return jsonify({"status": "Syllabus replaced"})
+
+@server.route("/api/uploadStyleDocs", methods=["POST"])
+def upload_style_docs():
+    time.sleep(1.4)
+    return jsonify({"status": "Style docs uploaded"})
+
+@server.route("/api/deleteStyleDoc", methods=["POST"])
+def delete_style_doc():
+    time.sleep(0.8)
+    return jsonify({"status": "Style doc deleted"})
 
 @server.route("/api/getClassTopics/<classID>")
 def get_class_topics(classID):
