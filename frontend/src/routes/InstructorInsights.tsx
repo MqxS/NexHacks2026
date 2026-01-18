@@ -24,13 +24,14 @@ type Bubble = NormalizedMastery & {
 }
 
 const splitTopic = (label: string) => {
-  if (label.length <= 12) return [label]
-  if (label.length <= 20 && label.includes(' ')) {
+  if (label.length <= 10) return [label]
+  if (label.includes(' ')) {
     const parts = label.split(' ')
     const mid = Math.ceil(parts.length / 2)
     return [parts.slice(0, mid).join(' '), parts.slice(mid).join(' ')]
   }
-  return [label]
+  const mid = Math.ceil(label.length / 2)
+  return [label.slice(0, mid), label.slice(mid)]
 }
 
 const randomInt = (min: number, max: number) =>
@@ -324,10 +325,10 @@ export const InstructorInsights = () => {
                     {bubble.radius > 40 ? (
                       (() => {
                         const lines = splitTopic(bubble.topic)
-                        const fontSize = Math.max(9, Math.min(13, bubble.radius * 0.18))
+                        const fontSize = Math.max(8, Math.min(12, bubble.radius * 0.18))
                         const lineHeight = fontSize + 2
-                        const fits = lines.length * lineHeight <= bubble.radius * 1.2
-                        if (!fits && bubble.topic.length > 18) return null
+                        const fits = lines.length * lineHeight <= bubble.radius * 1.35
+                        if (!fits && bubble.topic.length > 16) return null
                         const maxWidth = bubble.radius * 1.6
                         return (
                           <text

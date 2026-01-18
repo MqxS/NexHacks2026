@@ -17,8 +17,8 @@ export type Feedback = {
 
 export type TopicMetric = {
   topic: string
-  progress: number
-  questions: number
+  totalAnswers: number
+  rightAnswers: number
 }
 
 type BackendClassCard = {

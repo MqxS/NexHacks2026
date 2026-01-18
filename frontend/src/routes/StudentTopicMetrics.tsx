@@ -24,6 +24,11 @@ export const StudentTopicMetrics = () => {
     return metrics.filter((metric) => metric.topic.toLowerCase().includes(search.toLowerCase()))
   }, [metrics, search])
 
+  const buildProgress = (metric: TopicMetric) => {
+    if (metric.totalAnswers <= 0) return 0
+    return Math.round((metric.rightAnswers / metric.totalAnswers) * 100)
+  }
+
   const buildProgressGradient = (progress: number) => {
     if (progress <= 50) {
       return 'linear-gradient(to top, #d29862 0%, #d29862 100%)'
@@ -79,7 +84,9 @@ export const StudentTopicMetrics = () => {
           items={filteredMetrics}
           initialIndex={filteredMetrics.length === 1 ? 0 : 1}
           className="pt-10 pb-14"
-          renderItem={(metric, _index, selected) => (
+          renderItem={(metric, _index, selected) => {
+            const progress = buildProgress(metric)
+            return (
             <PaperCard
               className={cn(
                 'flex h-[380px] w-[240px] flex-col transition-transform duration-200',
@@ -88,7 +95,7 @@ export const StudentTopicMetrics = () => {
             >
               <div className="h-[64px]">
                 <p className="line-clamp-2 text-sm font-semibold text-espresso">{metric.topic}</p>
-                <p className="mt-1 text-xs text-espresso/60">{metric.questions} questions answered</p>
+                <p className="mt-1 text-xs text-espresso/60">{metric.totalAnswers} questions answered</p>
               </div>
 
               <div className="mt-auto flex flex-col items-center pb-6">
@@ -96,15 +103,15 @@ export const StudentTopicMetrics = () => {
                   <div
                     className="absolute bottom-0 left-0 right-0 rounded-full"
                     style={{
-                      height: `${metric.progress}%`,
-                      background: buildProgressGradient(metric.progress)
+                      height: `${progress}%`,
+                      background: buildProgressGradient(progress)
                     }}
                   />
                 </div>
-                <p className="mt-4 text-sm font-semibold text-espresso">{metric.progress}% mastery</p>
+                <p className="mt-4 text-sm font-semibold text-espresso">{progress}% mastery</p>
               </div>
             </PaperCard>
-          )}
+          )}}
         />
       )}
     </div>

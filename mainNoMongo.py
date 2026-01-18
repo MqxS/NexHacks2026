@@ -217,14 +217,15 @@ def get_metrics(classID):
     random.shuffle(topics)
     selected = topics[:target]
 
-    metrics = [
-        {
+    metrics = []
+    for topic in selected:
+        total_answers = random.randint(8, 60)
+        right_answers = random.randint(0, total_answers)
+        metrics.append({
             "topic": topic,
-            "progress": random.randint(35, 95),
-            "questions": random.randint(8, 60)
-        }
-        for topic in selected
-    ]
+            "totalAnswers": total_answers,
+            "rightAnswers": right_answers
+        })
     return jsonify(metrics)
 
 @server.route("/api/getRecentSessions/<classID>")
