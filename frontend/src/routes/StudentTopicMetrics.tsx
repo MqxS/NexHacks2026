@@ -20,8 +20,10 @@ export const StudentTopicMetrics = () => {
   const metrics = metricsQuery.data ?? []
 
   const filteredMetrics = useMemo(() => {
-    if (!search.trim()) return metrics
-    return metrics.filter((metric) => metric.topic.toLowerCase().includes(search.toLowerCase()))
+    const base = search.trim()
+      ? metrics.filter((metric) => metric.topic.toLowerCase().includes(search.toLowerCase()))
+      : metrics
+    return [...base].sort((a, b) => buildProgress(b) - buildProgress(a))
   }, [metrics, search])
 
   const buildProgress = (metric: TopicMetric) => {
