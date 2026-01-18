@@ -1,0 +1,234 @@
+{
+  "class_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc",
+  "is_math": true,
+  "use_wolfram": true,
+  "syllabus_chars": 1919,
+  "practice_items_count": 11,
+  "steps": {
+    "parse_syllabus": {
+      "name": "Parsing syllabus PDF",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "parse_practice": {
+      "name": "Parsing practice PDFs",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "create_class_file": {
+      "name": "Analyzing settings request (create_class_file)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "generate_question": {
+      "name": "Generating question",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "generate_question_with_suggestion": {
+      "name": "Generating question with suggestions",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_ok": {
+      "name": "Validating question (expected valid)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_bad": {
+      "name": "Validating question (expected invalid)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_hint": {
+      "name": "Validating hint against a step",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Metacognitive / Reflection": {
+      "name": "Generating hint (Metacognitive / Reflection)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Conceptual": {
+      "name": "Generating hint (Conceptual)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Strategic": {
+      "name": "Generating hint (Strategic)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Procedural / Subgoal": {
+      "name": "Generating hint (Procedural / Subgoal)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Bottom-Out / Explicit": {
+      "name": "Generating hint (Bottom-Out / Explicit)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "adjust_session_parameter": {
+      "name": "Analyzing settings request (adjust_session_parameter)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "regenerate_question": {
+      "name": "Analyzing settings request (regenerate_question)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "save_metadata": {
+      "name": "Analyzing settings request (save_metadata)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    }
+  },
+  "generated": {
+    "question": "Find $\\lim_{x \\to 0} \\frac{5^x - 1}{x}$. (A) 0 (B) 1 (C) $\\ln 5$ (D) 5 (E) Does not exist",
+    "answer": "log(5)",
+    "wolfram_query": "limit (5^x - 1)/x as x -> 0",
+    "validation_prompt": "You are a mathematical validator. Evaluate the student's step-by-step work for the limit problem: $\\lim_{x \\to 0} \\frac{5^x - 1}{x}$. For the provided step, check for: 1) Correct application of L'Hopital's Rule or the definition of the derivative. 2) Correct differentiation of $a^x$. 3) Algebraic accuracy. Output a JSON object with: 'is_valid' (boolean), 'error_category' (string or null), and 'feedback' (string). Do not provide the final answer (C) unless the student has already derived it correctly. Focus on whether the logic follows from the previous state.",
+    "metadata": {
+      "difficulty_level": 3,
+      "concepts": [
+        "Differentiation and Integration of Functions with Bases other than e",
+        "L’Hopital’s Rule"
+      ],
+      "unit": "math-calculus-bc",
+      "cumulative": true,
+      "adaptive": true,
+      "verified_with_wolfram": true,
+      "used_file_upload": true,
+      "used_class_file": true
+    }
+  },
+  "generated_with_suggestion": {
+    "question": "A population of space-dinosaurs $P(t)$ satisfies the differential equation $\\frac{dP}{dt} = P \\ln 3$. If $P(0) = 1$, what is the value of $\\lim_{t \\to 2} \\frac{P(t) - 9}{t - 2}$? (A) $9$ (B) $9 \\ln 3$ (C) $3 \\ln 9$ (D) $27$ (E) $\\ln 3$",
+    "answer": "9 log(3)",
+    "wolfram_query": "limit (3^t - 9)/(t-2) as t->2",
+    "validation_prompt": "You are an expert mathematics evaluator. Your task is to assess a student's step-by-step solution to the provided calculus problem involving a differential equation and a limit. \n\nContext:\n- The differential equation dP/dt = P ln 3 with P(0) = 1 yields the solution P(t) = 3^t.\n- The limit lim_{t -> 2} [P(t) - 9] / [t - 2] is the definition of the derivative P'(2).\n- Since P(2) = 3^2 = 9, the limit is indeed P'(2).\n- P'(t) = 3^t ln 3, so P'(2) = 9 ln 3.\n\nEvaluation Instructions:\n1. Check if the student correctly identifies P(t) = 3^t.\n2. Check if the student recognizes the limit as the derivative of P(t) at t=2.\n3. Verify the differentiation and substitution steps.\n4. Ensure the student selects the correct multiple-choice option (B).\n\nOutput Format:\nReturn a JSON object with these keys:\n- \"is_valid\" (boolean): Whether the current step is mathematically sound.\n- \"error_type\" (string|null): If invalid, categorize the error (e.g., \"Differential Equation Solution\", \"Limit Interpretation\", \"Differentiation Error\", \"Arithmetic\").\n- \"feedback\" (string): A concise explanation of the validity or error.\n- \"suggestion\" (string|null): A guiding hint for the student if they are incorrect or stuck, without providing the final answer.",
+    "metadata": {
+      "difficulty_level": 3,
+      "concepts": [
+        "Transcendental Functions",
+        "Separable Differential Equations",
+        "L'Hopital's Rule"
+      ],
+      "unit": "math-calculus-bc",
+      "cumulative": true,
+      "adaptive": true,
+      "verified_with_wolfram": true,
+      "used_class_file": true
+    }
+  },
+  "validation_ok": {
+    "ok": true,
+    "wolfram_query": "limit (5^x - 1)/x as x -> 0",
+    "wolfram_result": "log(5)",
+    "details": null
+  },
+  "validation_bad": {
+    "ok": false,
+    "wolfram_query": null,
+    "wolfram_result": null,
+    "details": "Gemini did not return valid JSON: Here is the JSON requested:\n```"
+  },
+  "hints": {
+    "Metacognitive / Reflection": {
+      "kind": "hint",
+      "text": "Does this expression look like the definition of a derivative for a specific function at a specific point?",
+      "hint_type": "Metacognitive / Reflection",
+      "wolfram_query": "limit (5^x - 1)/x as x -> 0",
+      "wolfram_result": "log(5)"
+    },
+    "Conceptual": {
+      "kind": "hint",
+      "text": "This limit matches the definition of the derivative of the function f(x) = 5^x evaluated at x = 0.",
+      "hint_type": "Conceptual",
+      "wolfram_query": "limit (5^x - 1)/x as x -> 0",
+      "wolfram_result": "log(5)"
+    },
+    "Strategic": {
+      "kind": "hint",
+      "text": "Since direct substitution results in the indeterminate form 0/0, try applying L'Hôpital's Rule or recognizing this expression as the definition of the derivative for f(x) = 5^x at x = 0.",
+      "hint_type": "Strategic",
+      "wolfram_query": "limit (5^x - 1)/x as x -> 0",
+      "wolfram_result": "log(5)"
+    },
+    "Procedural / Subgoal": {
+      "kind": "hint",
+      "text": "Start by checking the form of the limit by substituting x=0. If you get an indeterminate form like 0/0, you can apply L'Hôpital's Rule by differentiating the numerator and denominator separately.",
+      "hint_type": "Procedural / Subgoal",
+      "wolfram_query": "Limit[(5^x - 1)/x, x -> 0]",
+      "wolfram_result": "log(5)"
+    },
+    "Bottom-Out / Explicit": {
+      "kind": "hint",
+      "text": "This limit is the definition of the derivative of f(x) = 5^x at x = 0. Using the rule for exponential derivatives or L'Hôpital's Rule, the limit evaluates to ln 5.",
+      "hint_type": "Bottom-Out / Explicit",
+      "wolfram_query": "Limit[(5^x - 1)/x, x -> 0]",
+      "wolfram_result": "log(5)"
+    }
+  },
+  "hint_validation": {
+    "ok": false,
+    "wolfram_query": null,
+    "wolfram_result": null,
+    "details": null
+  },
+  "settings_analyses": [
+    {
+      "request_type": "adjust_session_parameter",
+      "parameter_changes": {
+        "difficulty_level_delta": 1,
+        "focus_concepts_add": [
+          "chain rule"
+        ]
+      },
+      "should_regenerate_question": true,
+      "notes": "Increase difficulty and focus on chain rule."
+    },
+    {
+      "request_type": "regenerate_question",
+      "parameter_changes": {},
+      "should_regenerate_question": true,
+      "notes": "User requested regeneration due to similarity with previous questions."
+    },
+    {
+      "request_type": "save_metadata",
+      "parameter_changes": {
+        "learner_profile_add": [
+          "struggles_with_factoring"
+        ]
+      },
+      "should_regenerate_question": false,
+      "notes": "Store as learner metadata for adaptiveness."
+    },
+    {
+      "request_type": "create_class_file",
+      "parameter_changes": {},
+      "should_regenerate_question": false,
+      "notes": "Generate a class file for AP Calculus based on provided syllabus and examples."
+    }
+  ],
+  "artifacts_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts"
+}

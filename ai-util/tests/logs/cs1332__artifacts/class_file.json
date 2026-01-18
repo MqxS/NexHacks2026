@@ -1,0 +1,88 @@
+{
+  "class_name": "cs1332",
+  "syllabus": {
+    "units": [
+      {
+        "title": "Data Structures (Low-level implementation)",
+        "topics": [
+          "Arrays and ArrayLists",
+          "LinkedLists (Singular, Doubly, Circular)",
+          "Stacks, Queues, Deques, Priority Queues",
+          "Various Trees: Binary, Binary Search, AVL, Splay, Heaps, 2-4 Trees, etc.",
+          "Hash Maps/Tables: External Chaining and Probing",
+          "Graphs and their algorithms"
+        ]
+      },
+      {
+        "title": "Common Algorithms",
+        "topics": [
+          "Sorting Algorithms: Bubble, Insertion, Selection, Cocktail Shaker, Merge, Quick, Radix, etc.",
+          "Pattern Matching Algorithms: Brute force, Boyer-Moore, KMP, Rabin-Karp",
+          "Graph Algorithms: Dijkstra’s Shortest Path and multiple MSTs",
+          "Dynamic Programming Algorithms"
+        ]
+      },
+      {
+        "title": "Analysis and Methodology",
+        "topics": [
+          "Big-O notation and complexity analysis",
+          "Testing and debugging programs",
+          "Individual Java programming skills"
+        ]
+      }
+    ]
+  },
+  "concepts": [
+    "Data Structures",
+    "Low-level implementation",
+    "Arrays",
+    "ArrayLists",
+    "LinkedLists",
+    "Singular LinkedLists",
+    "Doubly LinkedLists",
+    "Circular LinkedLists",
+    "Stacks",
+    "Queues",
+    "Deques",
+    "Priority Queues",
+    "Binary Trees",
+    "Binary Search Trees",
+    "AVL Trees",
+    "Splay Trees",
+    "Heaps",
+    "2-4 Trees",
+    "Hash Maps",
+    "Hash Tables",
+    "External Chaining",
+    "Probing",
+    "Graphs",
+    "Sorting Algorithms",
+    "Bubble Sort",
+    "Insertion Sort",
+    "Selection Sort",
+    "Cocktail Shaker Sort",
+    "Merge Sort",
+    "Quick Sort",
+    "Radix Sort",
+    "Pattern Matching Algorithms",
+    "Brute force pattern matching",
+    "Boyer-Moore Algorithm",
+    "KMP Algorithm",
+    "Rabin-Karp Algorithm",
+    "Graph Algorithms",
+    "Dijkstra’s Shortest Path",
+    "Minimum Spanning Trees (MSTs)",
+    "Dynamic Programming",
+    "Big-O notation",
+    "Complexity analysis",
+    "Testing and debugging",
+    "Java programming"
+  ],
+  "practice_problems": [
+    "What is the tightest Big-O bound for adding to the middle index of an ArrayList? Assume an optimal implementation and do not use amortized analysis. Options: O(1), O(log n), O(n), O(n log n), O(n^2).",
+    "What is the tightest Big-O bound for adding to the back of a CircularSinglyLinkedList? Assume an optimal implementation and do not use amortized analysis. Options: O(1), O(log n), O(n), O(n log n), O(n^2).",
+    "What is the tightest Big-O bound for adding to the third-to-last spot in a DoublyLinkedList? Assume an optimal implementation and do not use amortized analysis. Options: O(1), O(log n), O(n), O(n log n), O(n^2).",
+    "What is the tightest Big-O bound for the average case of adding an element that is larger than every other data in a BST?"
+  ],
+  "updated_at_iso": "2026-01-18T00:38:40.383616+00:00"
+}

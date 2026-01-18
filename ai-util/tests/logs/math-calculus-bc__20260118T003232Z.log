@@ -1,0 +1,129 @@
+2026-01-17 19:32:32,411 [INFO] Log file: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__20260118T003232Z.log
+2026-01-17 19:32:32,412 [INFO] Environment status: {
+  "gemini_api_key_set": true,
+  "wolfram_app_id_set": true,
+  "tokenc_api_key_set": true
+}
+2026-01-17 19:32:32,447 [INFO] Repo root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026
+2026-01-17 19:32:32,447 [INFO] ai-util root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util
+2026-01-17 19:32:32,447 [INFO] Sophia module dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia
+2026-01-17 19:32:32,447 [INFO] Selected class dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc
+2026-01-17 19:32:32,447 [INFO] Class type: math (wolfram enabled)
+2026-01-17 19:32:32,447 [INFO] syllabus.pdf: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc/syllabus.pdf
+2026-01-17 19:32:32,447 [INFO] practice PDFs: 1
+2026-01-17 19:32:32,448 [INFO]  - AP-Calculus-BC-hw.pdf
+2026-01-17 19:32:32,448 [INFO] Artifacts dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts
+2026-01-17 19:32:32,448 [INFO] Parsing syllabus PDF...
+2026-01-17 19:32:53,808 [INFO] Syllabus extracted chars: 1919
+2026-01-17 19:32:53,809 [INFO] Parsing practice PDFs...
+2026-01-17 19:33:28,776 [INFO] Practice items extracted: 11
+2026-01-17 19:33:28,776 [INFO] Sample practice items:
+Find \(\lim_{x \to -1} \frac{x^2 + 3x + 2}{x + 1}\).
+(A) 2
+(B) 1
+(C) 0
+(D) -1
+(E) Does not exist
+
+For what value(s) of \(k\), if any, is \(f(x) = \begin{cases} x^2 - k & \text{if } x < 2 \\ 2x + k & \text{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)?
+(A) -4, -2
+(B) 2
+(C) 4
+(D) -2, 4
+(E) Does not exist
+
+If \(f(x) = \sqrt{x^2 - 8x + 1}\), then \(f'(x)\) is
+(A) \(\frac{x-8}{\sqrt{x^2-8x+1}}\)
+(B) \(\frac{8}{\sqrt{x^2-8x+1}}\)
+(C) \(2\sqrt{x^2-8x+1} + 8\)
+(D) \(\frac{x-4}{\sqrt{x^2-8x+1}}\)
+(E) \(\frac{x+2}{\sqrt{x^2-8x+1}}\)
+2026-01-17 19:33:28,776 [INFO] Creating class file from PDFs...
+2026-01-17 19:34:50,781 [INFO] Class file saved: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts/class_file.json
+2026-01-17 19:34:50,782 [INFO] Class file concepts: 37
+2026-01-17 19:34:50,782 [INFO] Adjusted session: {
+  "difficulty_level": 3,
+  "cumulative": true,
+  "adaptive": true,
+  "focus_concepts": [
+    "Transcendental Functions",
+    "Differentiation and Integration of Functions with Bases other than e",
+    "Separable Differential Equations",
+    "Growth and Decay",
+    "Newton’s Law of Cooling"
+  ],
+  "unit_focus": "math-calculus-bc"
+}
+2026-01-17 19:34:50,782 [INFO] Generating question...
+2026-01-17 19:35:26,378 [INFO] Generated question:
+Find $\lim_{x \to 0} \frac{5^x - 1}{x}$. (A) 0 (B) 1 (C) $\ln 5$ (D) 5 (E) Does not exist
+2026-01-17 19:35:26,378 [INFO] Generated answer:
+log(5)
+2026-01-17 19:35:26,378 [INFO] Verified with wolfram: True
+2026-01-17 19:35:26,378 [INFO] Validation prompt length: 565
+2026-01-17 19:35:26,378 [INFO] Saved question record: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts/question_history.jsonl
+2026-01-17 19:35:26,379 [INFO] Generating question with suggestions...
+2026-01-17 19:36:05,323 [INFO] Generated question (with suggestions):
+A population of space-dinosaurs $P(t)$ satisfies the differential equation $\frac{dP}{dt} = P \ln 3$. If $P(0) = 1$, what is the value of $\lim_{t \to 2} \frac{P(t) - 9}{t - 2}$? (A) $9$ (B) $9 \ln 3$ (C) $3 \ln 9$ (D) $27$ (E) $\ln 3$
+2026-01-17 19:36:05,324 [INFO] Generated answer (with suggestions):
+9 log(3)
+2026-01-17 19:36:05,324 [INFO] Validating question (expected valid)...
+2026-01-17 19:36:08,325 [INFO] Validation ok=True wolfram_query=limit (5^x - 1)/x as x -> 0
+2026-01-17 19:36:08,326 [INFO] Validating question (expected invalid)...
+2026-01-17 19:36:12,370 [INFO] Bad validation ok=False wolfram_query=None wolfram_result=None
+2026-01-17 19:36:12,371 [INFO] Generating hint (Metacognitive / Reflection)...
+2026-01-17 19:36:15,964 [INFO] Hint (Metacognitive / Reflection) kind=hint type=Metacognitive / Reflection
+Does this expression look like the definition of a derivative for a specific function at a specific point?
+2026-01-17 19:36:15,964 [INFO] Generating hint (Conceptual)...
+2026-01-17 19:36:19,195 [INFO] Hint (Conceptual) kind=hint type=Conceptual
+This limit matches the definition of the derivative of the function f(x) = 5^x evaluated at x = 0.
+2026-01-17 19:36:19,195 [INFO] Generating hint (Strategic)...
+2026-01-17 19:36:23,130 [INFO] Hint (Strategic) kind=hint type=Strategic
+Since direct substitution results in the indeterminate form 0/0, try applying L'Hôpital's Rule or recognizing this expression as the definition of the derivative for f(x) = 5^x at x = 0.
+2026-01-17 19:36:23,131 [INFO] Generating hint (Procedural / Subgoal)...
+2026-01-17 19:36:26,855 [INFO] Hint (Procedural / Subgoal) kind=hint type=Procedural / Subgoal
+Start by checking the form of the limit by substituting x=0. If you get an indeterminate form like 0/0, you can apply L'Hôpital's Rule by differentiating the numerator and denominator separately.
+2026-01-17 19:36:26,855 [INFO] Generating hint (Bottom-Out / Explicit)...
+2026-01-17 19:36:30,639 [INFO] Hint (Bottom-Out / Explicit) kind=hint type=Bottom-Out / Explicit
+This limit is the definition of the derivative of f(x) = 5^x at x = 0. Using the rule for exponential derivatives or L'Hôpital's Rule, the limit evaluates to ln 5.
+2026-01-17 19:36:30,640 [INFO] Validating hint against a step...
+2026-01-17 19:36:33,662 [INFO] Hint validation ok=False wolfram_query=None
+2026-01-17 19:36:33,663 [INFO] Analyzing settings request (adjust_session_parameter)...
+2026-01-17 19:36:36,701 [INFO] Settings analysis (adjust_session_parameter): {
+  "request_type": "adjust_session_parameter",
+  "parameter_changes": {
+    "difficulty_level_delta": 1,
+    "focus_concepts_add": [
+      "chain rule"
+    ]
+  },
+  "should_regenerate_question": true,
+  "notes": "Increase difficulty and focus on chain rule."
+}
+2026-01-17 19:36:36,702 [INFO] Analyzing settings request (regenerate_question)...
+2026-01-17 19:36:38,205 [INFO] Settings analysis (regenerate_question): {
+  "request_type": "regenerate_question",
+  "parameter_changes": {},
+  "should_regenerate_question": true,
+  "notes": "User requested regeneration due to similarity with previous questions."
+}
+2026-01-17 19:36:38,206 [INFO] Analyzing settings request (save_metadata)...
+2026-01-17 19:36:41,535 [INFO] Settings analysis (save_metadata): {
+  "request_type": "save_metadata",
+  "parameter_changes": {
+    "learner_profile_add": [
+      "struggles_with_factoring"
+    ]
+  },
+  "should_regenerate_question": false,
+  "notes": "Store as learner metadata for adaptiveness."
+}
+2026-01-17 19:36:41,535 [INFO] Analyzing settings request (create_class_file)...
+2026-01-17 19:36:43,771 [INFO] Settings analysis (create_class_file): {
+  "request_type": "create_class_file",
+  "parameter_changes": {},
+  "should_regenerate_question": false,
+  "notes": "Generate a class file for AP Calculus based on provided syllabus and examples."
+}
+2026-01-17 19:36:43,773 [INFO] Saved results JSON: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__20260118T003232Z.json
+2026-01-17 19:36:43,773 [INFO] Done.

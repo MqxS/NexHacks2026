@@ -1,0 +1,135 @@
+2026-01-17 23:15:45,639 [INFO] Log file: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/ap-gov__20260118T041545Z.log
+2026-01-17 23:15:45,640 [INFO] Environment status: {
+  "gemini_api_key_set": true,
+  "wolfram_app_id_set": true,
+  "tokenc_api_key_set": true
+}
+2026-01-17 23:15:45,670 [INFO] Repo root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026
+2026-01-17 23:15:45,670 [INFO] ai-util root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util
+2026-01-17 23:15:45,670 [INFO] Sophia module dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophia
+2026-01-17 23:15:45,670 [INFO] Selected class dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/ap-gov
+2026-01-17 23:15:45,670 [INFO] Class type: non-math (wolfram disabled)
+2026-01-17 23:15:45,670 [INFO] syllabus.pdf: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/ap-gov/syllabus.pdf
+2026-01-17 23:15:45,670 [INFO] practice PDFs: 1
+2026-01-17 23:15:45,670 [INFO]  - ap_government_practice_exam_by_max_score.pdf
+2026-01-17 23:15:45,670 [INFO] Artifacts dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/ap-gov__artifacts
+2026-01-17 23:15:45,670 [INFO] Parsing syllabus PDF...
+2026-01-17 23:16:12,826 [INFO] Syllabus extracted chars: 992
+2026-01-17 23:16:12,827 [INFO] Parsing practice PDFs...
+2026-01-17 23:16:27,593 [INFO] Practice items extracted: 7
+2026-01-17 23:16:27,594 [INFO] Sample practice items:
+Which of the following statements is NOT true of the Supreme Court’s decision in McCulloch v. Maryland (1819)?
+A. It held that state governments could pass a law negating a federal law within their boundaries if they believed the federal law was unconstitutional.
+B. It confirmed the supremacy of the federal government over state governments.
+C. It determined that states could not levy taxes on federal government operations.
+D. It interpreted the “necessary and proper” powers clause of the Constitution to mean that the federal government has implied powers not specifically stated in the Constitution.
+E. It upheld the constitutionality of the national bank established by the federal government.
+
+Which of the following is a clause of the Constitution that gives the federal government broad powers in many policy areas?
+A. Interstate Commerce Clause
+B. Tenth Amendment
+C. Free-Exercise Clause
+D. Establishment Clause
+E. Fiscal Federalism Clause
+
+While the practice of separate schools for black and white students was declared unconstitutional by the Supreme Court in Brown v. Board of Education (1954), segregation in restaurants, stores, hotels, and other public accommodations remained legal until
+A. the Supreme Court’s decision in Loving v. Virginia (1967)
+B. the ratification of the Twenty-Fourth Amendment (1964)
+C. the passage of the Civil Rights Act of 1964
+D. state legislatures eventually changed the laws permitting segregation
+E. President Lyndon Johnson issued an executive order ending all segregation by race
+2026-01-17 23:16:27,594 [INFO] Creating class file from PDFs...
+2026-01-17 23:17:32,486 [INFO] Class file saved: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/ap-gov__artifacts/class_file.json
+2026-01-17 23:17:32,487 [INFO] Class file concepts: 33
+2026-01-17 23:17:32,487 [INFO] Adjusted session: {
+  "difficulty_level": 3,
+  "cumulative": true,
+  "adaptive": true,
+  "focus_concepts": [
+    "Government",
+    "Politics",
+    "Research Methodology",
+    "Library Research",
+    "Presentation Skills"
+  ],
+  "unit_focus": "ap-gov"
+}
+2026-01-17 23:17:32,487 [INFO] Generating question...
+2026-01-17 23:17:43,139 [INFO] Generated question:
+In the study of political science research methodology, which of the following would be considered the most reliable source for analyzing actual voter turnout and demographic trends in a specific election?
+2026-01-17 23:17:43,140 [INFO] Generated answer:
+C. Official records from the U.S. Census Bureau or state election boards.
+2026-01-17 23:17:43,140 [INFO] Verified with wolfram: False
+2026-01-17 23:17:43,140 [INFO] Validation prompt length: 664
+2026-01-17 23:17:43,141 [INFO] Saved question record: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/ap-gov__artifacts/question_history.jsonl
+2026-01-17 23:17:43,141 [INFO] Generating question with suggestions...
+2026-01-17 23:18:19,816 [INFO] Generated question (with suggestions):
+A student is conducting library research for a presentation on the politics of space exploration. Which of the following scenarios best illustrates the constitutional principle of 'checks and balances' regarding NASA's budget?
+
+A. The Supreme Court declaring that NASA has the power to regulate interstate commerce.
+B. The President proposing a budget for a mission to Mars, but Congress refusing to appropriate the necessary funds.
+C. A state government passing a law to launch its own satellite to track dinosaur fossils in the desert.
+D. Interest groups lobbying the bureaucracy to change safety regulations for commercial space flight.
+E. The media reporting on the high cost of space travel to influence public opinion.
+2026-01-17 23:18:19,816 [INFO] Generated answer (with suggestions):
+B
+2026-01-17 23:18:19,817 [INFO] Validating question (expected valid)...
+2026-01-17 23:18:26,486 [INFO] Validation ok=False wolfram_query=None
+2026-01-17 23:18:26,486 [INFO] Validating question (expected invalid)...
+2026-01-17 23:18:28,218 [INFO] Bad validation ok=False wolfram_query=None wolfram_result=None
+2026-01-17 23:18:28,219 [INFO] Generating hint (Metacognitive / Reflection)...
+2026-01-17 23:18:31,926 [INFO] Hint (Metacognitive / Reflection) kind=hint type=Metacognitive / Reflection
+Reflect on the difference between self-reported data (like surveys) and official administrative records. Which one is less likely to have errors in actual counts?
+2026-01-17 23:18:31,926 [INFO] Generating hint (Conceptual)...
+2026-01-17 23:18:35,563 [INFO] Hint (Conceptual) kind=hint type=Conceptual
+Consider the distinction between official administrative records (which record actual ballots cast) and self-reported survey data (which rely on voter memory and can be subject to social desirability bias).
+2026-01-17 23:18:35,563 [INFO] Generating hint (Strategic)...
+2026-01-17 23:18:39,146 [INFO] Hint (Strategic) kind=hint type=Strategic
+Compare the reliability of official government administrative records against self-reported survey data for tracking actual behavior.
+2026-01-17 23:18:39,147 [INFO] Generating hint (Procedural / Subgoal)...
+2026-01-17 23:18:42,378 [INFO] Hint (Procedural / Subgoal) kind=hint type=Procedural / Subgoal
+Start by distinguishing between self-reported data (like surveys) and official administrative records (like voter files) to see which is less prone to bias.
+2026-01-17 23:18:42,378 [INFO] Generating hint (Bottom-Out / Explicit)...
+2026-01-17 23:18:45,586 [INFO] Hint (Bottom-Out / Explicit) kind=hint type=Bottom-Out / Explicit
+The most reliable sources for this data are typically official government election records (like the FEC) for turnout, and large-scale validated surveys like the American National Election Studies (ANES) or the U.S. Census Bureau's Current Population Survey for demographics.
+2026-01-17 23:18:45,586 [INFO] Validating hint against a step...
+2026-01-17 23:18:52,733 [INFO] Hint validation ok=False wolfram_query=None
+2026-01-17 23:18:52,733 [INFO] Analyzing settings request (adjust_session_parameter)...
+2026-01-17 23:18:55,633 [INFO] Settings analysis (adjust_session_parameter): {
+  "request_type": "adjust_session_parameter",
+  "parameter_changes": {
+    "difficulty_level_delta": 1,
+    "focus_concepts_add": [
+      "chain rule"
+    ]
+  },
+  "should_regenerate_question": true,
+  "notes": "Increase difficulty and focus on chain rule for the next question."
+}
+2026-01-17 23:18:55,633 [INFO] Analyzing settings request (regenerate_question)...
+2026-01-17 23:18:56,944 [INFO] Settings analysis (regenerate_question): {
+  "request_type": "regenerate_question",
+  "parameter_changes": {},
+  "should_regenerate_question": true,
+  "notes": "User requested regeneration due to similarity with previous questions."
+}
+2026-01-17 23:18:56,944 [INFO] Analyzing settings request (save_metadata)...
+2026-01-17 23:18:59,819 [INFO] Settings analysis (save_metadata): {
+  "request_type": "save_metadata",
+  "parameter_changes": {
+    "learner_profile_add": [
+      "struggles_with_factoring"
+    ]
+  },
+  "should_regenerate_question": false,
+  "notes": "Store as learner metadata for adaptiveness."
+}
+2026-01-17 23:18:59,819 [INFO] Analyzing settings request (create_class_file)...
+2026-01-17 23:19:02,797 [INFO] Settings analysis (create_class_file): {
+  "request_type": "create_class_file",
+  "parameter_changes": {},
+  "should_regenerate_question": false,
+  "notes": "Generate/refresh background class file."
+}
+2026-01-17 23:19:02,799 [INFO] Saved results JSON: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/ap-gov__20260118T041545Z.json
+2026-01-17 23:19:02,800 [INFO] Done.

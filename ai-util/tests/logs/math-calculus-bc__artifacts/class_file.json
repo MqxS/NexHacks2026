@@ -1,0 +1,179 @@
+{
+  "class_name": "math-calculus-bc",
+  "syllabus": {
+    "units": [
+      {
+        "title": "Week 1: Transcendental Functions",
+        "topics": [
+          "Differentiation and Integration of Functions with Bases other than e & Applications"
+        ]
+      },
+      {
+        "title": "Week 2: Differential Equations",
+        "topics": [
+          "Solving Separable Differential Equations",
+          "Growth & Decay",
+          "Newton’s Law of Cooling",
+          "Slope Fields",
+          "Euler’s Method"
+        ]
+      },
+      {
+        "title": "Week 3: Transcendental Functions",
+        "topics": [
+          "Differentiation & Integration of Inverse Trig Functions"
+        ]
+      },
+      {
+        "title": "Week 4: Applications of Integration",
+        "topics": [
+          "Calculations of Volumes of Solids (Washer, Shell, and General Cross-section methods)",
+          "Arc Length",
+          "Areas of Surfaces of Revolution"
+        ]
+      },
+      {
+        "title": "Week 5: Advanced Integration Techniques",
+        "topics": [
+          "Trigonometric Integration",
+          "Integration Using Trig Substitution"
+        ]
+      },
+      {
+        "title": "Week 6: Advanced Integration Techniques",
+        "topics": [
+          "Integration Using Partial Fractions",
+          "Integration by Tables",
+          "Integration by Parts"
+        ]
+      },
+      {
+        "title": "Week 7: Limits & Advanced Integration Techniques",
+        "topics": [
+          "L’Hopital’s Rule",
+          "Improper Integrals"
+        ]
+      },
+      {
+        "title": "Week 8: Parametric Equations & Vector-Valued Functions",
+        "topics": [
+          "Differentiation of Parametric Functions",
+          "Curves given parametrically",
+          "Differentiation of Vector-Valued Functions",
+          "Calculation of Speed",
+          "Area of a region bounded by a polar graph"
+        ]
+      },
+      {
+        "title": "Week 9: Infinite Series",
+        "topics": [
+          "Sequences, Series & Convergence",
+          "The Integral Test",
+          "p-series"
+        ]
+      },
+      {
+        "title": "Week 10: Infinite Series",
+        "topics": [
+          "Comparisons of Series",
+          "Alternating Series",
+          "Ratio & Root Tests"
+        ]
+      },
+      {
+        "title": "Week 11: Infinite Series",
+        "topics": [
+          "Taylor Polynomials & Approximations"
+        ]
+      },
+      {
+        "title": "Week 12: Infinite Series",
+        "topics": [
+          "Power Series",
+          "Taylor & Maclaurin Series"
+        ]
+      },
+      {
+        "title": "Week 13: Infinite Series",
+        "topics": [
+          "Maclaurin Series for functions e^x, sin x, cos x, and 1/(1-x)"
+        ]
+      },
+      {
+        "title": "Week 14: Infinite Series & AP Exam Review",
+        "topics": [
+          "LaGrange Error Bound for Taylor Polynomials",
+          "In-depth Review of Selected AP Topics in Preparation for AP Exam"
+        ]
+      },
+      {
+        "title": "Week 15: AP Exam Review",
+        "topics": [
+          "In-depth Review of Selected AP Topics in Preparation for AP Exam"
+        ]
+      },
+      {
+        "title": "Week 16: AP Exam Review",
+        "topics": [
+          "In-depth Review of Selected AP Topics in Preparation for AP Exam"
+        ]
+      },
+      {
+        "title": "Week 17: AP Exam Review",
+        "topics": [
+          "In-depth Review of Selected AP Topics",
+          "AP Exam"
+        ]
+      },
+      {
+        "title": "Week 18: Post AP Exam Selected Topics",
+        "topics": []
+      }
+    ]
+  },
+  "concepts": [
+    "Transcendental Functions",
+    "Differentiation and Integration of Functions with Bases other than e",
+    "Separable Differential Equations",
+    "Growth and Decay",
+    "Newton’s Law of Cooling",
+    "Slope Fields",
+    "Euler’s Method",
+    "Inverse Trigonometric Functions",
+    "Volumes of Solids (Washer, Shell, and General Cross-section methods)",
+    "Arc Length",
+    "Areas of Surfaces of Revolution",
+    "Trigonometric Integration",
+    "Trigonometric Substitution",
+    "Integration Using Partial Fractions",
+    "Integration by Tables",
+    "Integration by Parts",
+    "L’Hopital’s Rule",
+    "Improper Integrals",
+    "Parametric Equations",
+    "Vector-Valued Functions",
+    "Differentiation of Parametric Functions",
+    "Differentiation of Vector-Valued Functions",
+    "Calculation of Speed",
+    "Area of Polar Regions",
+    "Sequences",
+    "Infinite Series Convergence",
+    "Integral Test",
+    "p-series",
+    "Comparison Tests for Series",
+    "Alternating Series",
+    "Ratio Test",
+    "Root Test",
+    "Taylor Polynomials and Approximations",
+    "Power Series",
+    "Taylor Series",
+    "Maclaurin Series",
+    "LaGrange Error Bound"
+  ],
+  "practice_problems": [
+    "Find $\\lim_{x \\to -1^+} \\frac{x^2 - 1}{x^3 + 2x^2 + x}$. (A) 2 (B) 1 (C) 0 (D) -1 (E) Does not exist",
+    "For what value(s) of $k$, if any, is $f(x) = \\begin{cases} x^2 - k & \\text{if } x < 2 \\\\ 2x + k & \\text{if } x \\ge 2 \\end{cases}$ continuous on $(-\\infty, \\infty)$? (A) -4, -2 (B) 2 (C) 4 (D) -2, 4 (E) Does not exist",
+    "If $f(x) = \\ln(x^2 - 8x + 1)$, then $f'(x)$ is (A) $\\frac{x-8}{x^2-8x+1}"
+  ],
+  "updated_at_iso": "2026-01-18T00:34:50.778520+00:00"
+}
