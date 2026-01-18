@@ -54,12 +54,18 @@ class Session:
     file: FileUpload #optional
 
 @dataclass
+class Metric:
+    rightAnswers: int
+    totalAnswers: int
+
+@dataclass
 class Class:
     syllabus: FileUpload
     styleFiles: List[FileUpload] #optional
     name: str
     professor: str
     topics: List[str]
+    metrics: Dict[str, Metric]
     sessions: List[Session]
     classFile: Optional[Dict[str, Any]] = None # To store processed ClassFile from AI
 
@@ -139,7 +145,8 @@ def create_class():
         professor=request.form.get("professor", "Unknown"),
         topics=extracted_topics,
         sessions=[],
-        classFile=class_file_data
+        classFile=class_file_data,
+        metrics={}
     )
 
     result = mongo.classes.insert_one(asdict(class_doc))
@@ -364,7 +371,7 @@ def submit_answer(questionID):
 
     validation_prompt = pending.get("validation_prompt")
     question_text = pending.get("content")
-    
+
     is_correct = False
 
     system_instruction = validation_prompt or "You are a math tutor. Verify the student's answer."
@@ -376,7 +383,9 @@ def submit_answer(questionID):
             "feedback": "string"
         }
     }, ensure_ascii=False)
-    
+
+    question_topics = pending.get("topics", [])
+
     try:
         val_res = ai_util.gemini.generate_json(
             system_instruction=system_instruction,
@@ -387,7 +396,29 @@ def submit_answer(questionID):
     except Exception as e:
         print(f"Validation failed: {e}")
         feedback = "Could not verify answer automatically."
-    
+
+    session_doc = mongo.sessions.find_one({"_id": ObjectId(pending["sessionID"])})
+    if session_doc:
+        class_id_str = session_doc.get("classID")
+        if class_id_str:
+            class_doc = mongo.classes.find_one({"_id": ObjectId(class_id_str)})
+            if class_doc:
+                metrics = class_doc.get("metrics", {})
+                for topic in question_topics:
+                    if topic:
+                        if topic not in metrics:
+                            metrics[topic] = asdict(Metric(rightAnswers=0, totalAnswers=0))
+                        metric_entry = metrics[topic]
+                        metric_entry["totalAnswers"] += 1
+                        if is_correct:
+                            metric_entry["rightAnswers"] += 1
+                        metrics[topic] = metric_entry
+                #update the class metrics in the db
+                mongo.classes.update_one(
+                    {"_id": ObjectId(class_id_str)},
+                    {"$set": {"metrics": metrics}}
+                )
+
     question_entry = Question(
         content=question_text,
         userAnswer=user_answer,
@@ -396,12 +427,12 @@ def submit_answer(questionID):
         questionId=questionID,
         metadata=pending.get("metadata", {})
     )
-    
+
     mongo.sessions.update_one(
         {"_id": ObjectId(pending["sessionID"])},
         {"$push": {"questions": asdict(question_entry)}}
     )
-    
+
     # Cleanup pending? (Optional, keep for logs)
     mongo.pending_questions.delete_one({"questionId": questionID})
 
