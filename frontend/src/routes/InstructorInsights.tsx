@@ -328,6 +328,7 @@ export const InstructorInsights = () => {
                         const lineHeight = fontSize + 2
                         const fits = lines.length * lineHeight <= bubble.radius * 1.2
                         if (!fits && bubble.topic.length > 18) return null
+                        const maxWidth = bubble.radius * 1.6
                         return (
                           <text
                             x={bubble.x}
@@ -335,6 +336,8 @@ export const InstructorInsights = () => {
                             textAnchor="middle"
                             dominantBaseline="middle"
                             fontSize={fontSize}
+                            textLength={maxWidth}
+                            lengthAdjust="spacingAndGlyphs"
                             fill="rgba(255, 255, 255, 0.92)"
                             fontWeight={600}
                           >
