@@ -460,7 +460,7 @@ class GeminiClient:
             )
 
 
-class SophiaAIUtil:
+class SophiAIUtil:
     def __init__(
         self,
         *,
