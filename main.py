@@ -475,7 +475,7 @@ def set_adaptive(sessionID):
         return jsonify({"error": "Session not found"}), 404
     return jsonify({"status": "Adaptive setting updated"})
 
-@server.route("/api/requestHint/<questionID>")
+@server.route("/api/requestHint/<questionID>", methods=["GET", "POST"])
 def request_hint(questionID):
     if not ai_util:
         return jsonify({"error": "AI module not initialized"}), 500
