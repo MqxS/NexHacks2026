@@ -544,20 +544,43 @@ def request_hint(questionID):
 
     question_text = pending.get("content")
     
+    # Get existing hints to provide context
+    existing_hints_data = pending.get("hints", [])
+    hint_history = [h.get("text", "") for h in existing_hints_data if h.get("text")]
+
     # We could optionally ask the user for their current status/thoughts to generate a better hint
     # For now, we assume a generic "I'm stuck" status.
     status_prompt = request.args.get("status", "I am stuck and unsure what to do next.")
     
+    # Determine hint type: Strategic for first hint, None (auto) for subsequent
+    req_hint_type = "Strategic" if not hint_history else None
+
     try:
         hint_res = ai_util.generate_hint(
             status_prompt=status_prompt,
             problem=question_text,
-            hint_type="Strategic", # Default to strategic
+            hint_history=hint_history,
+            hint_type=req_hint_type,
             use_wolfram=True
         )
+        
+        # Save the new hint to the pending question
+        new_hint_entry = {
+            "text": hint_res.text,
+            "kind": hint_res.kind,
+            "hint_type": hint_res.hint_type,
+            "wolfram_query": hint_res.wolfram_query,
+            "timestamp": bson.datetime.datetime.now()
+        }
+        mongo.pending_questions.update_one(
+            {"questionId": questionID},
+            {"$push": {"hints": new_hint_entry}}
+        )
+        
         return jsonify({
             "hint": hint_res.text,
-            "kind": hint_res.kind
+            "kind": hint_res.kind,
+            "hint_type": hint_res.hint_type
         })
     except Exception as e:
         print(f"Hint generation failed: {e}")

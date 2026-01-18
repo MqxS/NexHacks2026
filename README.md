@@ -40,7 +40,7 @@ Each class stores a **Class File** (JSON) that contains custom-curated class met
 *   Textbook citation (if applicable)
 *   Style-notes derived from assignments (professor vocabulary, problem structure, common phrasing)=
 
-Questions, hints, and answers are grounded in symbolic reasoning (courtesy of Wolfram Alpha) or 
+Questions, hints, and answers are grounded in symbolic reasoning (courtesy of Wolfram Alpha) or textbook citations, ensuring that the questions are relevant and meaningful.
 
 This allows for Sophi to generate questions that are aligned with the professor's teaching style, provide hints that are specific to the student's current level of understanding, and ground the questions in the class material, ensuring that the questions are relevant and meaningful.
 
@@ -58,7 +58,7 @@ The backend is a Flask application that handles user authentication, class and s
 
 ### AI Stack
 
-We used Google Gemini Flash Lite 2.5 as the primary LLM for question generation and hint provision. Gemini is a state-of-the-art language model that is designed to be fast, efficient, and accurate, and our expansive prompting workflow allowed for robust results in near-real-time.
+We used Google Gemini Flash Lite 2.5 as the primary LLM for question generation and hint provision. Gemini Flash Lite 2.5 is a state-of-the-art language model that is designed to be fast, efficient, and accurate, and our expansive prompting workflow allowed for robust results in near-real-time.
 
 To mitigate hallucination, we utilize a combination of fact-checking mechanisms and post-processing filters. We leverage the Wolfram Alpha API and its use of symbolic learning, translating questions to a primitive form that allows for more accurate fact-checking. Additionally, we leverage entries from the textbook citation, retrieved via a FAISS Vector-Store database also hosted by MongoDB, to ensure that the generated questions are aligned with the class material.
 
@@ -78,7 +78,7 @@ Again, we fully acknowledge that this space is extremely saturated, and that the
 
 ## About Us
 
-Karthik: I am a current student researcher in the Teachable AI Lab at the Georgia Institute of Technology. I've worked over the past semester implementing nontraditional learning algorithms with a focus in symbolic learning, so I have a deep understanding of addressing the gap between LLM 
+Karthik: I am a current student researcher in the Teachable AI Lab at the Georgia Institute of Technology, and I've worked over the past semester implementing nontraditional learning algorithms with a focus in symbolic learning. As such, my primary background is in true forms of reasoning. As a researcher leaning more on the traditional AI side, I was compelled by how old AI architecture design meshed with modern LLM solutions, resulting in strong and cohesive solutions.
 
 Max: 
 
@@ -92,16 +92,7 @@ Between the ripe hours of 1 AM and 3 AM, our team commenced the hardest integrat
 
 This was the first hackathon where we came in with a well-refined idea. 
 
-Needless to say, all of our team can agree that this is without a doubt the most difficult project we've ever worked on. However, we persevered and overcame all obstacles, and we're incredibly proud of the result, and we can all honestly say that with another week's worth of finetuning and perahps some 
-
-## What we learned
-
-Karthik: When I first embarked on this project, I was quite surprised by the amount of progress LLMs have made in the past three years. As a researcher leaning more on the traditional AI side, I was compelled by how old AI architecture design meshed with modern LLM solutions, resulting in strong and cohesive solutions. I'm also incredibly grateful for the various tools we had access to, especially The Token Company's models (which were so cool to use and inspect).
-
-Max:
-
-Joseph:
-
+Needless to say, all of our team can agree that this is without a doubt the most difficult project we've ever worked on. However, we persevered and overcame all obstacles, and we're incredibly proud of the result, and we can all honestly say that with another week's worth of finetuning and perahps some more feature additions, Sophi will be a tool that every teacher and student will love.
 
 ## What's next for Sophi
 
