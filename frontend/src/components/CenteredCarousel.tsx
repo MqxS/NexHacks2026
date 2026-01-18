@@ -5,12 +5,14 @@ export const CenteredCarousel = <T,>({
   items,
   renderItem,
   onSelect,
-  initialIndex = 0
+  initialIndex = 0,
+  className
 }: {
   items: T[]
   renderItem: (item: T, index: number, selected: boolean) => React.ReactNode
   onSelect?: (item: T, index: number) => void
   initialIndex?: number
+  className?: string
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(initialIndex)
@@ -75,7 +77,10 @@ export const CenteredCarousel = <T,>({
   return (
     <div
       ref={containerRef}
-      className="scrollbar-hide flex w-full snap-x snap-mandatory gap-10 overflow-x-auto px-[calc(50%-210px)] pb-10 pt-6"
+      className={cn(
+        'scrollbar-hide flex w-full snap-x snap-mandatory gap-10 overflow-x-auto overflow-y-visible px-[calc(50%-210px)] pb-10 pt-6',
+        className
+      )}
     >
       {items.map((item, index) => (
         <div
