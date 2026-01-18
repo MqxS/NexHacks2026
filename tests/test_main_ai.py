@@ -14,7 +14,7 @@ sys.modules["wolfram_checker"] = MagicMock()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Now import main_ai
-import main_ai
+import main
 
 class TestMainAI(unittest.TestCase):
     def setUp(self):

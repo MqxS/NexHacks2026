@@ -1,6 +1,11 @@
 import random
+import sys
+import os
+import tempfile
+import json
+import dataclasses
 from dataclasses import dataclass, asdict
-from typing import List
+from typing import List, Dict, Any, Optional
 
 import bson
 from bson import Binary, ObjectId
@@ -8,8 +13,26 @@ from flask import Flask, jsonify, request
 
 from backend.mongo import connect
 
+# Add ai-util/sophi to sys.path to import modules
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sophi_path = os.path.join(current_dir, "ai-util", "sophi")
+if sophi_path not in sys.path:
+    sys.path.insert(0, sophi_path)
+
+try:
+    from sophi_ai import SophiAIUtil, SessionParameters, ClassFile, GeneratedQuestion, ValidationResult, HintResponse
+    from wolfram_checker import WolframAlphaChecker
+except ImportError as e:
+    print(f"Error importing AI modules: {e}")
+    # Fallback or exit if essential
+    SophiAIUtil = None
+
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
 mongo = connect()
+
+# Initialize AI Utility
+# We assume environment variables GEMINI_API_KEY and WOLFRAM_APP_ID are set.
+ai_util = SophiAIUtil() if SophiAIUtil else None
 
 @dataclass
 class Question:
@@ -17,6 +40,8 @@ class Question:
     userAnswer: str
     aiAnswer: str
     wasUserCorrect: bool
+    questionId: str # Added to track specific questions
+    metadata: Dict[str, Any] # Added to store AI metadata (validation prompt, etc.)
 
 @dataclass
 class FileUpload:
@@ -43,6 +68,7 @@ class Class:
     professor: str
     topics: List[str]
     sessions: List[Session]
+    classFile: Optional[Dict[str, Any]] = None # To store processed ClassFile from AI
 
 @server.route("/api/hello")
 def hello():
@@ -74,7 +100,7 @@ def create_class():
     syllabus_file = request.files["syllabus"]
     syllabus_bytes = syllabus_file.read()
 
-    syllabus_file = FileUpload(
+    syllabus_file_obj = FileUpload(
         filename=syllabus_file.filename,
         data=Binary(syllabus_bytes)
     )
@@ -87,13 +113,44 @@ def create_class():
                 data=Binary(sf.read())
             ))
 
+    class_file_data = None
+    extracted_topics = []
+
+    if ai_util:
+        try:
+            # Create a temporary file for the syllabus
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_syllabus:
+                tmp_syllabus.write(syllabus_bytes)
+                tmp_syllabus_path = tmp_syllabus.name
+            
+            try:
+                # Call AI to generate class file
+                generated_class_file = ai_util.create_class_file_from_pdfs(
+                    syllabus_pdf_path=tmp_syllabus_path,
+                    problem_pdf_paths=[],
+                    class_name=request.form.get("name", "Untitled Class")
+                )
+                
+                class_file_data = generated_class_file.to_dict()
+                extracted_topics = generated_class_file.concepts
+                
+            finally:
+                # Clean up temporary file
+                if os.path.exists(tmp_syllabus_path):
+                    os.remove(tmp_syllabus_path)
+                    
+        except Exception as e:
+            print(f"Error generating class file: {e}")
+            # Fallback to empty data if AI fails
+
     class_doc = Class(
-        syllabus=syllabus_file,
+        syllabus=syllabus_file_obj,
         styleFiles=style_files,
         name=request.form.get("name", "Untitled Class"),
         professor=request.form.get("professor", "Unknown"),
-        topics=[],
-        sessions=[]
+        topics=extracted_topics,
+        sessions=[],
+        classFile=class_file_data
     )
 
     result = mongo.classes.insert_one(asdict(class_doc))
@@ -120,7 +177,7 @@ def create_session(classID):
         questions=[],
         classID=classID,
         adaptive=request.form.get("adaptive", "false").lower() == "true",
-        difficulty=float(request.form.get("difficulty", 0.5)),
+        difficulty=float(request.form.get("difficulty", 0.5)), # 0.0 to 1.0, map to 1-5 for AI
         isCumulative=request.form.get("cumulative", "false").lower() == "true",
         selectedTopics=request.form.getlist("selectedTopics"),
         customRequests=request.form.get("customRequests", ""),
@@ -205,64 +262,196 @@ def get_session_params(sessionID):
 
     return jsonify(session)
 
-#TODO: KARTHIK #1
+# IMPLEMENTED: KARTHIK #1 - AI Question Generation
 @server.route("/api/requestQuestion/<sessionID>", methods=["GET"])
 def request_question(sessionID):
-    questions = [
-        {"questionId": "Q101", "content": "What is the capital of France?"},
-        {"questionId": "Q102", "content": "Solve for x: 2x + 5 = 17."},
-        {"questionId": "Q103", "content": "Compute the derivative of $f(x)=x^2$."},
-        {"questionId": "Q104", "content": "Evaluate the integral $\\int_0^1 3x^2\\,dx$."},
-        {"questionId": "Q105", "content": "If $a^2+b^2=c^2$ with $a=3$ and $b=4$, find $c$."},
-        {"questionId": "Q106", "content": "Simplify: $\\frac{2}{x} + \\frac{3}{x} = ?$"},
-        {"questionId": "Q107", "content": "What is the slope of the line through $(1,2)$ and $(3,6)$?"},
-        {"questionId": "Q108", "content": "Convert $0.75$ to a fraction."},
-        {"questionId": "Q109", "content": "Solve: $\\sin(\\pi/2)$ = ?"},
-        {"questionId": "Q110", "content": "Find the area of a circle with radius $r$."}
-    ]
-    return jsonify(random.choice(questions))
+    if not ai_util:
+        return jsonify({"error": "AI module not initialized"}), 500
 
-#TODO: KARTHIK #2
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    session_doc = mongo.sessions.find_one({"_id": obj_id})
+    if not session_doc:
+        return jsonify({"error": "Session not found"}), 404
+
+    # Fetch class info to get syllabus text or class file
+    class_id_str = session_doc.get("classID")
+    class_doc = None
+    if class_id_str:
+        try:
+            class_doc = mongo.classes.find_one({"_id": ObjectId(class_id_str)})
+        except:
+            pass
+    
+    # Prepare SessionParameters
+    # Map difficulty 0.0-1.0 to 1-5
+    diff_float = float(session_doc.get("difficulty", 0.5))
+    difficulty_level = max(1, min(5, int(diff_float * 5)))
+    
+    sess_params = SessionParameters(
+        difficulty_level=difficulty_level,
+        cumulative=session_doc.get("isCumulative", False),
+        adaptive=session_doc.get("adaptive", True),
+        focus_concepts=session_doc.get("selectedTopics", []),
+        unit_focus=None # Could be derived from class or topics
+    )
+
+    # Get history
+    questions = session_doc.get("questions", [])
+    history = []
+    for q in questions:
+        # Convert stored Question dicts to history format expected by SophiAI
+        # history: list[JsonDict] -> [{"question": "...", "correct": True/False}, ...]
+        h_item = {
+            "question": q.get("content"),
+            "correct": q.get("wasUserCorrect"),
+            # "answer": q.get("aiAnswer") # Optional
+        }
+        history.append(h_item)
+
+    # Prepare ClassFile or Syllabus Text
+    # Ideally we should have processed the syllabus into a ClassFile.
+    # For now, if we have a raw syllabus file, we might need to extract text on the fly 
+    # OR better, assuming we can pass the raw text if extracted.
+    # Since extracting text from PDF is heavy, let's see if we have `classFile` stored.
+    
+    class_file_obj = None
+    file_upload_text = None
+    
+    if class_doc and class_doc.get("classFile"):
+        try:
+            class_file_obj = ClassFile.from_dict(class_doc["classFile"])
+        except:
+            pass
+            
+    # Also check session specific file
+    if session_doc.get("file") and session_doc.get("file").get("data"):
+         # This would require PDF text extraction which is in FileUtils/SophiAI
+         # For this implementation, we might skip extracting text from binary on the fly 
+         # unless we implement a caching mechanism or do it at upload time.
+         pass
+
+    # Generate Question
+    try:
+        generated_q = ai_util.generate_question(
+            session=sess_params,
+            question_answer_history=history,
+            class_file=class_file_obj,
+            user_suggestions=session_doc.get("customRequests"),
+            use_wolfram=True # Enable Wolfram
+        )
+    except Exception as e:
+        print(f"Error generating question: {e}")
+        # Fallback to a generic error or retry without wolfram
+        return jsonify({"error": f"Failed to generate question: {str(e)}"}), 500
+
+    # Create a temporary ID for the question
+    q_id = str(ObjectId())
+    
+    # We don't save the question to the session yet? 
+    # Usually in these flows, we return the question, and when the user answers, we save it.
+    # But to validate the answer later, we need to store the expected answer and validation prompt.
+    # So we should probably store a "pending question" or add it to the session with a "pending" status.
+    # However, the current data model `Question` implies a completed interaction (userAnswer, wasUserCorrect).
+    
+    # Let's return the question and store the metadata in a separate collection or 
+    # assume the client sends back the question content (insecure).
+    # Better: Store pending question in a 'pending_questions' collection or cache.
+    
+    pending_q = {
+        "sessionID": str(session_doc["_id"]),
+        "questionId": q_id,
+        "content": generated_q.question,
+        "aiAnswer": generated_q.answer,
+        "wolfram_query": generated_q.wolfram_query,
+        "validation_prompt": generated_q.validation_prompt,
+        "metadata": generated_q.metadata,
+        "timestamp": bson.datetime.datetime.now()
+    }
+    mongo.pending_questions.insert_one(pending_q)
+
+    return jsonify({
+        "questionId": q_id,
+        "content": generated_q.question
+    })
+
+# IMPLEMENTED: KARTHIK #2 - AI Answer Submission
 @server.route("/api/submitAnswer/<questionID>", methods=["POST"])
 def submit_answer(questionID):
-    feedback_bank = [
-        {
-            "isCorrect": True,
-            "correctAnswer": "Paris",
-            "whyIsWrong": ""
-        },
-        {
-            "isCorrect": True,
-            "correctAnswer": "$x=6$",
-            "whyIsWrong": ""
-        },
-        {
-            "isCorrect": True,
-            "correctAnswer": "$f'(x)=2x$",
-            "whyIsWrong": ""
-        },
-        {
-            "isCorrect": False,
-            "correctAnswer": "$x=6$",
-            "whyIsWrong": "Isolate $x$ by subtracting 5 first, then divide by 2."
-        },
-        {
-            "isCorrect": False,
-            "correctAnswer": "$\\int_0^1 3x^2\\,dx = 1$",
-            "whyIsWrong": "Use the antiderivative $x^3$ and evaluate from 0 to 1."
-        },
-        {
-            "isCorrect": False,
-            "correctAnswer": "$c=5$",
-            "whyIsWrong": "Apply the Pythagorean theorem: $3^2+4^2=9+16=25$."
-        },
-        {
-            "isCorrect": False,
-            "correctAnswer": "$\\sin(\\pi/2)=1$",
-            "whyIsWrong": "On the unit circle, $\\pi/2$ corresponds to the point $(0,1)$."
+    if not ai_util:
+        return jsonify({"error": "AI module not initialized"}), 500
+
+    # Find the pending question
+    pending = mongo.pending_questions.find_one({"questionId": questionID})
+    if not pending:
+        # Check if it was already answered/moved to session?
+        return jsonify({"error": "Question not found or expired"}), 404
+
+    user_answer = request.json.get("answer") if request.is_json else request.form.get("answer")
+    if not user_answer:
+        return jsonify({"error": "No answer provided"}), 400
+
+    # Validate Answer using Gemini/Wolfram
+    # We use the validation prompt stored in the pending question
+    
+    validation_prompt = pending.get("validation_prompt")
+    question_text = pending.get("content")
+    
+    is_correct = False
+    feedback = ""
+    
+    # Construct a prompt for the verifier (Gemini)
+    # SophiAIUtil doesn't have a direct "validate_student_answer" method exposed publicly 
+    # that takes the prompt, but we can use the internal gemini client.
+    
+    system_instruction = validation_prompt or "You are a math tutor. Verify the student's answer."
+    user_prompt = json.dumps({
+        "question": question_text,
+        "student_step_or_answer": user_answer,
+        "output_contract": {
+            "ok": "boolean",
+            "feedback": "string"
         }
-    ]
-    return jsonify(random.choice(feedback_bank))
+    }, ensure_ascii=False)
+    
+    try:
+        val_res = ai_util.gemini.generate_json(
+            system_instruction=system_instruction,
+            user_prompt=user_prompt
+        )
+        is_correct = bool(val_res.get("ok"))
+        feedback = str(val_res.get("feedback") or "")
+    except Exception as e:
+        print(f"Validation failed: {e}")
+        # Fallback
+        feedback = "Could not verify answer automatically."
+    
+    # Move from pending to session history
+    question_entry = Question(
+        content=question_text,
+        userAnswer=user_answer,
+        aiAnswer=pending.get("aiAnswer"),
+        wasUserCorrect=is_correct,
+        questionId=questionID,
+        metadata=pending.get("metadata", {})
+    )
+    
+    mongo.sessions.update_one(
+        {"_id": ObjectId(pending["sessionID"])},
+        {"$push": {"questions": asdict(question_entry)}}
+    )
+    
+    # Cleanup pending? (Optional, keep for logs)
+    # mongo.pending_questions.delete_one({"questionId": questionID})
+
+    return jsonify({
+        "isCorrect": is_correct,
+        "correctAnswer": pending.get("aiAnswer"),
+        "whyIsWrong": feedback if not is_correct else "Correct!"
+    })
 
 @server.route("/api/updateSessionParams/<sessionID>", methods=["POST"])
 def update_session_params(sessionID):
@@ -342,13 +531,37 @@ def set_adaptive(sessionID):
         return jsonify({"error": "Session not found"}), 404
     return jsonify({"status": "Adaptive setting updated"})
 
-#TODO: KARTHIK #3
+# IMPLEMENTED: KARTHIK #3 - AI Hint Generation
 @server.route("/api/requestHint/<questionID>")
 def request_hint(questionID):
-    hint = {
-        "hint": "It's also known as the city of lights."
-    }
-    return jsonify(hint)
+    if not ai_util:
+        return jsonify({"error": "AI module not initialized"}), 500
+
+    # Find the pending question
+    pending = mongo.pending_questions.find_one({"questionId": questionID})
+    if not pending:
+        return jsonify({"error": "Question not found"}), 404
+
+    question_text = pending.get("content")
+    
+    # We could optionally ask the user for their current status/thoughts to generate a better hint
+    # For now, we assume a generic "I'm stuck" status.
+    status_prompt = request.args.get("status", "I am stuck and unsure what to do next.")
+    
+    try:
+        hint_res = ai_util.generate_hint(
+            status_prompt=status_prompt,
+            problem=question_text,
+            hint_type="Strategic", # Default to strategic
+            use_wolfram=True
+        )
+        return jsonify({
+            "hint": hint_res.text,
+            "kind": hint_res.kind
+        })
+    except Exception as e:
+        print(f"Hint generation failed: {e}")
+        return jsonify({"hint": "Try breaking the problem into smaller steps."})
 
 @server.route("/api/editClassName/<classID>", methods=["POST"])
 def edit_class_name(classID):
@@ -428,14 +641,14 @@ def replace_syllabus(classID):
     syllabus_file = request.files["syllabus"]
     syllabus_bytes = syllabus_file.read()
 
-    syllabus_file = FileUpload(
+    syllabus_file_obj = FileUpload(
         filename=syllabus_file.filename,
         data=Binary(syllabus_bytes)
     )
 
     result = mongo.classes.update_one(
         {"_id": obj_id},
-        {"$set": {"syllabus": asdict(syllabus_file)}}
+        {"$set": {"syllabus": asdict(syllabus_file_obj)}}
     )
 
     if result.matched_count == 0:
