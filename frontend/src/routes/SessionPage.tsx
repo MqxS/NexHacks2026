@@ -10,6 +10,7 @@ import {LoadingSkeleton} from '../components/LoadingSkeleton'
 import {cn} from '../lib/utils'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import * as Slider from '@radix-ui/react-slider'
 import { ChevronDown, ChevronLeft, Lightbulb, Sliders, Check } from 'lucide-react'
 
 type SessionParams = {
@@ -47,7 +48,8 @@ export const SessionPage = () => {
   }
 
   const cold = [156, 183, 213] as [number, number, number]
-  const edge = Math.min(1, Math.max(0, params.difficulty))
+  const difficultyValue = Number.isFinite(params.difficulty) ? params.difficulty : 0
+  const edge = Math.min(1, Math.max(0, difficultyValue))
   const cool = blendColor(cold, [176, 196, 222], edge)
   const hotStart = Math.min(100, Math.max(0, ((edge - 0.45) / 0.55) * 100))
   const gradient =
@@ -367,20 +369,25 @@ export const SessionPage = () => {
             <div className="mt-4 space-y-4">
               <div>
                 <label className="text-sm font-medium text-espresso">Difficulty</label>
-                <input
-                  type="range"
-                  min={0}
+                <Slider.Root
+                  className="relative mt-3 flex w-full touch-none select-none items-center"
+                  value={[params.difficulty]}
                   max={1}
+                  min={0}
                   step={0.01}
-                  value={params.difficulty}
-                  onChange={(event) => setParams({ ...params, difficulty: Number(event.target.value) })}
-                  className="mt-2 h-2 w-full appearance-none rounded-full"
-                  style={{
-                    backgroundImage: `${gradient}, linear-gradient(90deg, rgba(103,70,54,0.15) 0%, rgba(103,70,54,0.15) 100%)`,
-                    backgroundSize: `${edge * 100}% 100%, 100% 100%`,
-                    backgroundRepeat: 'no-repeat'
-                  }}
-                />
+                  onValueChange={(value) => setParams({ ...params, difficulty: value[0] })}
+                >
+                  <Slider.Track className="relative h-2 w-full rounded-full bg-espresso/15 overflow-hidden">
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: gradient,
+                        width: `${edge * 100}%`
+                      }}
+                    />
+                  </Slider.Track>
+                  <Slider.Thumb className="block h-5 w-5 rounded-full border border-espresso/30 bg-paper shadow-paper" />
+                </Slider.Root>
               </div>
               <div>
                 <label className="text-sm font-medium text-espresso">Topic</label>

@@ -13,7 +13,7 @@ export const ClassSettings = () => {
   const navigate = useNavigate()
   const [syllabus, setSyllabus] = useState<File[]>([])
   const [styleDocs, setStyleDocs] = useState<File[]>([])
-  const [uploadedDocs, setUploadedDocs] = useState<string[]>([])
+  const [uploadedDocs] = useState<string[]>([])
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [confirmName, setConfirmName] = useState('')
 
@@ -61,7 +61,7 @@ export const ClassSettings = () => {
 
   const deleteDoc = useMutation({
     mutationFn: (docID: string) => api.deleteStyleDoc({ classID: classID ?? '', docID }),
-    onSuccess: (_, docID) => {
+    onSuccess: () => {
       toast.success('Style doc removed')
       styleDocsQuery.refetch()
     },

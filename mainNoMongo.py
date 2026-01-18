@@ -103,6 +103,14 @@ def delete_style_doc(classID, docName):
     time.sleep(0.8)
     return jsonify({"status": "Style doc deleted"})
 
+@server.route("/api/getStyleDocs/<classID>", methods=["GET"])
+def get_style_docs(classID):
+    time.sleep(0.4)
+    return jsonify([
+        {"filename": "lecture-notes.pdf"},
+        {"filename": "style-guide.md"}
+    ])
+
 @server.route("/api/getClassTopics/<classID>")
 def get_class_topics(classID):
     topics = [
