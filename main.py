@@ -163,18 +163,18 @@ def get_session_params(sessionID):
     )
     if not doc:
         return jsonify({"error": "Session not found"}), 404
-    session = Session(
-        name=doc.get("name", "New Session"),
-        difficulty=doc.get("difficulty", 0.5),
-        classID=doc.get("classID", ""),
-        isCumulative=doc.get("isCumulative", False),
-        adaptive=doc.get("adaptive", True),
-        focusedConcepts=doc.get("focusedConcepts", []),
-        questions=[],
-        file=Binary(b"")
-    )
 
-    return jsonify(asdict(session))
+    session = {
+        "name": doc.get("name", "New Session"),
+        "difficulty": doc.get("difficulty", 0.5),
+        "classID": doc.get("classID", ""),
+        "isCumulative": doc.get("isCumulative", False),
+        "adaptive": doc.get("adaptive", True),
+        "focusedConcepts": doc.get("focusedConcepts", []),
+        "questions": []
+    }
+
+    return jsonify(session)
 
 #TODO: KARTHIK #1
 @server.route("/api/requestQuestion/<sessionID>", methods=["GET"])
