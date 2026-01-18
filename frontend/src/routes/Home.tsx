@@ -207,7 +207,7 @@ export const Home = () => {
                 <label className="text-sm font-medium text-espresso">Class name</label>
                 <input
                   {...createForm.register('name')}
-                  className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+                  className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
                   placeholder="Linear Algebra"
                 />
                 {createForm.formState.errors.name ? (
@@ -218,7 +218,7 @@ export const Home = () => {
                 <label className="text-sm font-medium text-espresso">Instructor</label>
                 <input
                   {...createForm.register('professor')}
-                  className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+                  className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
                   placeholder="Dr. Gomez"
                 />
                 {createForm.formState.errors.professor ? (
