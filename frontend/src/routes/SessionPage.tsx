@@ -29,6 +29,7 @@ export const SessionPage = () => {
   const [adaptive, setAdaptive] = useState(false)
   const [hintRequest, setHintRequest] = useState('')
   const [hints, setHints] = useState<string[]>([])
+  const [hintPhoto, setHintPhoto] = useState<File | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
   const [exitOpen, setExitOpen] = useState(false)
   const [topicSearch, setTopicSearch] = useState('')
@@ -105,12 +106,14 @@ export const SessionPage = () => {
 
   const nextQuestionMutation = useMutation({
     mutationFn: () => api.requestQuestion(sessionID ?? ''),
-    onSuccess: (data) => {
-      queryClient.setQueryData(['session', sessionID], data)
+    onMutate: () => {
       setHints([])
       setHintRequest('')
       setFeedback(null)
       setAnswer('')
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['session', sessionID], data)
     },
     onError: (error: Error) => toast.error(error.message || 'Could not load next question')
   })
@@ -162,10 +165,12 @@ export const SessionPage = () => {
   })
 
   const hintMutation = useMutation({
-    mutationFn: () => api.requestHint({ questionID: questionQuery.data?.questionID ?? '', hintRequest }),
+    mutationFn: () =>
+      api.requestHint({ questionID: questionQuery.data?.questionID ?? '', hintRequest, photo: hintPhoto }),
     onSuccess: (data) => {
       setHints((prev) => [...prev, data.hint])
       setHintRequest('')
+      setHintPhoto(null)
       toast.success('Hint delivered')
     },
     onError: (error: Error) => toast.error(error.message || 'Could not request hint')
@@ -242,10 +247,15 @@ export const SessionPage = () => {
             <button
               type="button"
               onClick={() => answerMutation.mutate()}
-              disabled={!questionQuery.data || answer.trim().length === 0 || answerMutation.isPending}
+              disabled={
+                !questionQuery.data ||
+                answer.trim().length === 0 ||
+                answerMutation.isPending ||
+                Boolean(feedback)
+              }
               className={cn(
-                'rounded-full bg-sand px-4 py-2 text-sm font-medium text-paper',
-                'disabled:cursor-not-allowed disabled:opacity-60'
+                'rounded-full border border-espresso/20 bg-espresso px-4 py-2 text-sm font-medium text-paper',
+                'disabled:cursor-not-allowed disabled:bg-espresso/40 disabled:text-paper/70'
               )}
             >
               {answerMutation.isPending ? 'Submitting...' : 'Submit answer'}
@@ -316,25 +326,52 @@ export const SessionPage = () => {
 
         <PaperCard>
           <p className="text-sm font-medium text-espresso">Ask for a hint</p>
-          <p className="mt-1 text-xs text-espresso/60">Keep the conversation flowing while you solve.</p>
+          <p className="mt-1 text-xs text-espresso/60">Get the help you need.</p>
           <textarea
             value={hintRequest}
             onChange={(event) => setHintRequest(event.target.value)}
             className="mt-3 h-24 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
             placeholder="Where are you stuck? What have you tried?"
           />
-          <button
-            type="button"
-            className="mt-3 w-full rounded-full border border-espresso/20 px-4 py-2 text-sm text-espresso"
-          >
-            Upload photo of work (coming soon)
-          </button>
+          <div className="mt-3 rounded-2xl border border-espresso/15 bg-sand/40 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium text-espresso">Upload photo of work</p>
+                <p className="text-[11px] text-espresso/60">Optional. We will attach it to your hint request.</p>
+              </div>
+              <label className="cursor-pointer rounded-full border border-espresso/20 bg-paper px-3 py-1 text-xs text-espresso">
+                Choose file
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null
+                    setHintPhoto(file)
+                    event.target.value = ''
+                  }}
+                />
+              </label>
+            </div>
+            {hintPhoto ? (
+              <div className="mt-2 flex items-center justify-between rounded-xl border border-espresso/10 bg-paper px-3 py-2">
+                <span className="text-xs text-espresso">{hintPhoto.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setHintPhoto(null)}
+                  className="text-[11px] text-espresso/60 hover:text-espresso"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : null}
+          </div>
           <button
             type="button"
             onClick={() => hintMutation.mutate()}
             disabled={!questionQuery.data || hintRequest.trim().length === 0}
             className={cn(
-              'mt-4 w-full rounded-full bg-sage px-4 py-2 text-sm font-medium text-paper',
+              'mt-4 w-full rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper',
               'disabled:cursor-not-allowed disabled:opacity-60'
             )}
           >

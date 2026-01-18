@@ -235,6 +235,7 @@ def request_question(sessionID):
         {"questionId": "Q109", "content": "Solve: $\\sin(\\pi/2)$ = ?"},
         {"questionId": "Q110", "content": "Find the area of a circle with radius $r$."}
     ]
+    time.sleep(2)
     return jsonify(random.choice(questions))
 
 @server.route("/api/submitAnswer/<questionID>", methods=["POST"])
@@ -309,7 +310,7 @@ def set_adaptive_legacy(sessionID, setting):
         session["adaptive"] = adaptive
     return jsonify({"status": "Adaptive learning set"})
 
-@server.route("/api/requestHint/<questionID>")
+@server.route("/api/requestHint/<questionID>", methods=["GET", "POST"])
 def request_hint(questionID):
     hint = {
         "hint": "It's also known as the city of lights."
