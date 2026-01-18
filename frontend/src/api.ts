@@ -169,11 +169,8 @@ export const api = {
       saveDevClasses(next)
       return Promise.resolve({})
     }
-    const formData = new FormData()
-    formData.append('classID', payload.classID)
     return request(`/api/deleteClass/${encodeURIComponent(payload.classID)}`, {
-      method: 'POST',
-      body: formData
+      method: 'DELETE'
     })
   },
   replaceSyllabus: (formData: FormData) =>
