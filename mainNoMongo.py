@@ -44,7 +44,54 @@ class_cards = [
     {"classID": 3, "name": "History", "professor": "Dr. Max"}
 ]
 
-sessions_store = {}
+sessions_store = [
+    {
+        "sessionID": "S1001",
+        "classID": "1",
+        "name": "Quick warmup",
+        "difficulty": 0.4,
+        "isCumulative": False,
+        "adaptive": True,
+        "selectedTopics": ["Algebra"],
+        "customRequests": ""
+    },
+    {
+        "sessionID": "S1002",
+        "classID": "1",
+        "name": "Mixed review",
+        "difficulty": 0.7,
+        "isCumulative": True,
+        "adaptive": False,
+        "selectedTopics": ["Geometry", "Calculus", "Algebra"],
+        "customRequests": "Focus on proofs"
+    },
+    {
+        "sessionID": "S1003",
+        "classID": "2",
+        "name": "Concept check",
+        "difficulty": 0.5,
+        "isCumulative": False,
+        "adaptive": True,
+        "selectedTopics": ["Biology", "Chemistry"],
+        "customRequests": ""
+    },
+    {
+        "sessionID": "S1004",
+        "classID": "1",
+        "name": "Single topic sprint",
+        "difficulty": 0.3,
+        "isCumulative": False,
+        "adaptive": True,
+        "selectedTopics": ["Calculus"],
+        "customRequests": "Only word problems"
+    }
+]
+
+def find_session(session_id):
+    for session in sessions_store:
+        if session.get("sessionID") == session_id:
+            return session
+    return None
 
 @server.route("/api/hello")
 def hello():
@@ -102,7 +149,8 @@ def create_session(classID):
             selected_topics = raw_topics
 
     session_id = f"S{random.randint(1000, 9999)}"
-    sessions_store[session_id] = {
+    sessions_store.append({
+        "sessionID": session_id,
         "name": name,
         "difficulty": float(difficulty),
         "classID": classID,
@@ -110,7 +158,7 @@ def create_session(classID):
         "adaptive": str(adaptive).lower() == "true",
         "selectedTopics": selected_topics,
         "customRequests": custom_requests
-    }
+    })
     return jsonify({"sessionID": session_id})
 
 @server.route("/api/replaceSyllabus/<classID>", methods=["POST"])
@@ -149,25 +197,20 @@ def get_class_topics(classID):
 def get_recent_sessions(classID):
     sessions = [
         {
-            "sessionID": "S1",
-            "name": "Test Session 1",
-            # "timestamp": "2026-01-17T14:10:00Z",
-            "topics": ["Algebra", "Geometry"]
-        },
-        {
-            "sessionID": "S2",
-            "name": "Test Session 2",
-            # "timestamp": "2026-01-16T18:30:00Z",
-            "topics": ["Calculus"]
+            "sessionID": session["sessionID"],
+            "name": session.get("name", "Untitled Session"),
+            "topics": session.get("selectedTopics", []) or []
         }
+        for session in sessions_store
+        if session.get("classID") == classID
     ]
-    return jsonify(sessions)
+    return jsonify(sessions[-5:])
 
 @server.route("/api/getSessionParams/<sessionID>")
 def get_session_params(sessionID):
-    session_params = sessions_store.get(sessionID)
+    session_params = find_session(sessionID)
     if session_params:
-        return jsonify(session_params)
+        return jsonify({k: v for k, v in session_params.items() if k != "sessionID"})
     return jsonify({
         "name": "Midterm review",
         "difficulty": 0.6,
@@ -253,15 +296,17 @@ def set_adaptive(sessionID):
     else:
         adaptive = False
 
-    if sessionID in sessions_store:
-        sessions_store[sessionID]["adaptive"] = adaptive
+    session = find_session(sessionID)
+    if session:
+        session["adaptive"] = adaptive
     return jsonify({"status": "Adaptive learning set"})
 
 @server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
 def set_adaptive_legacy(sessionID, setting):
     adaptive = setting.lower() == "true"
-    if sessionID in sessions_store:
-        sessions_store[sessionID]["adaptive"] = adaptive
+    session = find_session(sessionID)
+    if session:
+        session["adaptive"] = adaptive
     return jsonify({"status": "Adaptive learning set"})
 
 @server.route("/api/requestHint/<questionID>")
@@ -323,9 +368,10 @@ def delete_class(classID):
 
 @server.route("/api/deleteSession/<sessionID>", methods=["DELETE"])
 def delete_session(sessionID):
-    if sessionID in sessions_store:
-        sessions_store.pop(sessionID, None)
-        return jsonify({"status": "Session deleted"})
+    for index, session in enumerate(sessions_store):
+        if session.get("sessionID") == sessionID:
+            sessions_store.pop(index)
+            return jsonify({"status": "Session deleted"})
     return jsonify({"error": "Session not found"}), 404
 
 @server.route("/", defaults={"path": ""})

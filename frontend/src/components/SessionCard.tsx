@@ -16,7 +16,7 @@ export const SessionCard = ({
   onDelete?: () => void
 }) => {
   return (
-    <PaperCard className="w-[220px] shrink-0 border border-espresso/15 bg-paper/90">
+    <PaperCard className="h-[200px] w-[240px] shrink-0 border border-espresso/15 bg-paper/90">
       <div className="flex h-full flex-col gap-3">
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -34,7 +34,7 @@ export const SessionCard = ({
             </button>
           ) : null}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-1 flex-wrap content-start gap-2 min-h-[48px]">
           {tags.map((tag) => (
             <span
               key={tag}
@@ -44,7 +44,7 @@ export const SessionCard = ({
             </span>
           ))}
         </div>
-        <div className="mt-auto flex items-center justify-between gap-2">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
           <button
             type="button"
             onClick={onResume}

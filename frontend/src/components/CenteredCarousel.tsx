@@ -15,6 +15,16 @@ export const CenteredCarousel = <T,>({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(initialIndex)
 
+  const scrollToIndex = (index: number, behavior: ScrollBehavior = 'smooth') => {
+    const container = containerRef.current
+    if (!container) return
+    const children = Array.from(container.children) as HTMLElement[]
+    const target = children[index]
+    if (!target) return
+    const left = target.offsetLeft - container.clientWidth / 2 + target.clientWidth / 2
+    container.scrollTo({ left, behavior })
+  }
+
   useLayoutEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -22,9 +32,8 @@ export const CenteredCarousel = <T,>({
     const children = Array.from(container.children) as HTMLElement[]
     const target = children[initialIndex]
     if (target) {
-      const left = target.offsetLeft - container.clientWidth / 2 + target.clientWidth / 2
       requestAnimationFrame(() => {
-        container.scrollTo({ left, behavior: 'auto' })
+        scrollToIndex(initialIndex, 'auto')
       })
     }
   }, [initialIndex, items.length])
@@ -75,6 +84,9 @@ export const CenteredCarousel = <T,>({
             'shrink-0 snap-center transition-transform duration-200',
             index === selectedIndex ? 'scale-[1.10]' : 'scale-95'
           )}
+          onClick={() => {
+            if (index !== selectedIndex) scrollToIndex(index)
+          }}
         >
           {renderItem(item, index, index === selectedIndex)}
         </div>

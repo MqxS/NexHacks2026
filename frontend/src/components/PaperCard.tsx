@@ -10,7 +10,7 @@ export const PaperCard = ({
 }) => {
   return (
     <div className={cn('graph-panel relative rounded-2xl p-6', className)}>
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 h-full">{children}</div>
     </div>
   )
 }
