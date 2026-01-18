@@ -19,17 +19,17 @@ export const StudentTopicMetrics = () => {
 
   const metrics = metricsQuery.data ?? []
 
+  const buildProgress = (metric: TopicMetric) => {
+    if (metric.totalAnswers <= 0) return 0
+    return Math.round((metric.rightAnswers / metric.totalAnswers) * 100)
+  }
+
   const filteredMetrics = useMemo(() => {
     const base = search.trim()
       ? metrics.filter((metric) => metric.topic.toLowerCase().includes(search.toLowerCase()))
       : metrics
     return [...base].sort((a, b) => buildProgress(b) - buildProgress(a))
   }, [metrics, search])
-
-  const buildProgress = (metric: TopicMetric) => {
-    if (metric.totalAnswers <= 0) return 0
-    return Math.round((metric.rightAnswers / metric.totalAnswers) * 100)
-  }
 
   const buildProgressGradient = (progress: number) => {
     if (progress <= 50) {
