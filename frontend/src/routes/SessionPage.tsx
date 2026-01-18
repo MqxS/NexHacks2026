@@ -11,7 +11,7 @@ import {cn} from '../lib/utils'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Slider from '@radix-ui/react-slider'
-import { ChevronDown, ChevronLeft, Lightbulb, Sliders, Check } from 'lucide-react'
+import { ChevronDown, ChevronLeft, Lightbulb, Sliders, Check, X } from 'lucide-react'
 
 type SessionParams = {
   difficulty: number
@@ -51,10 +51,11 @@ export const SessionPage = () => {
   const cold = [156, 183, 213] as [number, number, number]
   const difficultyValue = Number.isFinite(params.difficulty) ? params.difficulty : 0
   const edge = Math.min(1, Math.max(0, difficultyValue))
-  const cool = blendColor(cold, [176, 196, 222], edge)
-  const hotStart = Math.min(100, Math.max(0, ((edge - 0.45) / 0.55) * 100))
+  const coolT = Math.min(1, edge / 0.5)
+  const cool = blendColor(cold, [200, 214, 232], coolT)
+  const hotStart = Math.min(100, Math.max(0, ((edge - 0.5) / 0.5) * 100))
   const gradient =
-    edge < 0.45
+    edge <= 0.5
       ? `linear-gradient(90deg, #9CB7D5 0%, ${cool} 100%)`
       : `linear-gradient(90deg, #9CB7D5 0%, #9CB7D5 ${100 - hotStart}%, #C98B6A 100%)`
 
@@ -236,7 +237,7 @@ export const SessionPage = () => {
           <textarea
             value={answer}
             onChange={(event) => setAnswer(event.target.value)}
-            className="mt-3 h-28 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+            className="mt-3 h-28 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
             placeholder="Type your answer here..."
           />
           <div className="mt-3 flex items-center justify-between">
@@ -331,7 +332,7 @@ export const SessionPage = () => {
           <textarea
             value={hintRequest}
             onChange={(event) => setHintRequest(event.target.value)}
-            className="mt-3 h-24 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+            className="mt-3 h-24 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm placeholder:text-espresso/50"
             placeholder="Where are you stuck? What have you tried?"
           />
           <div className="mt-3 rounded-2xl border border-espresso/15 bg-sand/40 p-3">
@@ -447,6 +448,7 @@ export const SessionPage = () => {
                     <input
                       value={topicSearch}
                       onChange={(event) => setTopicSearch(event.target.value)}
+                      onKeyDown={(event) => event.stopPropagation()}
                       className="mb-2 w-full rounded-lg border border-espresso/20 bg-paper px-2 py-1 text-xs"
                       placeholder="Search topics"
                     />
@@ -459,7 +461,7 @@ export const SessionPage = () => {
                             <DropdownMenu.Item
                               key={item}
                               className={cn(
-                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm outline-none hover:bg-sand',
+                                'flex cursor-pointer items-center justify-between px-3 py-2 text-sm outline-none hover:bg-espresso/10',
                                 active ? 'bg-sand text-espresso' : 'text-espresso'
                               )}
                               onSelect={(event) => {
@@ -497,9 +499,12 @@ export const SessionPage = () => {
                             topics: prev.topics.filter((topicItem) => topicItem !== item)
                           }))
                         }
-                      className="rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
+                      className="group relative inline-flex items-center rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
                       >
-                        {item}
+                        <span>{item}</span>
+                        <span className="pointer-events-none absolute right-2 opacity-0 transition group-hover:opacity-100">
+                          <X className="h-3 w-3 text-espresso/70" />
+                        </span>
                       </button>
                     ))}
                   </div>

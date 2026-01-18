@@ -15,6 +15,12 @@ export type Feedback = {
   whyIsWrong: string
 }
 
+export type TopicMetric = {
+  topic: string
+  totalAnswers: number
+  rightAnswers: number
+}
+
 type BackendClassCard = {
   classID: number | string
   name: string
@@ -225,6 +231,20 @@ export const api = {
     ),
   getStyleDocs: (classID: string) =>
     request<Array<{ filename: string }>>(`/api/getStyleDocs/${encodeURIComponent(classID)}`),
+  getMetrics: (classID: string) =>
+    request<TopicMetric[] | Record<string, { rightAnswers: number; totalAnswers: number }>>(
+      `/api/getMetrics/${encodeURIComponent(classID)}`
+    ).then((metrics) => {
+      if (Array.isArray(metrics)) return metrics
+      if (metrics && typeof metrics === 'object') {
+        return Object.entries(metrics).map(([topic, data]) => ({
+          topic,
+          rightAnswers: data.rightAnswers ?? 0,
+          totalAnswers: data.totalAnswers ?? 0
+        }))
+      }
+      return []
+    }),
   requestQuestion: (sessionID: string) =>
     request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
       Content: question.content,

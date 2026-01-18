@@ -39,9 +39,9 @@ class Class:
     sessions: List[Session]
 
 class_cards = [
-    {"classID": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
-    {"classID": 2, "name": "Science", "professor": "Dr. Joseph"},
-    {"classID": 3, "name": "History", "professor": "Dr. Max"}
+    {"classID": 1, "name": "Mathematics", "professor": "Dr. Karthik", "topics": ["Algebra", "Geometry", "Calculus", "Statistics"]},
+    {"classID": 2, "name": "Science", "professor": "Dr. Joseph", "topics": ["Biology", "Chemistry", "Physics", "Ecology", "Astronomy", "Geology"]},
+    {"classID": 3, "name": "History", "professor": "Dr. Max", "topics": ["Ancient", "Medieval", "Modern", "World Wars"]}
 ]
 
 sessions_store = [
@@ -120,7 +120,7 @@ def create_class():
         or "Instructor"
     )
     next_id = max(card["classID"] for card in class_cards) + 1 if class_cards else 1
-    class_cards.append({"classID": next_id, "name": name, "professor": professor})
+    class_cards.append({"classID": next_id, "name": name, "professor": professor, "topics": []})
     return jsonify({"classID": str(next_id)})
 
 @server.route("/api/createSession/<classID>", methods=["POST"])
@@ -186,16 +186,47 @@ def get_style_docs(classID):
 
 @server.route("/api/getClassTopics/<classID>")
 def get_class_topics(classID):
-    topics = [
-        {"title": "Algebra"},
-        {"title": "Geometry"},
-        {"title": "Calculus"},
-        {"title": "Alpha"},
-        {"title": "Beta"},
-        {"title": "Gamma"},
-        {"title": "Delta"}
-    ]
-    return jsonify(topics)
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    for card in class_cards:
+        if card["classID"] == class_id:
+            return jsonify([{"title": t} for t in card.get("topics", [])])
+
+    return jsonify([])
+
+@server.route("/api/getMetrics/<classID>", methods=["GET"])
+def get_metrics(classID):
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    topics = []
+    for card in class_cards:
+        if card["classID"] == class_id:
+            topics = card.get("topics", [])
+            break
+
+    if not topics:
+        return jsonify([])
+
+    target = max(1, round(len(topics) * 0.5))
+    random.shuffle(topics)
+    selected = topics[:target]
+
+    metrics = []
+    for topic in selected:
+        total_answers = random.randint(8, 60)
+        right_answers = random.randint(0, total_answers)
+        metrics.append({
+            "topic": topic,
+            "totalAnswers": total_answers,
+            "rightAnswers": right_answers
+        })
+    return jsonify(metrics)
 
 @server.route("/api/getRecentSessions/<classID>")
 def get_recent_sessions(classID):
