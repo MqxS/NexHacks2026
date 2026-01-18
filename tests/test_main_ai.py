@@ -18,21 +18,21 @@ import main
 
 class TestMainAI(unittest.TestCase):
     def setUp(self):
-        self.app = main_ai.server.test_client()
+        self.app = main.server.test_client()
         self.app.testing = True
         
         # Mock Mongo
-        self.mock_mongo = main_ai.mongo
+        self.mock_mongo = main.mongo
         self.mock_sessions = self.mock_mongo.sessions
         self.mock_classes = self.mock_mongo.classes
         self.mock_pending = self.mock_mongo.pending_questions
         
         # Mock AI Util
-        self.mock_ai = main_ai.ai_util
+        self.mock_ai = main.ai_util
         if self.mock_ai is None:
-            # If main_ai failed to init AI (e.g. import error), we force mock it
-            main_ai.ai_util = MagicMock()
-            self.mock_ai = main_ai.ai_util
+            # If main failed to init AI (e.g. import error), we force mock it
+            main.ai_util = MagicMock()
+            self.mock_ai = main.ai_util
 
     def test_request_question(self):
         session_id = str(ObjectId())

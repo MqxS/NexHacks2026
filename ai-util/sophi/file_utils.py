@@ -198,7 +198,7 @@ class FileUtils:
     def _format_problems_with_gemini(self, extracted_text: str, *, gemini_client: t.Any) -> list[str]:
         system_instruction = (
             "You clean up extracted PDF text into a list of distinct practice problems. "
-            "Preserve mathematical expressions using LaTeX delimited by \\( ... \\) or \\[ ... \\]. "
+            "Preserve mathematical expressions using LaTeX delimited by $$ ... $$. "
             "Return at most 60 problems. "
             "Return JSON only."
         )
@@ -207,8 +207,8 @@ class FileUtils:
                 "Input text:\n1) Solve 2x+3=11\n2) Integral_0^1 2x e^{x^2} dx",
                 {
                     "problems": [
-                        "Solve for x: \\(2x + 3 = 11\\).",
-                        "Evaluate \\(\\int_{0}^{1} 2x e^{x^2} \\, dx\\).",
+                        "Solve for x: $$2x + 3 = 11$$.",
+                        "Evaluate $$\\int_{0}^{1} 2x e^{x^2} \\, dx$$.",
                     ]
                 },
             )
@@ -241,7 +241,7 @@ class FileUtils:
 
         system_instruction = (
             "You convert extracted PDF text into a list of practice items. Each item should have a question and, "
-            "if an answer key is present, an answer. Preserve math as LaTeX using \\( ... \\) or \\[ ... \\]. "
+            "if an answer key is present, an answer. Preserve math as LaTeX using $$ ... $$. "
             "Return at most 60 items. "
             "Return JSON only."
         )
@@ -250,8 +250,8 @@ class FileUtils:
                 "Input text:\n1) Solve 2x+3=11\nAnswer: x=4\n\n2) Find d/dx x^2\nAnswer: 2x",
                 {
                     "items": [
-                        {"question": "Solve for x: \\(2x + 3 = 11\\).", "answer": "\\(x=4\\)"},
-                        {"question": "Differentiate \\(x^2\\).", "answer": "\\(2x\\)"},
+                        {"question": "Solve for x: $$2x + 3 = 11$$.", "answer": "$$x=4$$"},
+                        {"question": "Differentiate $$x^2$$.", "answer": "$$2x$$"},
                     ]
                 },
             ),
@@ -260,7 +260,7 @@ class FileUtils:
                 {
                     "items": [
                         {
-                            "question": "Evaluate \\(\\int_{0}^{1} 2x e^{x^2} \\, dx\\).",
+                            "question": "Evaluate $$\\int_{0}^{1} 2x e^{x^2} \\, dx$$.",
                             "answer": None,
                         }
                     ]
@@ -306,14 +306,14 @@ class FileUtils:
     def _extract_problems_from_image(self, image_bytes: bytes, *, gemini_client: t.Any) -> list[str]:
         system_instruction = (
             "You read an image of a worksheet or textbook page and extract the practice problems. "
-            "Write them as plain text with LaTeX for math, using \\( ... \\) or \\[ ... \\]. "
+            "Write them as plain text with LaTeX for math, using $$ ... $$. "
             "Return at most 60 problems. "
             "Return JSON only."
         )
         few_shots = [
             (
                 "Extract problems from the page image. Return JSON.",
-                {"problems": ["Solve for x: \\(3x-5=16\\).", "Differentiate \\(f(x)=(x^2+1)^3\\)."]},
+                {"problems": ["Solve for x: $$3x-5=16$$.", "Differentiate $$f(x)=(x^2+1)^3$$."]},
             )
         ]
         out = gemini_client.generate_json(
@@ -334,7 +334,7 @@ class FileUtils:
         system_instruction = (
             "You read an image of a worksheet, practice exam, or textbook page and extract practice items. "
             "Each item should have a question and, if the answer is visible on the page, an answer. "
-            "Preserve math as LaTeX using \\( ... \\) or \\[ ... \\]. "
+            "Preserve math as LaTeX using $$ ... $$. "
             "Return at most 60 items. "
             "Return JSON only."
         )
@@ -343,8 +343,8 @@ class FileUtils:
                 "Extract practice items from the page image. Return JSON.",
                 {
                     "items": [
-                        {"question": "Solve for x: \\(3x-5=16\\).", "answer": None},
-                        {"question": "Differentiate \\(f(x)=(x^2+1)^3\\).", "answer": None},
+                        {"question": "Solve for x: $$3x-5=16$$.", "answer": None},
+                        {"question": "Differentiate $$f(x)=(x^2+1)^3$$.", "answer": None},
                     ]
                 },
             )
@@ -390,7 +390,7 @@ class FileUtils:
         system_instruction = (
             "You read a PDF of a worksheet, practice exam, or textbook pages and extract practice items. "
             "Each item should have a question and, if an answer key is present, an answer. "
-            "Preserve math as LaTeX using \\( ... \\) or \\[ ... \\]. "
+            "Preserve math as LaTeX using $$ ... $$. "
             "Return JSON only."
         )
         few_shots = [
@@ -398,8 +398,8 @@ class FileUtils:
                 "Extract practice items from the PDF. Return JSON.",
                 {
                     "items": [
-                        {"question": "Solve for x: \\(3x-5=16\\).", "answer": None},
-                        {"question": "Differentiate \\(x^2\\).", "answer": "\\(2x\\)"},
+                        {"question": "Solve for x: $$3x-5=16$$.", "answer": None},
+                        {"question": "Differentiate $$x^2$$.", "answer": "$$2x$$"},
                     ]
                 },
             )
@@ -445,7 +445,9 @@ class FileUtils:
     def _format_syllabus_with_gemini(self, extracted_text: str, *, gemini_client: t.Any) -> str:
         system_instruction = (
             "You convert messy syllabus text into a clean unit/topic outline. "
-            "Be comprehensive and include all units and topics found. Preserve course-specific names. Return JSON only."
+            "Be comprehensive and include all units and topics found. Preserve course-specific names. "
+            "STRICTLY exclude administrative info (grading, policies, instructors, office hours). "
+            "Return JSON only."
         )
         few_shots = [
             (
@@ -481,7 +483,9 @@ class FileUtils:
 
         system_instruction = (
             "You read a PDF course syllabus and extract the unit/topic outline. "
-            "Be comprehensive. Return JSON only."
+            "Be comprehensive with topics. "
+            "STRICTLY exclude administrative info (grading, policies, instructors, office hours). "
+            "Return JSON only."
         )
         few_shots = [
             (
@@ -516,7 +520,9 @@ class FileUtils:
     def _extract_syllabus_from_image(self, image_bytes: bytes, *, gemini_client: t.Any) -> str:
         system_instruction = (
             "You read an image of a course syllabus page and extract the unit/topic outline. "
-            "Be comprehensive. Return JSON only."
+            "Be comprehensive with topics. "
+            "STRICTLY exclude administrative info (grading, policies, instructors, office hours). "
+            "Return JSON only."
         )
         few_shots = [
             (
