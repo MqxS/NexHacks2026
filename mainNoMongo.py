@@ -98,8 +98,8 @@ def upload_style_docs(classID):
     time.sleep(1.4)
     return jsonify({"status": "Style docs uploaded"})
 
-@server.route("/api/deleteStyleDoc/<classID>", methods=["DELETE"])
-def delete_style_doc(classID):
+@server.route("/api/deleteStyleDoc/<classID>/<docName>", methods=["DELETE"])
+def delete_style_doc(classID, docName):
     time.sleep(0.8)
     return jsonify({"status": "Style doc deleted"})
 

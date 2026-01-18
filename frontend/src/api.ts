@@ -185,11 +185,13 @@ export const api = {
     }),
   deleteStyleDoc: (payload: { classID: string; docID: string }) =>
     request(
-      `/api/deleteStyleDoc/${encodeURIComponent(payload.classID)}?docID=${encodeURIComponent(payload.docID)}`,
+      `/api/deleteStyleDoc/${encodeURIComponent(payload.classID)}/${encodeURIComponent(payload.docID)}`,
       {
-      method: 'DELETE'
+        method: 'DELETE'
       }
     ),
+  getStyleDocs: (classID: string) =>
+    request<Array<{ filename: string }>>(`/api/getStyleDocs/${encodeURIComponent(classID)}`),
   requestQuestion: (sessionID: string) =>
     request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
       Content: question.content,

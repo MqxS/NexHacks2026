@@ -41,6 +41,20 @@ export const SessionPage = () => {
   })
   const [savedParams, setSavedParams] = useState(params)
 
+  const blendColor = (start: [number, number, number], end: [number, number, number], t: number) => {
+    const mix = (a: number, b: number) => Math.round(a + (b - a) * t)
+    return `rgb(${mix(start[0], end[0])}, ${mix(start[1], end[1])}, ${mix(start[2], end[2])})`
+  }
+
+  const cold = [156, 183, 213] as [number, number, number]
+  const edge = Math.min(1, Math.max(0, params.difficulty))
+  const cool = blendColor(cold, [176, 196, 222], edge)
+  const hotStart = Math.min(100, Math.max(0, ((edge - 0.45) / 0.55) * 100))
+  const gradient =
+    edge < 0.45
+      ? `linear-gradient(90deg, #9CB7D5 0%, ${cool} 100%)`
+      : `linear-gradient(90deg, #9CB7D5 0%, #9CB7D5 ${100 - hotStart}%, #C98B6A 100%)`
+
   const classID = useMemo(() => {
     if (!sessionID) return null
     return localStorage.getItem(`session:${sessionID}`)
@@ -360,7 +374,12 @@ export const SessionPage = () => {
                   step={0.01}
                   value={params.difficulty}
                   onChange={(event) => setParams({ ...params, difficulty: Number(event.target.value) })}
-                  className="mt-2 w-full"
+                  className="mt-2 h-2 w-full appearance-none rounded-full"
+                  style={{
+                    backgroundImage: `${gradient}, linear-gradient(90deg, rgba(103,70,54,0.15) 0%, rgba(103,70,54,0.15) 100%)`,
+                    backgroundSize: `${edge * 100}% 100%, 100% 100%`,
+                    backgroundRepeat: 'no-repeat'
+                  }}
                 />
               </div>
               <div>

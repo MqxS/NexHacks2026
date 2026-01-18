@@ -1,12 +1,12 @@
-import {useMemo, useState} from 'react'
-import {useMutation, useQuery} from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import * as Dialog from '@radix-ui/react-dialog'
-import {useNavigate, useParams} from 'react-router-dom'
-import {toast} from 'sonner'
-import {api} from '../api'
-import {PaperCard} from '../components/PaperCard'
-import {UploadDropzone} from '../components/UploadDropzone'
-import {cn} from '../lib/utils'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
+import { api } from '../api'
+import { PaperCard } from '../components/PaperCard'
+import { UploadDropzone } from '../components/UploadDropzone'
+import { cn } from '../lib/utils'
 
 export const ClassSettings = () => {
   const { classID } = useParams()
@@ -20,6 +20,12 @@ export const ClassSettings = () => {
   const { data: classes } = useQuery({
     queryKey: ['classCards'],
     queryFn: api.getClassCards
+  })
+
+  const styleDocsQuery = useQuery({
+    queryKey: ['styleDocs', classID],
+    queryFn: () => api.getStyleDocs(classID ?? ''),
+    enabled: Boolean(classID)
   })
 
   const className = useMemo(() => {
@@ -47,7 +53,7 @@ export const ClassSettings = () => {
     },
     onSuccess: () => {
       toast.success('Style docs updated')
-      setUploadedDocs((prev) => [...prev, ...styleDocs.map((file) => file.name)])
+      styleDocsQuery.refetch()
       setStyleDocs([])
     },
     onError: (error: Error) => toast.error(error.message || 'Could not upload style docs')
@@ -57,7 +63,7 @@ export const ClassSettings = () => {
     mutationFn: (docID: string) => api.deleteStyleDoc({ classID: classID ?? '', docID }),
     onSuccess: (_, docID) => {
       toast.success('Style doc removed')
-      setUploadedDocs((prev) => prev.filter((item) => item !== docID))
+      styleDocsQuery.refetch()
     },
     onError: (error: Error) => toast.error(error.message || 'Could not delete doc')
   })
@@ -121,19 +127,19 @@ export const ClassSettings = () => {
             >
               {uploadDocs.isPending ? 'Uploading...' : 'Upload style docs'}
             </button>
-            {uploadedDocs.length === 0 ? (
+            {(styleDocsQuery.data ?? uploadedDocs).length === 0 ? (
               <p className="mt-3 text-sm text-espresso/70">No style docs yet.</p>
             ) : (
               <div className="mt-3 space-y-2">
-                {uploadedDocs.map((doc) => (
+                {(styleDocsQuery.data ?? uploadedDocs).map((doc) => (
                   <div
-                    key={doc}
+                    key={typeof doc === 'string' ? doc : doc.filename}
                     className="flex items-center justify-between rounded-xl border border-espresso/15 bg-sand px-3 py-2 text-xs text-espresso"
                   >
-                    <span className="truncate">{doc}</span>
+                    <span className="truncate">{typeof doc === 'string' ? doc : doc.filename}</span>
                     <button
                       type="button"
-                      onClick={() => deleteDoc.mutate(doc)}
+                      onClick={() => deleteDoc.mutate(typeof doc === 'string' ? doc : doc.filename)}
                       className="rounded-full border border-espresso/20 px-2 py-1 text-[10px]"
                     >
                       Delete
