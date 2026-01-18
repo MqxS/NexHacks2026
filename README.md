@@ -10,7 +10,7 @@
 
 **\\(so\varphi\\)** (pronounced *Sophie*), named after the Greek word for *wisdom*, is an intelligent, adaptive practice platform designed to bridge the gap between static course materials and personalized learning. In the high-stakes environment of university STEM courses, generic study tools often fail to capture the nuance of a professor's specific teaching style. Sophi solves this by ingesting course-specific "DNA"—syllabi, past exams, and notes—to generate an infinite stream of high-quality, stylistically accurate practice problems.
 
-By employing **symbolic verification** (via Wolfram Alpha and RAG) and **contextual compression** (via The Token Company), Sophi eliminates the hallucinations common in LLMs while maintaining lightning-fast performance. It helps students achieve the "golden ratio of practice" (referencing $\varphi$): maximizing retention and understanding while minimizing the time spent on passive study.
+By employing **symbolic verification** (via Wolfram Alpha and RAG) and **contextual compression** (via The Token Company), Sophi eliminates the hallucinations common in LLMs while maintaining lightning-fast performance (sub 3 second question generation). It helps students achieve the "golden ratio of practice" (referencing $\varphi$): maximizing retention and understanding while minimizing the time spent on passive study.
 
 ## 🛠️ Tech Stack
 
@@ -48,7 +48,7 @@ Sophi doesn't just "know math"; it knows *your* math class. By uploading PDFs of
 Students don't just "practice"; they configure a **Session** based on their needs:
 *   **Focus Mode**: Target specific weak units (e.g., "Unit 3: Derivatives").
 *   **Cumulative Mode**: Interleaved practice across all previous units to boost retention.
-*   **Difficulty Scaling**: 1-5 scale that adjusts in real-time based on performance.
+*   **Difficulty Scaling & Adaptive Mode**: Scale that adjusts in real-time based on performance.
 
 ### 3. Hallucination-Free Math
 One of the biggest risks of AI in STEM is "confident wrongness." Sophi mitigates this with a **Dual-Verification System**:
@@ -59,12 +59,12 @@ One of the biggest risks of AI in STEM is "confident wrongness." Sophi mitigates
 ### 4. Progressive Hints & "Maximal Stimulation"
 True learning happens during the struggle, not the solution. Sophi's hint system is designed to maximize **active recall** and cognitive stimulation:
 *   **Tiered Assistance**: Hints don't just give the answer. They start with high-level *metacognitive* or *conceptual* nudges (e.g., "What implies continuity here?") and only descend to *procedural* steps if you're truly stuck.
-*   **The "Golden Ratio"**: By withholding the full solution until necessary, Sophi keeps you in the zone of proximal development—maximizing retention without causing frustration.
+*   **The "Golden Ratio"**: By withholding the full solution until necessary, Sophi keeps you in the zone of optimal development, so the challenge is just right to promote learning without causing frustration.
 *   **Context-Aware**: Hints remember your previous attempts, ensuring you never get the same advice twice.
 
 ## 🏗️ How We Built It
 
-The development of Sophi was a masterclass in system integration, built during a sleepless 36-hour sprint.
+The development of Sophi was a masterclass in system integration, built during a sleepless 24-hour sprint.
 
 ### The "Sophi AI" Pipeline
 The heart of the project is `sophi_ai.py`, a complex orchestration layer that manages the conversation between the user, Gemini, and Wolfram.
@@ -73,7 +73,14 @@ The heart of the project is `sophi_ai.py`, a complex orchestration layer that ma
 3.  **Dynamic Prompting**: We don't use static prompts. The system dynamically assembles prompts based on the user's session history, injecting specific "focus concepts" and "style guides" from the Class File at runtime.
 
 ### Frontend Engineering
-The frontend is built with **React** and **Framer Motion** to feel "alive." We focused heavily on **Optimistic UI**—the interface predicts the next state to mask API latency, making the app feel instantaneous even when complex AI reasoning is happening in the background.
+The frontend is built with **React** and **Framer Motion** to feel extremely fluid. We focused heavily on **Optimistic UI**—the interface predicts the next state to mask API latency, making the app feel instantaneous even when complex AI reasoning is happening in the background.
+
+### Backend Engineering
+The backend is a **Flask** API designed around low-latency, verifiable problem generation. It exposes endpoints for **Class File ingestion**, **session orchestration**, and **answer verification**, and acts as the control plane between Gemini, Wolfram Alpha, FAISS retrieval, and MongoDB persistence.
+
+*   **PDF Ingestion & Course DNA Extraction**: Uploaded PDFs (syllabi, notes, exams) are parsed server-side, chunked, compressed, and converted into a structured *Class File* JSON that the frontend can browse and the AI pipeline can condition on.
+*   **Session State & Persistence**: We store sessions, attempts, and performance signals in **MongoDB Atlas**, enabling adaptive difficulty, cumulative review, and “don’t repeat the same hint twice” behavior across devices.
+*   **Retrieval-Augmented Generation (RAG)**: Relevant snippets (units, definitions, instructor phrasing, and optionally textbook references via FAISS) are retrieved per request to keep prompts grounded and stylistically consistent with the course.
 
 ## ⚔️ Competitive Analysis
 

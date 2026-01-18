@@ -254,7 +254,7 @@ export const ClassSessionSetup = () => {
                     !cumulative ? 'bg-espresso text-paper' : 'bg-paper text-espresso'
                   )}
                 >
-                  Isolated
+                  Focus
                 </button>
                 <button
                   type="button"
@@ -268,7 +268,7 @@ export const ClassSessionSetup = () => {
                 </button>
               </div>
               <p className="mt-2 text-xs text-espresso/60">
-                Isolated uses only the selected topic. Cumulative includes prerequisite topics too.
+                Focus uses only the selected topic. Cumulative includes prerequisite topics too.
               </p>
             </div>
 

@@ -521,7 +521,7 @@ export const SessionPage = () => {
                       !params.cumulative ? 'bg-espresso text-paper' : 'bg-paper text-espresso'
                     )}
                   >
-                    Isolated
+                    Focus
                   </button>
                   <button
                     type="button"
