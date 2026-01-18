@@ -38,13 +38,15 @@ Each session dynamically generates questions, validates answers, provides target
 Each class stores a **Class File** (JSON) that contains custom-curated class metadata, including:
 *   Topic breakdown (indented syllabus-style hierarchy)
 *   Textbook citation (if applicable)
-*   Style-notes derived from assignments (professor vocabulary, problem structure, common phrasing)
+*   Style-notes derived from assignments (professor vocabulary, problem structure, common phrasing)=
 
-This allows for Sophi to generate questions that are aligned with the professor's teaching style, provide hints that are specific to the student's current level of understanding, and ground 
+Questions, hints, and answers are grounded in symbolic reasoning (courtesy of Wolfram Alpha) or 
+
+This allows for Sophi to generate questions that are aligned with the professor's teaching style, provide hints that are specific to the student's current level of understanding, and ground the questions in the class material, ensuring that the questions are relevant and meaningful.
 
 ## How we built it
 
-We divided our work into managing the frontend, backend, and AI utilities. As we had three 
+We divided our work into managing the frontend, backend, and AI utilities. As we had three people on our team, this allowed us to distribute the workload evenly, with each person focusing on a specific aspect of the project.
 
 ### Frontend
 
@@ -56,7 +58,7 @@ The backend is a Flask application that handles user authentication, class and s
 
 ### AI Stack
 
-We used Google Gemini 3 Flash (Preview) as the primary LLM for question generation and hint provision. Gemini 3 Flash is a state-of-the-art language model that is designed to be fast, efficient, and accurate, and our expansive prompting workflow allowed for robust results in near-real-time.
+We used Google Gemini Flash Lite 2.5 as the primary LLM for question generation and hint provision. Gemini 3 Flash is a state-of-the-art language model that is designed to be fast, efficient, and accurate, and our expansive prompting workflow allowed for robust results in near-real-time.
 
 To mitigate hallucination, we utilize a combination of fact-checking mechanisms and post-processing filters. We leverage the Wolfram Alpha API and its use of symbolic learning, translating questions to a primitive form that allows for more accurate fact-checking. Additionally, we leverage entries from the textbook citation, retrieved via a FAISS Vector-Store database also hosted by MongoDB, to ensure that the generated questions are aligned with the class material.
 

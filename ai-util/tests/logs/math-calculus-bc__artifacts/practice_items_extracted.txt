@@ -1,11 +1,21 @@
-Question: Find \(\lim_{x \to 1} \frac{x^2 - 3x + 2}{x - 1}\).
-Answer: -1
+Find \(\lim_{x \to -1} \frac{2x^2 + 1}{3x - 2}\).
 
-Question: For what value(s) of \(k\), if any, is \(f(x) = \begin{cases} x^2 - k & \text{if } x < 2 \\ k^2 - x & \text{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)?
-Answer: 2
+For what value(s) of \(k\), if any, is the function \(f(x) = \begin{cases} 2x^2 - k & 	ext{if } x < 2 \\ x + k & 	ext{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)?
 
-Question: If \(f(x) = \sqrt{x^2 - 8x + 1}\), then \(f'(x)\) is:
-Answer: \(\frac{x - 4}{\sqrt{x^2 - 8x + 1}}\)
+If \(f(x) = (2x - 8)^{1/2}\), then \(f'(x)\) is
 
-Question: Evaluate \(\int \frac{8}{1 + 8x} \, dx\).
-Answer: \(\ln|1 + 8x| + C\)
+Evaluate \(\int (8x^{-1} + 8) dx\).
+
+A particle moves along the x-axis so that at any time \(t \ge 0\), its velocity is given by \(v(t) = \cos(4t)\). If the position of the particle at time \(t = \frac{\pi}{4}\) is \(x(\frac{\pi}{4}) = 8\), what is the particle’s position at time \(t=0\)?
+
+Given \(f(x) = \frac{4}{x^2 - 3}\), for what values of \(x\) is the graph of \(f\) concave downwards?
+
+Let \(f\) be defined by \(f(x) = \sqrt{6 - x}\) for all real numbers \(x\). For what values of \(x\) is the function increasing?
+
+Find an equation for the line tangent to the graph of \(f(x) = \sqrt{7x - 1}\) at the point where \(x=6\).
+
+What is the equation of the line tangent to the curve \(y = x^3 - 2x^2\) at the point \((2, 0)\)?
+
+A particle moves along the x-axis so that its velocity at any time \(t \ge 0\) is given by \(v(t) = 4t^3 - 4t\). Which of the following expressions could represent the position \(x(t)\) of the particle at any time \(t \ge 0\)?
+
+What is the slope of the tangent line to \(x^2 + 2xy + 3y^2 = 22\) that lies in the first quadrant at the point where \(y=1\)?

@@ -1,0 +1,238 @@
+{
+  "class_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/ap-gov",
+  "is_math": false,
+  "use_wolfram": false,
+  "syllabus_chars": 4691,
+  "practice_items_count": 7,
+  "steps": {
+    "parse_syllabus": {
+      "name": "Parsing syllabus PDF",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "parse_practice": {
+      "name": "Parsing practice PDFs",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "create_class_file": {
+      "name": "Analyzing settings request (create_class_file)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "generate_question": {
+      "name": "Generating question",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "generate_question_with_suggestion": {
+      "name": "Generating question with suggestions",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_ok": {
+      "name": "Validating question (expected valid)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_bad": {
+      "name": "Validating question (expected invalid)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "validate_hint": {
+      "name": "Validating hint against a step",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Metacognitive / Reflection": {
+      "name": "Generating hint (Metacognitive / Reflection)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Conceptual": {
+      "name": "Generating hint (Conceptual)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Strategic": {
+      "name": "Generating hint (Strategic)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Procedural / Subgoal": {
+      "name": "Generating hint (Procedural / Subgoal)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "Bottom-Out / Explicit": {
+      "name": "Generating hint (Bottom-Out / Explicit)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "adjust_session_parameter": {
+      "name": "Analyzing settings request (adjust_session_parameter)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "regenerate_question": {
+      "name": "Analyzing settings request (regenerate_question)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    },
+    "save_metadata": {
+      "name": "Analyzing settings request (save_metadata)",
+      "ok": true,
+      "skipped": false,
+      "error": null
+    }
+  },
+  "generated": {
+    "question": "According to the syllabus, what is the primary requirement for the 'Project/Presentation' assignment in this course?",
+    "answer": "A research paper on a government/politics topic of choice, including library research and a brief presentation.",
+    "wolfram_query": "",
+    "validation_prompt": "You are a verifier evaluating a student's step-by-step solution to a mathematical problem. The student's work is provided as 'student_step'. The original problem is provided as 'question'.\n\nYour task is to determine if 'student_step' is a logically correct and necessary next step towards solving the 'question'.\n\n**Validation Rules:**\n1. **Numeric Correctness:** The numerical result of the step must be mathematically correct based on the previous state (if applicable) or the initial problem.\n2. **Unit Robustness:** Accept the step if the numeric value is correct, even if the unit is missing, abbreviated, or slightly different (e.g., '5 m/s', '5 meters per second', '5' are all acceptable if 5 is the correct number for that quantity). \n3. **Unit Error:** Mark as incorrect if the unit is fundamentally wrong (e.g., the answer should be in meters but the step shows kilograms).\n4. **Logical Flow:** The step must follow logically from the preceding context (if provided) or be a valid initial manipulation of the problem.\n\n**Output Format:** Return a single JSON object with the following keys:\n- \"ok\": boolean (true if the step is valid according to the rules, false otherwise).\n- \"error_type\": string or null. If \"ok\" is false, specify the error type (e.g., \"Arithmetic Error\", \"Unit Mismatch\", \"Logical Flaw\"). If \"ok\" is true, this must be null.\n- \"feedback\": string. A brief, constructive explanation of the validation result. If incorrect, explain the specific error. If correct, state that the step is valid.",
+    "metadata": {
+      "difficulty_level": 3,
+      "concepts": [
+        "Research Paper",
+        "Presentation",
+        "Government/Politics Topic",
+        "Library Research"
+      ],
+      "unit": "ap-gov",
+      "cumulative": true,
+      "adaptive": true,
+      "verified_with_wolfram": false,
+      "used_file_upload": true,
+      "used_class_file": true
+    }
+  },
+  "generated_with_suggestion": {
+    "question": "Which section of the AP Government syllabus outlines the requirements for the 'Research Paper on a government/politics topic of choice, including library research and a brief presentation'?",
+    "answer": "Assignments and Activities",
+    "wolfram_query": "",
+    "validation_prompt": "You are a verifier evaluating a student's step-by-step solution to a math problem. The student's work is provided as 'student_step'. The correct solution path is known internally, but you must only compare the 'student_step' against the 'question' to determine validity. \n\n**Validation Rules:**\n1. **Logical Validity:** Determine if the 'student_step' is a mathematically sound and necessary progression from the implied previous state (or the initial equation if it's the first step) towards solving the 'question'.\n2. **Unit Robustness:** If the step involves a numerical answer or intermediate calculation, the numeric value must be correct. Accept the step if the numeric value is correct, even if the unit is missing, abbreviated, or slightly different (e.g., '5 m/s', '5 meters per second', '5' are all acceptable if 5 is the correct number). \n3. **Unit Error:** If the numeric value is correct but the unit is fundamentally wrong (e.g., the answer should be in meters but the student wrote kilograms), mark the step as invalid ('ok': false).\n4. **Output Format:** Return a JSON object with keys: 'ok' (boolean), 'error_type' (string, e.g., 'Algebraic Error', 'Calculation Error', 'Unit Error', 'Irrelevant Step', or null if ok), and 'feedback' (string explaining the validation decision).\n\n**Input Structure:**\n- 'question': The original problem statement.\n- 'student_step': The specific step provided by the student for evaluation.\n\n**Example Scenario (Internal Logic Check):**\nIf Question is 'Solve for x: 2x+3=11' and Student Step is '2x = 8'.\n- Verification: Valid subtraction of 3 from both sides. Numeric value 8 is correct.\n- Output: {\"ok\": true, \"error_type\": null, \"feedback\": \"The step correctly isolates the term containing x by subtracting 3 from both sides.\"}\n\n**Example Scenario (Unit Check):**\nIf Question is 'A car travels 10 meters in 2 seconds. What is its speed?' and Student Step is 'Speed = 5 kg'.\n- Verification: Numeric value 5 is correct (10/2). Unit 'kg' is incorrect for speed (should be m/s).\n- Output: {\"ok\": false, \"error_type\": \"Unit Error\", \"feedback\": \"The numerical calculation (5) is correct, but the unit provided (kg) is incorrect for speed.\"}",
+    "metadata": {
+      "difficulty_level": 3,
+      "concepts": [
+        "Research Paper",
+        "Presentation",
+        "Government/Politics Topic",
+        "Library Research",
+        "Assignments and Activities"
+      ],
+      "unit": "ap-gov",
+      "cumulative": true,
+      "adaptive": true,
+      "verified_with_wolfram": false,
+      "used_class_file": true
+    }
+  },
+  "validation_ok": {
+    "ok": true,
+    "wolfram_query": null,
+    "wolfram_result": null,
+    "details": "{\"answer\": \"Research paper on a government/politics topic of choice, including library research and a brief presentation.\", \"explanation\": \"The primary requirement for the 'Project/Presentation' assignment is explicitly stated in the 'Assignments and Activities' section of the provided text.\"}"
+  },
+  "validation_bad": {
+    "ok": false,
+    "wolfram_query": null,
+    "wolfram_result": null,
+    "details": "{\"answer\": null, \"explanation\": \"The equation is incomplete.\"}"
+  },
+  "hints": {
+    "Metacognitive / Reflection": {
+      "kind": "followup",
+      "text": "Where in the course materials (like the syllabus document or course website) can you find the specific details about the 'Project/Presentation' assignment?",
+      "hint_type": null,
+      "wolfram_query": null,
+      "wolfram_result": null
+    },
+    "Conceptual": {
+      "kind": "followup",
+      "text": "Since this question refers to a specific course syllabus, can you tell me which course or context you are referring to?",
+      "hint_type": null,
+      "wolfram_query": null,
+      "wolfram_result": null
+    },
+    "Strategic": {
+      "kind": "followup",
+      "text": "Since this question refers to a specific course document (the syllabus), what is the best resource you have available right now to find that information?",
+      "hint_type": null,
+      "wolfram_query": null,
+      "wolfram_result": null
+    },
+    "Procedural / Subgoal": {
+      "kind": "followup",
+      "text": "Where can you find the syllabus for this course?",
+      "hint_type": null,
+      "wolfram_query": null,
+      "wolfram_result": null
+    },
+    "Bottom-Out / Explicit": {
+      "kind": "hint",
+      "text": "You need to locate and read the 'Project/Presentation' section within the official course syllabus document.",
+      "hint_type": "Bottom-Out / Explicit",
+      "wolfram_query": null,
+      "wolfram_result": null
+    }
+  },
+  "hint_validation": {
+    "ok": false,
+    "wolfram_query": "D[x^2,x]",
+    "wolfram_result": null,
+    "details": "The hint is completely irrelevant to solving the algebraic equation 2x + 3 = 11."
+  },
+  "settings_analyses": [
+    {
+      "request_type": "adjust_session_parameter",
+      "parameter_changes": {
+        "difficulty_level_delta": 1,
+        "focus_concepts_add": [
+          "chain rule"
+        ]
+      },
+      "should_regenerate_question": true,
+      "notes": "Increase difficulty slightly and focus on chain rule."
+    },
+    {
+      "request_type": "regenerate_question",
+      "parameter_changes": {},
+      "should_regenerate_question": true,
+      "notes": "Avoid repeating the same structure."
+    },
+    {
+      "request_type": "save_metadata",
+      "parameter_changes": {
+        "learner_profile_add": [
+          "struggles_with_factoring"
+        ]
+      },
+      "should_regenerate_question": false,
+      "notes": "Store as learner metadata for adaptiveness."
+    },
+    {
+      "request_type": "create_class_file",
+      "parameter_changes": {},
+      "should_regenerate_question": false,
+      "notes": "Generate/refresh background class file."
+    }
+  ],
+  "artifacts_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/ap-gov__artifacts"
+}

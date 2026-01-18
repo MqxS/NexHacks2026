@@ -1,7 +1,5 @@
 Unit 1: Transcendental Functions
 - Differentiation and Integration of Functions with Bases other than e & Applications
-- Differentiation & Integration of Inverse Trig Functions
-- Exponential, logarithmic, and inverse trigonometric functions
 
 Unit 2: Differential Equations
 - Solving Separable Differential Equations
@@ -10,30 +8,61 @@ Unit 2: Differential Equations
 - Slope Fields
 - Euler’s Method
 
-Unit 3: Applications of Integration
-- Calculations of Volumes of Solids (Washer, shell, and general cross-section methods)
+Unit 3: Transcendental Functions
+- Differentiation & Integration of Inverse Trig Functions
+
+Unit 4: Applications of Integration
+- Calculations of Volumes of Solids
 - Arc Length
 - Areas of Surfaces of Revolution
 
-Unit 4: Advanced Integration Techniques
+Unit 5: Advanced Integration Techniques
 - Trigonometric Integration
 - Integration Using Trig Substitution
+
+Unit 6: Advanced Integration Techniques
 - Integration Using Partial Fractions
 - Integration by Tables
-- Integration by Parts
+
+Unit 7: Limits and Advanced Integration Techniques
+- L’Hopital’s Rule
 - Improper Integrals
 
-Unit 5: Limits
-- L’Hopital’s Rule
-
-Unit 6: Parametric Equations, Vector-Valued Functions & Polar Graphs
+Unit 8: Parametric Equations and Vector-Valued Functions
 - Differentiation of Parametric Functions
-- Differentiation of Vector-Valued Functions
-- Calculation of Speed
-- Area of a region bounded by a polar graph
+- Differentiation of Vector-Valued Functions and Calculation of Speed
 
-Unit 7: Infinite Series
+Unit 9: Infinite Series
 - Sequences, Series & Convergence
-- The Integral Test & p-series
+- The Integral Test
+- p-series
+
+Unit 10: Infinite Series
 - Comparisons of Series
-- Alternating Series, Ratio, & Root
+- Alternating Series
+- Ratio, & Root Tests
+
+Unit 11: Infinite Series
+- Taylor Polynomials & Approximations
+
+Unit 12: Infinite Series
+- Power Series and Taylor & Maclaurin Series
+
+Unit 13: Infinite Series
+- Maclaurin Series for functions e^x, sin(x), cos(x), and 1/(1 -x)
+
+Unit 14: Infinite Series and AP Exam Review
+- LaGrange Error Bound for Taylor Polynomials
+- AP Exam Review: In-depth Review of Selected AP Topics in Preparation for AP Exam
+
+Unit 15: AP Exam Review
+- AP Exam Review: In-depth Review of Selected AP Topics in Preparation for AP Exam
+
+Unit 16: AP Exam Review
+- AP Exam Review: In-depth Review of Selected AP Topics in Preparation for AP Exam
+
+Unit 17: AP Exam Review and AP Exam
+- AP Exam Review: In-depth Review of Selected AP Topics & AP Exam
+
+Unit 18: Post AP Exam
+- Post AP Exam Selected Topics

@@ -1,0 +1,145 @@
+{
+  "class_name": "ap-gov",
+  "syllabus": {
+    "units": [
+      {
+        "title": "Assignments and Activities",
+        "topics": [
+          "Project/Presentation: Research paper on a government/politics topic of choice, including library research and a brief presentation.",
+          "Election Assignments: Assignments based on real elections, including taking sides, debating, and voting.",
+          "Graphs, Charts and Maps: Interpretation of statistical information presented in these formats."
+        ]
+      },
+      {
+        "title": "Topics Covered (Overview)",
+        "topics": [
+          "I. Constitutional Underpinnings",
+          "II. Civil Liberties/Civil Rights",
+          "III. Political beliefs and behaviors",
+          "IV. Political Parties, Elections, and Campaigns",
+          "V. Interest Groups and the Media",
+          "VI. Institutions of Government",
+          "VII. Public Policy"
+        ]
+      },
+      {
+        "title": "Unit I: Constitutional Underpinnings",
+        "topics": [
+          "Readings: Wilson – Ch. 2 The Constitution, Ch. 3 Federalism; Cigler – 1.1 A Tradition Born in Strife, 1.2 The Founding Fathers: An Age of Realism, 1.3 The Founding Fathers: A Reform Caucus in Action, 1.4 Federalist No. 51, 2.1 Federalist No. 39, 2.2 McCulloch v. Maryland, 2.3 The Devil in Devolution, 2.4 Health and Welfare: Contagious Confusion.",
+          "Key Concepts: History of the Constitution, Separation of Powers, Federalism, Democratic Theories."
+        ]
+      },
+      {
+        "title": "Unit II: Civil Liberties/Civil Rights",
+        "topics": [
+          "Readings: Wilson – Ch. 5 Civil Liberties, Ch. 6 Civil Rights; Cigler – 3.1 Near v. Minnesota, 3.2 From the Saturday Press to the New York Times, 3.3 Gideon v. Wainwright, 3.4 Griswold v. Connecticut, 3.5 Lawrence and Garner v. Texas, 3.6 Rights, Liberties and Security: Recalibrating the Balance after September 11, 3.7 Brown v. Board of Education, 3.8 Affirmative Action: Don’t Mend it or End it – Bend it, 3.9 Reaffirming Diversity: A Legal Analysis of the University of Michigan Affirmative Action Cases.",
+          "Key Concepts: Development and Interpretation of Rights and Liberties, Supreme Court Decisions and Workings."
+        ]
+      },
+      {
+        "title": "Unit III: Political Beliefs and Behaviors",
+        "topics": [
+          "Readings: Wilson – Ch. 4 American Political Culture, Ch. 7 Public Opinion, Ch. 8 Political Participation; Cigler – 4.1 Polling and the Transformation of Public Opinion, 4.2 Is “Popular Rule” Possible?, 4.3 Can We Trust the Polls?, 5.1 Finding the Lost Voters, 5.2 Voting Rites: Why We Need a a New Concept of Citizenship, 5.3 Bowling Alone: America’s Declining Social Capital, 5.4 Bowling Together: The United State of America.",
+          "Key Concepts: Beliefs, Factors in Beliefs, Voting Habits."
+        ]
+      },
+      {
+        "title": "Unit IV: Political Parties, Elections, and Campaigns",
+        "topics": [
+          "Readings: Wilson – Ch. 9 Political Parties, Ch. 10 Elections and Campaigns; Cigler – 6.1 The Case for the Importance of Political Parties, 6.2 The Great Election Grab, 6.3 A Tale of Two Electorates: The Changing American Party Coalitions, 7.1 The Long Campaign: The Politics of Tedium, 7.2 McConnell v. The Federal Election Commission, 7.3 The Stagnation of Congressional Elections, 7.4 Weaving the Tangled Web into Political Action.",
+          "Key Concepts: Functions and Organization of Parties, Electoral Processes, Campaign Organization."
+        ]
+      },
+      {
+        "title": "Unit V: Interest Groups and the Media",
+        "topics": [
+          "Readings: Wilson – Ch. 11 Interest Groups, Ch. 12 The Media; Cigler – 8.1 Lowering the Political Hero to Our Level, 8.2 American News Consumption During Times of National Crisis, 8.3 The Pentagon Is Fighting – and Winning – the Public Relations War, 9.1 Federalist No. 10, 9.2 Lobbyists – Why the Bad Rap?, 9.3 Associations Without Members, 9.4 From Big Bird to Bill Gates: Organized Interests and the Emergence of Hyperpolitics.",
+          "Key Concepts: Specific Interests, Role of Interest Groups, Function and Impact of Media."
+        ]
+      },
+      {
+        "title": "Unit VI: Institutions of Government",
+        "topics": [
+          "Readings: Wilson – Ch. 13 Congress, Ch. 14 The Presidency, Ch. 15 The Bureaucracy, Ch. 16 The Judiciary; Cigler – 10.1 The Changing Textbook Congress, 10.2 Going Nowhere: A Gridlocked Congress?, 10.3 The Evolution of Tom DeLay, 10.4 The Student: How Hilary Clinton Set Out to Master the Senate, 11.1 The Power to Persuade, 11.2 Myth of the Presidential Mandate, 11.3 Rating the Presidents: Purpose, Criteria, Consequences, 11.4 Inside the Bush Presidency: Reflections of an Academic Interloper, 12.1 “Political Hacks” Versus “Bureaucrats”, 12.2 From Ouagadougou to Cape Canaveral: Why Bad News Doesn’t Travel Up, 13.1 Federalist No. 78, 13.2 Marbury v. Madison.",
+          "Key Concepts: Congress, Bureaucracy, Presidency, The Courts."
+        ]
+      },
+      {
+        "title": "Unit VII: Public Policy",
+        "topics": [
+          "Readings: Wilson – Ch. 17 The Policy-Making Process, Ch. 18 Economic Policy, Ch. 19 Social Welfare, Ch. 20 Foreign and Military Policy, Ch. 21 Environmental Policy; Cigler – 14.1 Stories, 14.2 Regulation: The New Pork Barrel, 14.3 Liberal Lessons from Welfare Reform, 14.4 Safe Deposit: The Case for Foreign Aid, 14.5 America Unbound: The Bush Revolution in Foreign Policy.",
+          "Key Concepts: Policy Making, Enactment of Policy, Role of Bureaucracy/Courts."
+        ]
+      }
+    ]
+  },
+  "concepts": [
+    "Research Paper",
+    "Presentation",
+    "Government/Politics Topic",
+    "Library Research",
+    "Election Assignments",
+    "Debating",
+    "Voting",
+    "Graphs, Charts and Maps Interpretation",
+    "Statistical Information Interpretation",
+    "Constitutional Underpinnings",
+    "Civil Liberties/Civil Rights",
+    "Political Beliefs and Behaviors",
+    "Political Parties",
+    "Elections and Campaigns",
+    "Interest Groups",
+    "The Media",
+    "Institutions of Government",
+    "Public Policy",
+    "History of the Constitution",
+    "Separation of Powers",
+    "Federalism",
+    "Democratic Theories",
+    "Development and Interpretation of Rights and Liberties",
+    "Supreme Court Decisions and Workings",
+    "American Political Culture",
+    "Public Opinion",
+    "Political Participation",
+    "Polling",
+    "Popular Rule",
+    "Social Capital",
+    "Functions and Organization of Political Parties",
+    "Electoral Processes",
+    "Campaign Organization",
+    "Specific Interests",
+    "Role of Interest Groups",
+    "Function and Impact of Media",
+    "Congress",
+    "The Presidency",
+    "The Bureaucracy",
+    "The Judiciary",
+    "Policy Making Process",
+    "Enactment of Policy",
+    "Economic Policy",
+    "Social Welfare Policy",
+    "Foreign and Military Policy",
+    "Environmental Policy",
+    "McCulloch v. Maryland",
+    "Brown v. Board of Education",
+    "Federalist No. 51",
+    "Federalist No. 10",
+    "Federalist No. 78",
+    "Marbury v. Madison",
+    "Affirmative Action",
+    "Voting Rites",
+    "Political Hero",
+    "News Consumption",
+    "Lobbyists"
+  ],
+  "practice_problems": [
+    "Which of the following statements is NOT true of the Supreme Court’s decision in McCulloch v. Maryland (1819)? A. It held that state governments could pass a law negating a federal law within their boundaries if they believed the federal law was unconstitutional. B. It confirmed the supremacy of the federal government over state governments. C. It determined that states could not levy taxes on federal government operations. D. It interpreted the “necessary and proper” powers clause of the Constitution to mean that the federal government has implied powers not specifically stated in the Constitution. E. It upheld the constitutionality of the national bank established by the federal government.",
+    "Which of the following is a clause of the Constitution that gives the federal government broad powers in many policy areas?",
+    "While the practice of separate schools for black and white students was declared unconstitutional by the Supreme Court in Brown v. Board of Education (1954), segregation in restaurants, stores, hotels, and other public accommodations remained legal until when?",
+    "Which is a reason the power of the two major parties is in decline in the United States?",
+    "The Supreme Court’s power of judicial review was established by which landmark case?",
+    "Which one of the following groups is MOST likely to participate in an election?",
+    "A filibuster occurs when in the Senate."
+  ],
+  "updated_at_iso": "2026-01-18T05:58:43.840373+00:00"
+}
