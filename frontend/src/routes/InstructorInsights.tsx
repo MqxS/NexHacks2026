@@ -196,14 +196,14 @@ export const InstructorInsights = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <PaperCard className="flex flex-col gap-6">
+        <PaperCard className="flex h-full flex-col">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-espresso/60">Class selection</p>
             <p className="mt-2 text-sm text-espresso/70">
               Choose a class to generate a mastery snapshot.
             </p>
           </div>
-          <div className="space-y-3">
+          <div className="mt-4 space-y-3">
             <div className="relative">
               <select
                 value={selectedClassId}
@@ -225,7 +225,7 @@ export const InstructorInsights = () => {
             </div>
             {isError ? <p className="text-xs text-red-600">We could not load classes.</p> : null}
           </div>
-          <div className="space-y-3 pt-2 text-xs text-espresso/70">
+          <div className="mt-auto space-y-3 pt-6 text-xs text-espresso/70">
             <div className="flex items-center justify-between pb-2">
               <span>Bubble size</span>
               <span className="font-medium text-espresso">Questions asked</span>
