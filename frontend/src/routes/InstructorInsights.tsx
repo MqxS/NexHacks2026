@@ -229,11 +229,11 @@ export const InstructorInsights = () => {
           <div className="absolute bottom-6 left-0 right-0 space-y-3 pt-2 text-xs text-espresso/70">
             <div className="flex items-center justify-between pb-2">
               <span>Bubble size</span>
-              <span className="font-medium text-espresso">Questions asked</span>
+              <span className="font-medium text-espresso">Question Volume</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Bubble color</span>
-              <span className="font-medium text-espresso">Percent correct</span>
+              <span className="font-medium text-espresso">Recall Rate</span>
             </div>
             <div className="h-2 w-full rounded-full bg-gradient-to-r from-[#d29862] to-[#82a584]" />
             <div className="flex items-center justify-between text-[11px] text-espresso/60">
