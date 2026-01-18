@@ -102,7 +102,7 @@ class GeminiClient:
     def __init__(
         self,
         api_key: str | None = None,
-        model: str = "gemini-3-flash-preview",
+        model: str = "gemini-flash-lite-latest",
         base_url: str = "https://generativelanguage.googleapis.com/v1beta",
         timeout_s: float = 60.0,
         tokenc_api_key: str | None = None,
@@ -606,7 +606,7 @@ class SophiAIUtil:
                 user_prompt=user_prompt,
                 few_shots=few_shots,
                 temperature=0.1,
-                max_output_tokens=256,
+                max_output_tokens=512,
             )
         except Exception as e:
             return ValidationResult(ok=False, wolfram_query=None, wolfram_result=None, details=str(e))
@@ -708,7 +708,7 @@ class SophiAIUtil:
             user_prompt=user_prompt,
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=512,
+            max_output_tokens=1024,
         )
         wolfram_query = out.get("wolfram_query")
         wolfram_query_s = str(wolfram_query).strip() if wolfram_query else ""
@@ -883,7 +883,7 @@ class SophiAIUtil:
                 user_prompt=build_user_prompt({"attempt": attempt, "previous_issue": last_error}),
                 few_shots=few_shots,
                 temperature=0.2,
-                max_output_tokens=6144,
+                max_output_tokens=4096,
             )
             out_d: JsonDict | None
             if isinstance(out, dict):
@@ -966,7 +966,11 @@ class SophiAIUtil:
         system_instruction = (
             "You write a strict validation prompt for another AI model. "
             "It must evaluate a student's step-by-step work for a question. "
-            "Return JSON only."
+            "Return JSON only.\n"
+            "IMPORTANT: The validation logic you describe MUST be robust to units. "
+            "Instruct the verifier to accept answers where the numeric value is correct even if the unit is missing, "
+            "abbreviated, or slightly different (e.g. '5 m/s', '5 meters per second', '5' are all acceptable if 5 is the correct number). "
+            "If the unit is wrong (e.g. '5 kg' instead of '5 m'), mark it as incorrect."
         )
         few_shots = [
             (
@@ -976,7 +980,8 @@ class SophiAIUtil:
                         "You are a verifier. Given (1) the question and (2) a student's proposed next step, "
                         "decide if the step is logically valid. "
                         "Output JSON with keys: ok (boolean), error_type (string|null), feedback (string). "
-                        "Be concise. Never reveal the final answer unless the student already did."
+                        "Be concise. Never reveal the final answer unless the student already did. "
+                        "Ignore missing units if the number is correct."
                     )
                 },
             )
@@ -986,7 +991,7 @@ class SophiAIUtil:
             user_prompt=json.dumps({"question": question, "output_contract": {"validation_prompt": "string"}}, ensure_ascii=False),
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=6144,
+            max_output_tokens=2048,
         )
         return str(out.get("validation_prompt") or "").strip()
 
@@ -1090,7 +1095,7 @@ class SophiAIUtil:
                 user_prompt=build_user_prompt({"attempt": attempt, "previous_issue": last_issue}),
                 few_shots=few_shots,
                 temperature=0.2,
-                max_output_tokens=6144,
+                max_output_tokens=2048,
                 image_bytes=status_image_bytes,
                 image_mime_type=status_image_mime_type,
             )
@@ -1179,9 +1184,9 @@ class SophiAIUtil:
             user_prompt=user_prompt,
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=6144,
+            max_output_tokens=1024,
         )
-
+    
     def _generate_syllabus_section(self, syllabus_lines: list[str]) -> JsonDict:
         system_instruction = (
             "You convert a course syllabus text into a structured JSON outline. "
@@ -1204,7 +1209,7 @@ class SophiAIUtil:
             user_prompt=user_prompt,
             few_shots=few_shots,
             temperature=0.1,
-            max_output_tokens=6144,
+            max_output_tokens=8192,
         )
         return t.cast(JsonDict, out.get("syllabus") or {})
 
@@ -1222,7 +1227,7 @@ class SophiAIUtil:
             system_instruction=system_instruction,
             user_prompt=user_prompt,
             temperature=0.2,
-            max_output_tokens=6144,
+            max_output_tokens=4096,
         )
         return list(out.get("concepts") or [])
 
@@ -1242,7 +1247,7 @@ class SophiAIUtil:
             system_instruction=system_instruction,
             user_prompt=user_prompt,
             temperature=0.1,
-            max_output_tokens=6144,
+            max_output_tokens=8192,
         )
         return list(out.get("practice_problems") or [])
 

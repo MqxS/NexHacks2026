@@ -1,9 +1,9 @@
 {
-  "class_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc",
-  "is_math": true,
-  "use_wolfram": true,
-  "syllabus_chars": 1744,
-  "practice_items_count": 5,
+  "class_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/cs1332",
+  "is_math": false,
+  "use_wolfram": false,
+  "syllabus_chars": 0,
+  "practice_items_count": 16,
   "steps": {
     "parse_syllabus": {
       "name": "Parsing syllabus PDF",
@@ -103,98 +103,96 @@
     }
   },
   "generated": {
-    "question": "Find the limit: $\\lim_{x \\to 0} \\frac{e^{3x} - 1}{x}$.",
-    "answer": "3",
-    "wolfram_query": "limit (e^(3x) - 1) / x as x -> 0",
-    "validation_prompt": "You are a mathematical validator. Evaluate the student's step-by-step work for the limit: $\\lim_{x \\to 0} \\frac{e^{3x} - 1}{x}$. For the provided step, check for algebraic accuracy, correct application of limit laws, or proper use of L'Hôpital's Rule if applicable. Return a JSON object with the following keys: 'is_valid' (boolean), 'error_category' (string or null, e.g., 'algebraic', 'differentiation', 'limit_property'), and 'feedback' (a brief hint without giving away the final answer). Ensure the logic is sound for the specific value $x \\to 0$.",
+    "question": "What is the primary purpose of the 'Course Outline' section in a syllabus?",
+    "answer": "To provide a high-level overview of the topics to be covered throughout the course.",
+    "wolfram_query": "",
+    "validation_prompt": "You are a verifier. Given (1) the question and (2) a student's proposed next step, decide if the step is logically valid. Output JSON with keys: ok (boolean), error_type (string|null), feedback (string). Be concise. Never reveal the final answer unless the student already did. The student's 'step' will be a single, complete answer to the question, as this is a conceptual question, not a multi-step calculation. Evaluate the correctness and completeness of the provided answer against the question. If the answer is correct, set 'ok' to true. If the answer is incorrect or fundamentally incomplete, set 'ok' to false and provide a brief explanation in 'feedback'. Ignore unit discrepancies as per the general instruction, but since this is a conceptual question, focus on semantic correctness.",
     "metadata": {
       "difficulty_level": 3,
       "concepts": [
-        "Transcendental Functions",
-        "Differentiation of Exponential and Logarithmic Functions",
-        "L’Hopital’s Rule"
+        "Syllabus Structure",
+        "Course Outline"
       ],
-      "unit": "math-calculus-bc",
+      "unit": "cs1332",
       "cumulative": true,
       "adaptive": true,
-      "verified_with_wolfram": true,
-      "used_file_upload": true,
+      "verified_with_wolfram": false,
       "used_class_file": true
     }
   },
   "generated_with_suggestion": {
-    "question": "A spacecraft's velocity is modeled by $v(t) = \\frac{e^{3t} - 1}{t}$. Find the limit: $\\lim_{t \\to 0} v(t)$.",
-    "answer": "3",
-    "wolfram_query": "limit (e^(3t) - 1)/t as t -> 0",
-    "validation_prompt": "You are a mathematical validator. Evaluate the student's step for the limit: lim_{t -> 0} (e^{3t} - 1) / t. 1. Check if the student correctly identifies the 0/0 indeterminate form. 2. If L'Hopital's Rule is applied, verify the derivatives: d/dt(e^{3t}-1) = 3e^{3t} and d/dt(t) = 1. 3. If Taylor series expansion is used, verify e^{3t} = 1 + 3t + (9t^2)/2 + ... 4. Check for algebraic errors or incorrect limit properties. Return a JSON object with: 'is_step_correct' (boolean), 'error_type' (string or null), and 'feedback' (string). Do not reveal the final answer (3) unless the student has already derived it.",
+    "question": "Considering the CS1332 course outline, which section typically details the specific topics covered in Week 5, and how does this relate to the overall Learning Objectives for the unit?",
+    "answer": "The Weekly Topics section details specific topics for Week 5, which directly supports the achievement of the relevant Learning Objectives outlined in the Course Outline.",
+    "wolfram_query": "",
+    "validation_prompt": "You are a verifier. Given (1) the question and (2) a student's proposed next step, decide if the step is logically valid. Output JSON with keys: ok (boolean), error_type (string|null), feedback (string). Be concise. Never reveal the final answer unless the student already did. Ignore missing units if the number is correct.",
     "metadata": {
-      "difficulty_level": 3,
+      "difficulty_level": 2,
       "concepts": [
-        "Differentiation of Exponential and Logarithmic Functions",
-        "Limits",
-        "L’Hopital’s Rule"
+        "Syllabus Structure",
+        "Weekly Topics",
+        "Learning Objectives"
       ],
-      "unit": "math-calculus-bc",
+      "unit": "cs1332",
       "cumulative": true,
       "adaptive": true,
-      "verified_with_wolfram": true,
+      "verified_with_wolfram": false,
       "used_class_file": true
     }
   },
   "validation_ok": {
     "ok": true,
-    "wolfram_query": "limit (e^(3x) - 1) / x as x -> 0",
-    "wolfram_result": "3",
-    "details": null
+    "wolfram_query": null,
+    "wolfram_result": null,
+    "details": "{\"answer\": \"To provide a chronological or thematic overview of the topics to be covered throughout the course.\", \"explanation\": \"The course outline details the structure and progression of the course content.\"}"
   },
   "validation_bad": {
     "ok": false,
     "wolfram_query": null,
     "wolfram_result": null,
-    "details": "Gemini did not return valid JSON: Here is the JSON requested:\n```"
+    "details": "{\"answer\": null, \"explanation\": \"The equation is incomplete and cannot be solved.\"}"
   },
   "hints": {
     "Metacognitive / Reflection": {
       "kind": "hint",
-      "text": "Does this expression remind you of the definition of the derivative for a specific function at a certain point?",
+      "text": "Think about what information you need to know at the very beginning of a course to understand the overall structure and expectations.",
       "hint_type": "Metacognitive / Reflection",
-      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
-      "wolfram_result": "3"
+      "wolfram_query": null,
+      "wolfram_result": null
     },
     "Conceptual": {
       "kind": "hint",
-      "text": "Consider how this limit matches the definition of the derivative of f(x) = e^(3x) at x = 0.",
+      "text": "Think about what information a student needs to know about the structure and progression of the course content.",
       "hint_type": "Conceptual",
-      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
-      "wolfram_result": "3"
+      "wolfram_query": null,
+      "wolfram_result": null
     },
     "Strategic": {
       "kind": "hint",
-      "text": "Since direct substitution results in the indeterminate form 0/0, consider using L'Hôpital's Rule or applying the standard limit formula for (e^u - 1)/u by using a substitution.",
+      "text": "Think about what information a student needs to know about the entire course structure and schedule at a glance.",
       "hint_type": "Strategic",
-      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
-      "wolfram_result": "3"
+      "wolfram_query": null,
+      "wolfram_result": null
     },
     "Procedural / Subgoal": {
       "kind": "hint",
-      "text": "Since direct substitution gives 0/0, try applying L'Hôpital's Rule by differentiating the numerator and denominator separately.",
+      "text": "Think about what information you need to know at the *beginning* of the course to plan your study schedule.",
       "hint_type": "Procedural / Subgoal",
-      "wolfram_query": "Limit[(exp(3x)-1)/x, x->0]",
-      "wolfram_result": "3"
+      "wolfram_query": null,
+      "wolfram_result": null
     },
     "Bottom-Out / Explicit": {
       "kind": "hint",
-      "text": "Apply L'Hôpital's Rule by differentiating the numerator and denominator: the derivative of e^(3x) - 1 is 3e^(3x) and the derivative of x is 1, so the limit becomes 3e^(3*0)/1, which equals 3.",
+      "text": "The primary purpose is to list the topics that will be covered in the course and often the schedule for when they will be covered.",
       "hint_type": "Bottom-Out / Explicit",
-      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
-      "wolfram_result": "3"
+      "wolfram_query": null,
+      "wolfram_result": null
     }
   },
   "hint_validation": {
     "ok": false,
-    "wolfram_query": null,
+    "wolfram_query": "D[x^2,x]",
     "wolfram_result": null,
-    "details": "The hint mentions a derivative, which is irrelevant to solving the linear equation 2x + 3 = 11. Additionally, the statement 'The derivative is x' is mathematically incorrect in this context."
+    "details": "The hint is about differentiation, which is irrelevant to solving the linear equation 2x + 3 = 11."
   },
   "settings_analyses": [
     {
@@ -206,13 +204,13 @@
         ]
       },
       "should_regenerate_question": true,
-      "notes": "Increase difficulty and add chain rule to focus concepts."
+      "notes": "Increase difficulty slightly and focus on chain rule."
     },
     {
       "request_type": "regenerate_question",
       "parameter_changes": {},
       "should_regenerate_question": true,
-      "notes": "User requested regeneration due to similarity with previous questions."
+      "notes": "Avoid repeating the same structure."
     },
     {
       "request_type": "save_metadata",
@@ -228,8 +226,8 @@
       "request_type": "create_class_file",
       "parameter_changes": {},
       "should_regenerate_question": false,
-      "notes": "Generate/refresh background class file for AP Calculus."
+      "notes": "Generate/refresh background class file."
     }
   ],
-  "artifacts_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts"
+  "artifacts_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/cs1332__artifacts"
 }
