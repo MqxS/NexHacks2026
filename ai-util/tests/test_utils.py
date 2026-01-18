@@ -34,7 +34,7 @@ def _configure_logging(*, class_dir_name: str) -> tuple[logging.Logger, pathlib.
     ts = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     log_path = _logs_root() / f"{class_dir_name}__{ts}.log"
 
-    logger = logging.getLogger("sophia_test_utils")
+    logger = logging.getLogger("sophi_test_utils")
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
@@ -83,17 +83,17 @@ def _load_env(logger: logging.Logger) -> None:
     logger.info("Environment status: %s", _safe_json(status))
 
 
-def _import_sophia(logger: logging.Logger) -> tuple[t.Any, t.Any, t.Any]:
-    sophia_dir = _ai_util_root() / "sophia"
-    if str(sophia_dir) not in sys.path:
-        sys.path.insert(0, str(sophia_dir))
+def _import_sophi(logger: logging.Logger) -> tuple[t.Any, t.Any, t.Any]:
+    sophi_dir = _ai_util_root() / "sophi"
+    if str(sophi_dir) not in sys.path:
+        sys.path.insert(0, str(sophi_dir))
     try:
-        import sophia_ai as sophia_ai_mod
+        import sophi_ai as sophi_ai_mod
         import wolfram_checker as wolfram_checker_mod
     except Exception as e:
         logger.info("Import failed: %s", str(e))
         raise
-    return sophia_ai_mod, wolfram_checker_mod, sophia_dir
+    return sophi_ai_mod, wolfram_checker_mod, sophi_dir
 
 
 def _run_for_class_dir(
@@ -106,15 +106,15 @@ def _run_for_class_dir(
     is_math = class_name.startswith("math-")
     use_wolfram = bool(is_math)
 
-    sophia_ai_mod, wolfram_checker_mod, sophia_dir = _import_sophia(logger)
+    sophi_ai_mod, wolfram_checker_mod, sophi_dir = _import_sophi(logger)
 
     WolframAlphaChecker = wolfram_checker_mod.WolframAlphaChecker
-    SophiaAIUtil = sophia_ai_mod.SophiaAIUtil
-    SessionParameters = sophia_ai_mod.SessionParameters
+    SophiAIUtil = sophi_ai_mod.SophiAIUtil
+    SessionParameters = sophi_ai_mod.SessionParameters
 
     logger.info("Repo root: %s", str(_repo_root()))
     logger.info("ai-util root: %s", str(_ai_util_root()))
-    logger.info("Sophia module dir: %s", str(sophia_dir))
+    logger.info("Sophi module dir: %s", str(sophi_dir))
     logger.info("Selected class dir: %s", str(class_dir))
     logger.info("Class type: %s", "math (wolfram enabled)" if use_wolfram else "non-math (wolfram disabled)")
 
@@ -135,7 +135,7 @@ def _run_for_class_dir(
             wolfram = None
             use_wolfram = False
 
-    ai = SophiaAIUtil(wolfram=wolfram)
+    ai = SophiAIUtil(wolfram=wolfram)
 
     artifacts_dir = _logs_root() / f"{class_dir.name}__artifacts"
     artifacts_dir.mkdir(parents=True, exist_ok=True)
