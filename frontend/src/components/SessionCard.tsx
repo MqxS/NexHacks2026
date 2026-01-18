@@ -34,7 +34,7 @@ export const SessionCard = ({
             </button>
           ) : null}
         </div>
-        <div className="flex flex-1 flex-wrap content-start gap-2 min-h-[48px]">
+        <div className="flex flex-1 flex-wrap content-start gap-2 min-h-[48px] max-h-[72px] overflow-y-auto pr-1 scrollbar-hide">
           {tags.map((tag) => (
             <span
               key={tag}
