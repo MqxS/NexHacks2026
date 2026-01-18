@@ -91,7 +91,7 @@ const Shell = ({ children }: { children: ReactNode }) => {
             <div className="h-16 w-24 overflow-hidden rounded-3xl">
               <img
                 src={appIcon}
-                alt="Sophia"
+                alt="Sophi"
                 className="h-full w-full object-cover object-[center_50%] shadow-paper"
               />
             </div>
