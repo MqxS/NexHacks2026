@@ -490,14 +490,10 @@ class SophiAIUtil:
             return False
 
         system_instruction = (
-            "You are a subject classifier. Determine if the provided text (topics, question, class name) "
-            "relates to a subject where Wolfram Alpha is useful (Mathematics, Physics, Chemistry, Engineering, etc.). "
+            "Classify if the context is PURE MATH suitable for Wolfram Alpha symbolic solving. "
+            "Strictly TRUE for: Calculus, Algebra, Geometry, Differential Equations, Physics calculations. "
+            "Strictly FALSE for: Computer Science (CS1332, Data Structures, Algorithms), Coding, History, Literature, or general logic. "
             "Return JSON only: {\"is_math\": boolean}."
-            "Examples:"
-            "Input: 'Class: History. Topic: World War II' -> {\"is_math\": false}"
-            "Input: 'Class: Calculus. Topic: Derivatives' -> {\"is_math\": true}"
-            "Input: 'Question: Solve 2x+5=10' -> {\"is_math\": true}"
-            "Input: 'Question: Analyze the theme of Hamlet' -> {\"is_math\": false}"
         )
         try:
             out = self.gemini.generate_json(
@@ -1051,6 +1047,7 @@ class SophiAIUtil:
         *,
         status_prompt: str,
         problem: str,
+        hint_history: list[str] | None = None,
         hint_type: str | None = None,
         status_image_bytes: bytes | None = None,
         status_image_mime_type: str = "image/png",
@@ -1066,6 +1063,7 @@ class SophiAIUtil:
             "If you provide a hint, keep it short and aligned with one of the hint types. "
             "Use LaTeX for math delimited by $$ ... $$. "
             "Whenever possible, supply a Wolfram Alpha query that can validate the key claim. "
+            "If 'hint_history' is provided, do NOT repeat previous hints. Provide a progressively more helpful hint. "
             "Return JSON only."
         )
         few_shots: list[tuple[str, JsonDict]] = [
@@ -1123,6 +1121,7 @@ class SophiAIUtil:
             payload: JsonDict = {
                 "problem": problem,
                 "status_prompt": status_prompt,
+                "hint_history": hint_history or [],
                 "hint_type": hint_type,
                 "hint_types": [
                     "Metacognitive / Reflection",
