@@ -175,8 +175,9 @@ export const InstructorInsights = () => {
 
   const bubbles = useMemo(() => {
     if (masteryData.length === 0) return []
-    const minRadius = 22
-    const maxRadius = Math.min(96, Math.max(54, size.width * 0.1))
+    const minRadius = 18
+    const densityFactor = masteryData.length > 12 ? 0.08 : 0.1
+    const maxRadius = Math.min(92, Math.max(44, size.width * densityFactor))
     const mutedGreen = [130, 165, 132]
     const mutedOrange = [210, 152, 98]
     const bubbleData = masteryData.map((item) => ({

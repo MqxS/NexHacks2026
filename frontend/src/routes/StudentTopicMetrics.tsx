@@ -82,16 +82,16 @@ export const StudentTopicMetrics = () => {
           renderItem={(metric, _index, selected) => (
             <PaperCard
               className={cn(
-                'flex h-[380px] w-[240px] flex-col justify-between transition-transform duration-200',
+                'flex h-[380px] w-[240px] flex-col transition-transform duration-200',
                 selected ? 'scale-[1.06]' : 'scale-95'
               )}
             >
-              <div>
-                <p className="text-sm font-semibold text-espresso">{metric.topic}</p>
+              <div className="h-[64px]">
+                <p className="line-clamp-2 text-sm font-semibold text-espresso">{metric.topic}</p>
                 <p className="mt-1 text-xs text-espresso/60">{metric.questions} questions answered</p>
               </div>
 
-              <div className="flex h-full flex-col items-center justify-end pb-6">
+              <div className="mt-auto flex flex-col items-center pb-6">
                 <div className="relative h-[220px] w-10 overflow-hidden rounded-full border border-espresso/15 bg-paper">
                   <div
                     className="absolute bottom-0 left-0 right-0 rounded-full"
