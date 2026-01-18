@@ -257,6 +257,13 @@ def set_adaptive(sessionID):
         sessions_store[sessionID]["adaptive"] = adaptive
     return jsonify({"status": "Adaptive learning set"})
 
+@server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
+def set_adaptive_legacy(sessionID, setting):
+    adaptive = setting.lower() == "true"
+    if sessionID in sessions_store:
+        sessions_store[sessionID]["adaptive"] = adaptive
+    return jsonify({"status": "Adaptive learning set"})
+
 @server.route("/api/requestHint/<questionID>")
 def request_hint(questionID):
     hint = {
@@ -313,6 +320,13 @@ def delete_class(classID):
             return jsonify({"status": "Class deleted"})
 
     return jsonify({"error": "Class not found"}), 404
+
+@server.route("/api/deleteSession/<sessionID>", methods=["DELETE"])
+def delete_session(sessionID):
+    if sessionID in sessions_store:
+        sessions_store.pop(sessionID, None)
+        return jsonify({"status": "Session deleted"})
+    return jsonify({"error": "Session not found"}), 404
 
 @server.route("/", defaults={"path": ""})
 @server.route("/<path:path>")

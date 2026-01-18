@@ -264,5 +264,9 @@ export const api = {
       method: 'POST',
       body: formData
     })
-  }
+  },
+  deleteSession: (payload: { sessionID: string }) =>
+    request(`/api/deleteSession/${encodeURIComponent(payload.sessionID)}`, {
+      method: 'DELETE'
+    })
 }
