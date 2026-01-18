@@ -146,6 +146,7 @@ export const InstructorInsights = () => {
     x: number
     y: number
   } | null>(null)
+  const hoverTimeoutRef = useRef<number | null>(null)
   const { ref, size } = useElementSize()
 
   useEffect(() => {
@@ -174,7 +175,7 @@ export const InstructorInsights = () => {
   const bubbles = useMemo(() => {
     if (masteryData.length === 0) return []
     const minRadius = 22
-    const maxRadius = Math.min(80, Math.max(48, size.width * 0.08))
+    const maxRadius = Math.min(96, Math.max(54, size.width * 0.1))
     const mutedGreen = [130, 165, 132]
     const mutedOrange = [210, 152, 98]
     const bubbleData = masteryData.map((item) => ({
@@ -278,18 +279,23 @@ export const InstructorInsights = () => {
                     <circle
                       cx={bubble.x}
                       cy={bubble.y}
-                      r={bubble.radius}
+                      r={hovered?.bubble.topic === bubble.topic ? bubble.radius * 1.06 : bubble.radius}
                       fill={bubble.color}
                       fillOpacity={0.85}
                       stroke="rgba(82, 56, 44, 0.2)"
                       strokeWidth={1}
-                      onMouseEnter={() =>
+                      style={{ transition: 'r 180ms ease-out' }}
+                      onMouseEnter={() => {
+                        if (hoverTimeoutRef.current) {
+                          window.clearTimeout(hoverTimeoutRef.current)
+                          hoverTimeoutRef.current = null
+                        }
                         setHovered({
                           bubble,
                           x: bubble.x,
                           y: bubble.y
                         })
-                      }
+                      }}
                       onMouseMove={() =>
                         setHovered({
                           bubble,
@@ -297,7 +303,10 @@ export const InstructorInsights = () => {
                           y: bubble.y
                         })
                       }
-                      onMouseLeave={() => setHovered(null)}
+                      onMouseLeave={() => {
+                        if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current)
+                        hoverTimeoutRef.current = window.setTimeout(() => setHovered(null), 160)
+                      }}
                     >
                       <title>
                         {`${bubble.topic}\n${bubble.questions} questions\n${bubble.correct}% correct`}
