@@ -85,7 +85,7 @@ const interpolateColor = (from: number[], to: number[], amount: number) => {
 
 const computeLayout = (bubbles: Omit<Bubble, 'x' | 'y'>[], width: number, height: number) => {
   const placed: Bubble[] = []
-  const padding = 6
+  const padding = 8
   const center = { x: width / 2, y: height / 2 }
   const sorted = [...bubbles].sort((a, b) => b.radius - a.radius)
 
@@ -100,7 +100,7 @@ const computeLayout = (bubbles: Omit<Bubble, 'x' | 'y'>[], width: number, height
     let placedBubble: Bubble | null = null
     let angle = 0
     let spiral = 0
-    for (let i = 0; i < 1600; i += 1) {
+    for (let i = 0; i < 2600; i += 1) {
       const x = center.x + Math.cos(angle) * spiral
       const y = center.y + Math.sin(angle) * spiral
       const withinBounds =
@@ -112,8 +112,8 @@ const computeLayout = (bubbles: Omit<Bubble, 'x' | 'y'>[], width: number, height
         placedBubble = { ...bubble, x, y }
         break
       }
-      angle += 0.35
-      spiral += 0.7
+      angle += 0.25
+      spiral += 0.55
     }
 
     if (!placedBubble) {
@@ -124,6 +124,33 @@ const computeLayout = (bubbles: Omit<Bubble, 'x' | 'y'>[], width: number, height
 
     placed.push(placedBubble)
   })
+
+  for (let iter = 0; iter < 60; iter += 1) {
+    for (let i = 0; i < placed.length; i += 1) {
+      for (let j = i + 1; j < placed.length; j += 1) {
+        const a = placed[i]
+        const b = placed[j]
+        const dx = b.x - a.x
+        const dy = b.y - a.y
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1
+        const minDist = a.radius + b.radius + padding
+        if (dist < minDist) {
+          const push = (minDist - dist) / 2
+          const nx = dx / dist
+          const ny = dy / dist
+          a.x -= nx * push
+          a.y -= ny * push
+          b.x += nx * push
+          b.y += ny * push
+
+          a.x = Math.min(width - a.radius - padding, Math.max(a.radius + padding, a.x))
+          a.y = Math.min(height - a.radius - padding, Math.max(a.radius + padding, a.y))
+          b.x = Math.min(width - b.radius - padding, Math.max(b.radius + padding, b.x))
+          b.y = Math.min(height - b.radius - padding, Math.max(b.radius + padding, b.y))
+        }
+      }
+    }
+  }
 
   return placed
 }
@@ -329,7 +356,7 @@ export const InstructorInsights = () => {
                         const lineHeight = fontSize + 2
                         const fits = lines.length * lineHeight <= bubble.radius * 1.35
                         if (!fits && bubble.topic.length > 16) return null
-                        const maxWidth = bubble.radius * 1.6
+                        const maxWidth = bubble.radius * 1.45
                         return (
                           <text
                             x={bubble.x}
