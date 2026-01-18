@@ -127,11 +127,20 @@ export const Home = () => {
 
   return (
     <div className="space-y-10 min-h-[70vh] flex flex-col justify-center">
-      <div>
-        <h1 className="text-3xl font-semibold text-espresso">Your classes</h1>
-        <p className="mt-2 text-sm text-espresso/70">
-          Pick a class to start or continue a session.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold text-espresso">Your classes</h1>
+          <p className="mt-2 text-sm text-espresso/70">
+            Pick a class to start or continue a session.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('/instructor')}
+          className="mt-2 rounded-full border border-espresso/20 bg-paper px-4 py-2 text-xs font-medium text-espresso/80 transition hover:-translate-y-0.5 hover:text-espresso"
+        >
+          Instructor? Click here
+        </button>
       </div>
 
       {isLoading ? (
@@ -181,7 +190,6 @@ export const Home = () => {
           }}
         />
       )}
-
 
       <Dialog.Root open={createOpen} onOpenChange={setCreateOpen}>
         <Dialog.Portal>

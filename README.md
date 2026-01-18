@@ -10,7 +10,7 @@
 
 **\\(so\varphi\\)** (pronounced *Sophie*), named after the Greek word for *wisdom*, is an intelligent, adaptive practice platform designed to bridge the gap between static course materials and personalized learning. In the high-stakes environment of university STEM courses, generic study tools often fail to capture the nuance of a professor's specific teaching style. Sophi solves this by ingesting course-specific "DNA"—syllabi, past exams, and notes—to generate an infinite stream of high-quality, stylistically accurate practice problems.
 
-By employing **symbolic verification** (via Wolfram Alpha) and **contextual compression** (via The Token Company), Sophi eliminates the hallucinations common in LLMs while maintaining lightning-fast performance. It helps students achieve the "golden ratio of practice" (referencing $\varphi$): maximizing retention and understanding while minimizing the time spent on passive study.
+By employing **symbolic verification** (via Wolfram Alpha and RAG) and **contextual compression** (via The Token Company), Sophi eliminates the hallucinations common in LLMs while maintaining lightning-fast performance. It helps students achieve the "golden ratio of practice" (referencing $\varphi$): maximizing retention and understanding while minimizing the time spent on passive study.
 
 ## 🛠️ Tech Stack
 
@@ -34,6 +34,7 @@ Sophi was born to be that tutor. We built it to solve three critical failures in
 1.  **Resource Scarcity**: Most professors provide only 1-2 practice exams. Once you finish them, you're out of material.
 2.  **The "Illusion of Competence"**: Students often re-read notes (passive study) instead of solving new problems (active recall), leading to a 20% drop in potential performance (Roediger & Karpicke, 2006).
 3.  **Feedback Latency**: Waiting days for a grade prevents the "tight feedback loop" required for rapid skill acquisition. (Anderson, J. R., et al., 1995)
+4.  **The "Spoiler Effect"**: When stuck, students often jump straight to the full solution (via Chegg or answer keys), bypassing the productive struggle essential for deep learning. This premature revelation robs them of the cognitive stimulation needed to form lasting neural pathways.
 
 ## 🚀 Key Features
 
@@ -54,6 +55,12 @@ One of the biggest risks of AI in STEM is "confident wrongness." Sophi mitigates
 *   The LLM generates the *pedagogical* structure of the question.
 *   **Wolfram Alpha** is queried to verify the *mathematical truth* of the answer and steps.
 *   If the LLM's answer doesn't match the symbolic ground truth, the question is regenerated before the user ever sees it.
+
+### 4. Progressive Hints & "Maximal Stimulation"
+True learning happens during the struggle, not the solution. Sophi's hint system is designed to maximize **active recall** and cognitive stimulation:
+*   **Tiered Assistance**: Hints don't just give the answer. They start with high-level *metacognitive* or *conceptual* nudges (e.g., "What implies continuity here?") and only descend to *procedural* steps if you're truly stuck.
+*   **The "Golden Ratio"**: By withholding the full solution until necessary, Sophi keeps you in the zone of proximal development—maximizing retention without causing frustration.
+*   **Context-Aware**: Hints remember your previous attempts, ensuring you never get the same advice twice.
 
 ## 🏗️ How We Built It
 
