@@ -11,7 +11,7 @@ import {cn} from '../lib/utils'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Slider from '@radix-ui/react-slider'
-import { ChevronDown, ChevronLeft, Lightbulb, Sliders, Check } from 'lucide-react'
+import { ChevronDown, ChevronLeft, Lightbulb, Sliders, Check, X } from 'lucide-react'
 
 type SessionParams = {
   difficulty: number
@@ -499,9 +499,12 @@ export const SessionPage = () => {
                             topics: prev.topics.filter((topicItem) => topicItem !== item)
                           }))
                         }
-                      className="rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
+                      className="group inline-flex items-center gap-2 rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
                       >
-                        {item}
+                        <span>{item}</span>
+                        <span className="opacity-0 transition group-hover:opacity-100">
+                          <X className="h-3 w-3 text-espresso/70" />
+                        </span>
                       </button>
                     ))}
                   </div>

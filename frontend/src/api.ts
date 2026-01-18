@@ -232,7 +232,9 @@ export const api = {
   getStyleDocs: (classID: string) =>
     request<Array<{ filename: string }>>(`/api/getStyleDocs/${encodeURIComponent(classID)}`),
   getMetrics: (classID: string) =>
-    request<TopicMetric[]>(`/api/getMetrics/${encodeURIComponent(classID)}`),
+    request<TopicMetric[] | Record<string, unknown>>(`/api/getMetrics/${encodeURIComponent(classID)}`).then(
+      (metrics) => (Array.isArray(metrics) ? metrics : [])
+    ),
   requestQuestion: (sessionID: string) =>
     request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
       Content: question.content,

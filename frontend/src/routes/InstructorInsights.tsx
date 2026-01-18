@@ -23,6 +23,16 @@ type Bubble = NormalizedMastery & {
   y: number
 }
 
+const splitTopic = (label: string) => {
+  if (label.length <= 12) return [label]
+  if (label.length <= 20 && label.includes(' ')) {
+    const parts = label.split(' ')
+    const mid = Math.ceil(parts.length / 2)
+    return [parts.slice(0, mid).join(' '), parts.slice(mid).join(' ')]
+  }
+  return [label]
+}
+
 const randomInt = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min
 
@@ -310,22 +320,32 @@ export const InstructorInsights = () => {
                         hoverTimeoutRef.current = window.setTimeout(() => setHovered(null), 160)
                       }}
                     >
-                      <title>
-                        {`${bubble.topic}\n${bubble.questions} questions\n${bubble.correct}% correct`}
-                      </title>
                     </circle>
-                    {bubble.radius > 48 && bubble.topic.length <= 12 ? (
-                      <text
-                        x={bubble.x}
-                        y={bubble.y}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fontSize={Math.max(9, Math.min(14, bubble.radius * 0.2))}
-                        fill="rgba(255, 255, 255, 0.92)"
-                        fontWeight={600}
-                      >
-                        {bubble.topic}
-                      </text>
+                    {bubble.radius > 40 ? (
+                      (() => {
+                        const lines = splitTopic(bubble.topic)
+                        const fontSize = Math.max(9, Math.min(13, bubble.radius * 0.18))
+                        const lineHeight = fontSize + 2
+                        const fits = lines.length * lineHeight <= bubble.radius * 1.2
+                        if (!fits && bubble.topic.length > 18) return null
+                        return (
+                          <text
+                            x={bubble.x}
+                            y={bubble.y - ((lines.length - 1) * lineHeight) / 2}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fontSize={fontSize}
+                            fill="rgba(255, 255, 255, 0.92)"
+                            fontWeight={600}
+                          >
+                            {lines.map((line, index) => (
+                              <tspan key={`${bubble.topic}-${index}`} x={bubble.x} dy={index === 0 ? 0 : lineHeight}>
+                                {line}
+                              </tspan>
+                            ))}
+                          </text>
+                        )
+                      })()
                     ) : null}
                   </g>
                 ))}

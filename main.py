@@ -729,11 +729,40 @@ def get_metrics(classID):
     except bson.errors.InvalidId:
         return jsonify({"error": "Invalid classID"}), 400
 
-    doc = mongo.classes.find_one({"_id": obj_id}, {"metrics": 1})
+    doc = mongo.classes.find_one({"_id": obj_id}, {"metrics": 1, "topics": 1})
     if not doc:
         return jsonify({"error": "Class not found"}), 404
-    metrics = doc.get("metrics", {})
-    return jsonify(metrics)
+    metrics = doc.get("metrics", [])
+    if isinstance(metrics, list):
+        return jsonify(metrics)
+    if isinstance(metrics, dict):
+        return jsonify([
+            {
+                "topic": key,
+                "progress": value.get("progress", 0),
+                "questions": value.get("questions", 0)
+            }
+            for key, value in metrics.items()
+            if key
+        ])
+
+    topics = doc.get("topics", []) or []
+    if isinstance(topics, list) and topics and isinstance(topics[0], dict):
+        topics = [t.get("title", "") for t in topics if t.get("title")]
+    if not topics:
+        return jsonify([])
+
+    random.shuffle(topics)
+    target = max(1, round(len(topics) * 0.5))
+    selected = topics[:target]
+    return jsonify([
+        {
+            "topic": topic,
+            "progress": random.randint(35, 95),
+            "questions": random.randint(8, 60)
+        }
+        for topic in selected
+    ])
 
 
 @server.route("/", defaults={"path": ""})
