@@ -8,6 +8,10 @@ import {cn} from './lib/utils'
 import { Home as HomeIcon, Settings } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import appIcon from './assets/icons/icon-nobg.png'
+import geminiLogo from './assets/logos/gemini.svg'
+import wolframLogo from './assets/logos/wolframalpha.svg'
+import tokenLogo from './assets/logos/the-token-company.ico'
+import traeLogo from './assets/logos/trae.png'
 
 const Breadcrumbs = () => {
   const location = useLocation()
@@ -83,7 +87,7 @@ const HomeButton = () => {
 
 const Shell = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="app-shell relative">
+    <div className="app-shell relative flex min-h-screen flex-col">
       <div className="noise-overlay" />
       <header className="sticky top-0 z-20 border-b border-espresso/10 bg-paper/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2">
@@ -103,7 +107,62 @@ const Shell = ({ children }: { children: ReactNode }) => {
           </div>
         </div>
       </header>
-      <main className="relative mx-auto max-w-6xl px-6 pb-16 pt-10">{children}</main>
+      <main className="relative mx-auto w-full max-w-6xl flex-1 px-6 pb-16 pt-10">{children}</main>
+      <footer className="border-t border-espresso/10 bg-paper/80 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4 text-xs text-espresso/70">
+          <div>
+            Made with ❤️ at{' '}
+            <a
+              href="https://nexhacks.com"
+              className="font-medium text-espresso underline underline-offset-4"
+              target="_blank"
+              rel="noreferrer"
+            >
+              NexHacks
+            </a>
+            .
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-espresso/60">Powered by</span>
+            <a
+              href="https://deepmind.google/technologies/gemini/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img src={geminiLogo} alt="Google Gemini" className="h-5 w-5" />
+              <span className="text-espresso">Google Gemini</span>
+            </a>
+            <a
+              href="https://www.wolframalpha.com/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img src={wolframLogo} alt="WolframAlpha" className="h-5 w-5" />
+              <span className="text-espresso">WolframAlpha</span>
+            </a>
+            <a
+              href="https://thetokencompany.com/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img src={tokenLogo} alt="The Token Company" className="h-5 w-5" />
+              <span className="text-espresso">The Token Company</span>
+            </a>
+            <a
+              href="https://www.trae.ai/"
+              className="flex items-center gap-2 rounded-full border border-espresso/15 bg-paper px-3 py-1 transition hover:-translate-y-0.5"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img src={traeLogo} alt="TRAE" className="h-5 w-5" />
+              <span className="text-espresso">TRAE</span>
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

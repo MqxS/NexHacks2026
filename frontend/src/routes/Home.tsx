@@ -15,20 +15,6 @@ import {cn} from '../lib/utils'
 import {useNavigate} from 'react-router-dom'
 import {classArt, createClassArt} from '../lib/classArt'
 
-const hashSeed = (value: string) => {
-  let hash = 0
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash * 31 + value.charCodeAt(i)) >>> 0
-  }
-  return hash || 1
-}
-
-const artForId = (id: string) => {
-  if (classArt.length === 0) return undefined
-  const index = hashSeed(id) % classArt.length
-  return classArt[index]
-}
-
 const createSchema = z.object({
   name: z.string().min(1, 'Class name is required'),
   professor: z.string().min(1, 'Instructor is required')
@@ -63,7 +49,7 @@ export const Home = () => {
       formData.append('name', payload.name)
       formData.append('professor', payload.professor)
       if (syllabus[0]) formData.append('syllabus', syllabus[0])
-      attachments.forEach((file) => formData.append('files', file))
+      attachments.forEach((file) => formData.append('styleFiles', file))
       return api.createClass(formData)
     },
     onSuccess: () => {
@@ -131,9 +117,9 @@ export const Home = () => {
   const carouselItems = [...cards, { classID: 'create', Name: 'Create class', Professor: 'Start a fresh study space' }]
   const initialIndex = cards.length === 0 ? 0 : Math.min(1, cards.length - 1)
   const artById = useMemo(() => {
-    return carouselItems.reduce<Record<string, string>>((acc, item) => {
-      if (item.classID === 'create') return acc
-      const art = artForId(item.classID)
+    const classItems = carouselItems.filter((item) => item.classID !== 'create')
+    return classItems.reduce<Record<string, string>>((acc, item, index) => {
+      const art = classArt[index % classArt.length]
       if (art) acc[item.classID] = art
       return acc
     }, {})
@@ -144,7 +130,7 @@ export const Home = () => {
       <div>
         <h1 className="text-3xl font-semibold text-espresso">Your classes</h1>
         <p className="mt-2 text-sm text-espresso/70">
-          Pick a class to start a new session or keep your materials organized.
+          Pick a class to start or continue a session.
         </p>
       </div>
 
@@ -244,7 +230,7 @@ export const Home = () => {
                 ) : null}
               </div>
               <div>
-                <label className="text-sm font-medium text-espresso">Additional files, like homework or study guides (optional)</label>
+                <label className="text-sm font-medium text-espresso">Additional files, like homework or study guides to guide question style (optional)</label>
                 <UploadDropzone
                   files={attachments}
                   onFiles={setAttachments}
