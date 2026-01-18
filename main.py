@@ -111,21 +111,6 @@ def create_session(classID):
         "sessionID": str(result.inserted_id)
     })
 
-@server.route("/api/replaceSyllabus", methods=["POST"])
-def replace_syllabus():
-    time.sleep(1.2)
-    return jsonify({"status": "Syllabus replaced"})
-
-@server.route("/api/uploadStyleDocs", methods=["POST"])
-def upload_style_docs():
-    time.sleep(1.4)
-    return jsonify({"status": "Style docs uploaded"})
-
-@server.route("/api/deleteStyleDoc", methods=["POST"])
-def delete_style_doc():
-    time.sleep(0.8)
-    return jsonify({"status": "Style doc deleted"})
-
 @server.route("/api/getClassTopics/<classID>")
 def get_class_topics(classID):
     try:
@@ -307,6 +292,129 @@ def request_hint(questionID):
         "hint": "It's also known as the city of lights."
     }
     return jsonify(hint)
+
+@server.route("/api/editClassName/<classID>", methods=["POST"])
+def edit_class_name(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "name" not in request.form:
+        return jsonify({"error": "No name provided"}), 400
+
+    new_name = request.form["name"]
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"name": new_name}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class name updated"})
+
+@server.route("/api/editClassProf/<classID>", methods=["POST"])
+def edit_class_prof(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "professor" not in request.form:
+        return jsonify({"error": "No professor name provided"}), 400
+
+    new_professor = request.form["professor"]
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"professor": new_professor}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class professor updated"})
+
+@server.route("/api/deleteClass/<classID>", methods=["DELETE"])
+def delete_class(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    result = mongo.classes.delete_one({"_id": obj_id})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class deleted"})
+
+
+@server.route("/api/deleteSession/<sessionID>", methods=["DELETE"])
+def delete_session(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    result = mongo.sessions.delete_one({"_id": obj_id})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Session deleted"})
+
+@server.route("replaceSyllabus/<classID>", methods=["POST"])
+def replace_syllabus(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "syllabus" not in request.files:
+        return jsonify({"error": "No syllabus file provided"}), 400
+
+    syllabus_file = request.files["syllabus"]
+    syllabus_bytes = syllabus_file.read()
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"syllabus": Binary(syllabus_bytes)}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Syllabus replaced"})
+
+@server.route("/api/uploadStyleDocs/<classID>", methods=["POST"])
+def upload_style_docs(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    style_files = []
+    for sf in request.files.getlist("styleFiles"):
+        if sf and sf.filename:
+            style_files.append(Binary(sf.read()))
+
+    if not style_files:
+        return jsonify({"error": "No style files provided"}), 400
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$push": {"styleFiles": {"$each": style_files}}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Style documents uploaded"})
+
+@server.route("/api/getStyleDocs/<classID>", methods=["GET"])
+def get_style_docs(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    doc = mongo.classes.find_one({"_id": obj_id}, {"styleFiles": 1})
+    if not doc:
+        return jsonify({"error": "Class not found"}), 404
+    style_files = doc.get("styleFiles", [])
+    files_data = [sf.decode('utf-8', errors='ignore') for sf in style_files]
+    return jsonify({"styleFiles": files_data})
 
 @server.route("/", defaults={"path": ""})
 @server.route("/<path:path>")
