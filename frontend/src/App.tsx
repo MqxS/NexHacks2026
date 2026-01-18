@@ -4,6 +4,7 @@ import {Home} from './routes/Home'
 import {ClassSessionSetup} from './routes/ClassSessionSetup'
 import {ClassSettings} from './routes/ClassSettings'
 import {SessionPage} from './routes/SessionPage'
+import {InstructorInsights} from './routes/InstructorInsights'
 import {cn} from './lib/utils'
 import { Home as HomeIcon, Settings } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -174,6 +175,7 @@ export default function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Page><Home /></Page>} />
+          <Route path="/instructor" element={<Page><InstructorInsights /></Page>} />
           <Route path="/class/:classID/session" element={<Page><ClassSessionSetup /></Page>} />
           <Route path="/class/:classID/settings" element={<Page><ClassSettings /></Page>} />
           <Route path="/session/:sessionID" element={<Page><SessionPage /></Page>} />
