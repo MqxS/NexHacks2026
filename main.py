@@ -156,14 +156,14 @@ def get_class_topics(classID):
 def get_recent_sessions(classID):
     sessions = mongo.sessions.find(
         {"classID": classID},
-        {"name": 1, "focusedConcepts": 1}
+        {"name": 1, "selectedTopics": 1}
     ).sort("_id", -1).limit(5)
 
     return jsonify([
         {
             "sessionID": str(doc["_id"]),
             # "timestamp": doc["_id"].generation_time.isoformat(),
-            "topics": doc.get("focusedConcepts", []) or [],
+            "topics": doc.get("selectedTopics", []) or [],
             "name": doc.get("name", "Untitled Session")
         }
         for doc in sessions
