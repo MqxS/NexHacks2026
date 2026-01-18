@@ -297,7 +297,7 @@ export const ClassSessionSetup = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-espresso">Optional file</label>
+              <label className="text-sm font-medium text-espresso">Optional file (like a study guide or homework) to guide generation</label>
               <UploadDropzone files={file} onFiles={setFile} multiple={false} />
             </div>
 
