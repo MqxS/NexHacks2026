@@ -82,6 +82,17 @@ body {
   pointer-events: none;
 }
 
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8EED3;
+  backdrop-filter: blur(14px);
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

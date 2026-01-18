@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react'
+import {useEffect, useState} from 'react'
 import {Route, Routes, useLocation, useNavigate, useParams} from 'react-router-dom'
 import {Home} from './routes/Home'
 import {ClassSessionSetup} from './routes/ClassSessionSetup'
@@ -10,6 +11,7 @@ import {cn} from './lib/utils'
 import { Home as HomeIcon, Settings, Moon } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import appIcon from './assets/icons/icon-nobg.png'
+import smallIcon from './assets/icons/small-icon-nobg.png'
 import geminiLogo from './assets/logos/gemini.svg'
 import wolframLogo from './assets/logos/wolframalpha.svg'
 import tokenLogo from './assets/logos/the-token-company.ico'
@@ -185,19 +187,51 @@ const LogoButton = () => {
 
 export default function App() {
   const location = useLocation()
+  const [showSplash, setShowSplash] = useState(true)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setShowSplash(false)
+    }, 900)
+    return () => window.clearTimeout(timer)
+  }, [])
+
   return (
-    <Shell>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Page><Home /></Page>} />
-          <Route path="/instructor" element={<Page><InstructorInsights /></Page>} />
-          <Route path="/class/:classID/session" element={<Page><ClassSessionSetup /></Page>} />
-          <Route path="/class/:classID/settings" element={<Page><ClassSettings /></Page>} />
-          <Route path="/class/:classID/metrics" element={<Page><StudentTopicMetrics /></Page>} />
-          <Route path="/session/:sessionID" element={<Page><SessionPage /></Page>} />
-        </Routes>
+    <div className="relative min-h-screen">
+      <Shell>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Page><Home /></Page>} />
+            <Route path="/instructor" element={<Page><InstructorInsights /></Page>} />
+            <Route path="/class/:classID/session" element={<Page><ClassSessionSetup /></Page>} />
+            <Route path="/class/:classID/settings" element={<Page><ClassSettings /></Page>} />
+            <Route path="/class/:classID/metrics" element={<Page><StudentTopicMetrics /></Page>} />
+            <Route path="/session/:sessionID" element={<Page><SessionPage /></Page>} />
+          </Routes>
+        </AnimatePresence>
+      </Shell>
+      <AnimatePresence>
+        {showSplash ? (
+          <motion.div
+            className="splash-overlay"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
+            <motion.img
+              src={smallIcon}
+              alt="Sophi"
+              className="h-28 w-28 rounded-3xl"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+            />
+          </motion.div>
+        ) : null}
       </AnimatePresence>
-    </Shell>
+    </div>
   )
 }
 
