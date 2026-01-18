@@ -31,7 +31,8 @@ class Session:
     adaptive: bool
     difficulty: float
     isCumulative : bool
-    focusedConcepts: List[str] #optional
+    selectedTopics: List[str] #optional
+    customRequests: str #optional
     file: FileUpload #optional
 
 @dataclass
@@ -121,7 +122,8 @@ def create_session(classID):
         adaptive=request.form.get("adaptive", "false").lower() == "true",
         difficulty=float(request.form.get("difficulty", 0.5)),
         isCumulative=request.form.get("cumulative", "false").lower() == "true",
-        focusedConcepts=[],
+        selectedTopics=request.form.getlist("selectedTopics"),
+        customRequests=request.form.get("customRequests", ""),
         file=file_doc
     )
 
@@ -177,7 +179,15 @@ def get_session_params(sessionID):
 
     doc = mongo.sessions.find_one(
         {"_id": obj_id},
-        {"name": 1, "classID":1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
+        {
+            "name": 1,
+            "classID":1,
+            "difficulty": 1,
+            "isCumulative": 1,
+            "adaptive": 1,
+            "selectedTopics": 1,
+            "customRequests": 1
+        }
     )
     if not doc:
         return jsonify({"error": "Session not found"}), 404
@@ -188,7 +198,8 @@ def get_session_params(sessionID):
         "classID": doc.get("classID", ""),
         "isCumulative": doc.get("isCumulative", False),
         "adaptive": doc.get("adaptive", True),
-        "focusedConcepts": doc.get("focusedConcepts", []),
+        "selectedTopics": doc.get("selectedTopics", []),
+        "customRequests": doc.get("customRequests", ""),
         "questions": []
     }
 
@@ -270,9 +281,10 @@ def update_session_params(sessionID):
             return jsonify({"error": "Invalid difficulty value"}), 400
     if "cumulative" in request.form:
         update_fields["isCumulative"] = request.form["cumulative"].lower() == "true"
-    if "focusedConcepts" in request.form:
-        concepts = request.form.getlist("focusedConcepts")
-        update_fields["focusedConcepts"] = concepts
+    if "selectedTopics" in request.form:
+        update_fields["selectedTopics"] = request.form.getlist("selectedTopics")
+    if "customRequests" in request.form:
+        update_fields["customRequests"] = request.form["customRequests"]
 
     if not update_fields:
         return jsonify({"error": "No valid fields to update"}), 400
@@ -287,13 +299,40 @@ def update_session_params(sessionID):
     return jsonify({"status": "Session parameters updated"})
 
 @server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
-def set_adaptive(sessionID, setting):
+def set_adaptive_legacy(sessionID, setting):
     try:
         obj_id = ObjectId(sessionID)
     except bson.errors.InvalidId:
         return jsonify({"error": "Invalid sessionID"}), 400
 
     adaptive = setting.lower() == "true"
+
+    result = mongo.sessions.update_one(
+        {"_id": obj_id},
+        {"$set": {"adaptive": adaptive}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Adaptive setting updated"})
+
+@server.route("/api/setAdaptive/<sessionID>", methods=["POST"])
+def set_adaptive(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    payload = request.get_json(silent=True) or {}
+    if "active" in payload:
+        adaptive = bool(payload.get("active"))
+    elif "adaptive" in payload:
+        adaptive = bool(payload.get("adaptive"))
+    elif "active" in request.form:
+        adaptive = request.form.get("active").lower() == "true"
+    elif "adaptive" in request.form:
+        adaptive = request.form.get("adaptive").lower() == "true"
+    else:
+        return jsonify({"error": "No adaptive setting provided"}), 400
 
     result = mongo.sessions.update_one(
         {"_id": obj_id},
@@ -459,7 +498,6 @@ def get_style_docs(classID):
         }
         for sf in style_files
     ])
-
 
 @server.route("/", defaults={"path": ""})
 @server.route("/<path:path>")

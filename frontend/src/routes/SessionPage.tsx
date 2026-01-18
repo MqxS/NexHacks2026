@@ -10,6 +10,7 @@ import {LoadingSkeleton} from '../components/LoadingSkeleton'
 import {cn} from '../lib/utils'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import * as Slider from '@radix-ui/react-slider'
 import { ChevronDown, ChevronLeft, Lightbulb, Sliders, Check } from 'lucide-react'
 
 type SessionParams = {
@@ -41,6 +42,21 @@ export const SessionPage = () => {
   })
   const [savedParams, setSavedParams] = useState(params)
 
+  const blendColor = (start: [number, number, number], end: [number, number, number], t: number) => {
+    const mix = (a: number, b: number) => Math.round(a + (b - a) * t)
+    return `rgb(${mix(start[0], end[0])}, ${mix(start[1], end[1])}, ${mix(start[2], end[2])})`
+  }
+
+  const cold = [156, 183, 213] as [number, number, number]
+  const difficultyValue = Number.isFinite(params.difficulty) ? params.difficulty : 0
+  const edge = Math.min(1, Math.max(0, difficultyValue))
+  const cool = blendColor(cold, [176, 196, 222], edge)
+  const hotStart = Math.min(100, Math.max(0, ((edge - 0.45) / 0.55) * 100))
+  const gradient =
+    edge < 0.45
+      ? `linear-gradient(90deg, #9CB7D5 0%, ${cool} 100%)`
+      : `linear-gradient(90deg, #9CB7D5 0%, #9CB7D5 ${100 - hotStart}%, #C98B6A 100%)`
+
   const classID = useMemo(() => {
     if (!sessionID) return null
     return localStorage.getItem(`session:${sessionID}`)
@@ -62,14 +78,9 @@ export const SessionPage = () => {
     if (sessionParamsQuery.status !== 'success') return
     const parsed = sessionParamsQuery.data as Partial<SessionParams> & {
       adaptive?: boolean
-      topic?: string
     }
-    const nextParams = {
-      ...parsed,
-      topics: parsed.topics ?? (parsed.topic ? [parsed.topic] : [])
-    }
-    setParams((prev) => ({ ...prev, ...nextParams }))
-    setSavedParams((prev) => ({ ...prev, ...nextParams }))
+    setParams((prev) => ({ ...prev, ...parsed }))
+    setSavedParams((prev) => ({ ...prev, ...parsed }))
     if (typeof parsed.adaptive === 'boolean') {
       setAdaptive(parsed.adaptive)
     }
@@ -353,15 +364,25 @@ export const SessionPage = () => {
             <div className="mt-4 space-y-4">
               <div>
                 <label className="text-sm font-medium text-espresso">Difficulty</label>
-                <input
-                  type="range"
-                  min={0}
+                <Slider.Root
+                  className="relative mt-3 flex w-full touch-none select-none items-center"
+                  value={[params.difficulty]}
                   max={1}
+                  min={0}
                   step={0.01}
-                  value={params.difficulty}
-                  onChange={(event) => setParams({ ...params, difficulty: Number(event.target.value) })}
-                  className="mt-2 w-full"
-                />
+                  onValueChange={(value) => setParams({ ...params, difficulty: value[0] })}
+                >
+                  <Slider.Track className="relative h-2 w-full rounded-full bg-espresso/15 overflow-hidden">
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: gradient,
+                        width: `${edge * 100}%`
+                      }}
+                    />
+                  </Slider.Track>
+                  <Slider.Thumb className="block h-5 w-5 rounded-full border border-espresso/30 bg-paper shadow-paper" />
+                </Slider.Root>
               </div>
               <div>
                 <label className="text-sm font-medium text-espresso">Topic</label>

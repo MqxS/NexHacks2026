@@ -1,3 +1,4 @@
+import json
 import random
 import time
 from dataclasses import dataclass
@@ -43,6 +44,8 @@ class_cards = [
     {"classID": 3, "name": "History", "professor": "Dr. Max"}
 ]
 
+sessions_store = {}
+
 @server.route("/api/hello")
 def hello():
     return jsonify({"message": "API Working!"})
@@ -76,17 +79,39 @@ def create_class():
 @server.route("/api/createSession/<classID>", methods=["POST"])
 def create_session(classID):
     time.sleep(1.2)
-    # payload = request.get_json(silent=True) or {}
-    # name = (
-    #     request.form.get("name")
-    #     or payload.get("name")
-    #     or "New Session"
-    # )
-    session = {
-        "sessionID": "ABC123"
-        # "name": name
+    payload = request.get_json(silent=True) or {}
+    name = request.form.get("name") or payload.get("name") or "New Session"
+    difficulty = request.form.get("difficulty") or payload.get("difficulty") or 0.5
+    adaptive = request.form.get("adaptive") or payload.get("adaptive") or False
+    cumulative = request.form.get("cumulative") or payload.get("cumulative") or False
+    custom_requests = request.form.get("customRequests") or payload.get("customRequests") or ""
+
+    selected_topics = request.form.getlist("selectedTopics")
+    if not selected_topics:
+        raw_topics = payload.get("selectedTopics") or request.form.get("selectedTopics") or payload.get("topics")
+        if isinstance(raw_topics, str):
+            try:
+                parsed = json.loads(raw_topics)
+                if isinstance(parsed, list):
+                    selected_topics = parsed
+                elif parsed:
+                    selected_topics = [str(parsed)]
+            except json.JSONDecodeError:
+                selected_topics = [raw_topics]
+        elif isinstance(raw_topics, list):
+            selected_topics = raw_topics
+
+    session_id = f"S{random.randint(1000, 9999)}"
+    sessions_store[session_id] = {
+        "name": name,
+        "difficulty": float(difficulty),
+        "classID": classID,
+        "isCumulative": str(cumulative).lower() == "true",
+        "adaptive": str(adaptive).lower() == "true",
+        "selectedTopics": selected_topics,
+        "customRequests": custom_requests
     }
-    return jsonify(session)
+    return jsonify({"sessionID": session_id})
 
 @server.route("/api/replaceSyllabus/<classID>", methods=["POST"])
 def replace_syllabus(classID):
@@ -98,10 +123,18 @@ def upload_style_docs(classID):
     time.sleep(1.4)
     return jsonify({"status": "Style docs uploaded"})
 
-@server.route("/api/deleteStyleDoc/<classID>", methods=["DELETE"])
-def delete_style_doc(classID):
+@server.route("/api/deleteStyleDoc/<classID>/<docName>", methods=["DELETE"])
+def delete_style_doc(classID, docName):
     time.sleep(0.8)
     return jsonify({"status": "Style doc deleted"})
+
+@server.route("/api/getStyleDocs/<classID>", methods=["GET"])
+def get_style_docs(classID):
+    time.sleep(0.4)
+    return jsonify([
+        {"filename": "lecture-notes.pdf"},
+        {"filename": "style-guide.md"}
+    ])
 
 @server.route("/api/getClassTopics/<classID>")
 def get_class_topics(classID):
@@ -132,15 +165,18 @@ def get_recent_sessions(classID):
 
 @server.route("/api/getSessionParams/<sessionID>")
 def get_session_params(sessionID):
-    session_params = {
+    session_params = sessions_store.get(sessionID)
+    if session_params:
+        return jsonify(session_params)
+    return jsonify({
         "name": "Midterm review",
         "difficulty": 0.6,
-        "topic": "Algebra",
-        "cumulative": False,
-        "customRequests": "",
-        "adaptive": True
-    }
-    return jsonify(session_params)
+        "classID": "",
+        "isCumulative": False,
+        "adaptive": True,
+        "selectedTopics": ["Algebra"],
+        "customRequests": ""
+    })
 
 @server.route("/api/requestQuestion/<sessionID>")
 def request_question(sessionID):
@@ -205,6 +241,20 @@ def update_session_params(sessionID):
 
 @server.route("/api/setAdaptive/<sessionID>", methods=["POST"])
 def set_adaptive(sessionID):
+    payload = request.get_json(silent=True) or {}
+    if "active" in payload:
+        adaptive = bool(payload.get("active"))
+    elif "adaptive" in payload:
+        adaptive = bool(payload.get("adaptive"))
+    elif "active" in request.form:
+        adaptive = request.form.get("active").lower() == "true"
+    elif "adaptive" in request.form:
+        adaptive = request.form.get("adaptive").lower() == "true"
+    else:
+        adaptive = False
+
+    if sessionID in sessions_store:
+        sessions_store[sessionID]["adaptive"] = adaptive
     return jsonify({"status": "Adaptive learning set"})
 
 @server.route("/api/requestHint/<questionID>")

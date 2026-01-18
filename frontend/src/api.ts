@@ -36,6 +36,18 @@ type BackendSession = {
   topics: string[]
 }
 
+type BackendSessionParams = {
+  name?: string
+  difficulty?: number
+  classID?: string
+  isCumulative?: boolean
+  adaptive?: boolean
+  selectedTopics?: string[]
+  topics?: string[]
+  topic?: string
+  customRequests?: string
+}
+
 // const isDev = import.meta.env.DEV
 const isDev = false
 const devClassesKey = 'dev:classCards'
@@ -157,7 +169,28 @@ export const api = {
   getRecentSessions: (classID: string) =>
     request<BackendSession[]>(`/api/getRecentSessions/${encodeURIComponent(classID)}`),
   getSessionParams: (sessionID: string) =>
-    request<Record<string, unknown>>(`/api/getSessionParams/${encodeURIComponent(sessionID)}`),
+    request<BackendSessionParams>(`/api/getSessionParams/${encodeURIComponent(sessionID)}`).then((params) => {
+      const topics =
+        (Array.isArray(params.selectedTopics) && params.selectedTopics) ||
+        (Array.isArray(params.topics) && params.topics) ||
+        (params.topic ? [params.topic] : [])
+      const legacy = params as { cumulative?: boolean }
+      const cumulative =
+        typeof params.isCumulative === 'boolean'
+          ? params.isCumulative
+          : typeof legacy.cumulative === 'boolean'
+            ? legacy.cumulative
+            : false
+      return {
+        name: params.name ?? 'New Session',
+        difficulty: typeof params.difficulty === 'number' ? params.difficulty : 0.5,
+        classID: params.classID ?? '',
+        cumulative,
+        adaptive: params.adaptive ?? false,
+        topics,
+        customRequests: params.customRequests ?? ''
+      }
+    }),
   createSession: (classID: string, formData: FormData) =>
     request<{ sessionID: string }>(`/api/createSession/${encodeURIComponent(classID)}`, {
       method: 'POST',
@@ -185,11 +218,13 @@ export const api = {
     }),
   deleteStyleDoc: (payload: { classID: string; docID: string }) =>
     request(
-      `/api/deleteStyleDoc/${encodeURIComponent(payload.classID)}?docID=${encodeURIComponent(payload.docID)}`,
+      `/api/deleteStyleDoc/${encodeURIComponent(payload.classID)}/${encodeURIComponent(payload.docID)}`,
       {
-      method: 'DELETE'
+        method: 'DELETE'
       }
     ),
+  getStyleDocs: (classID: string) =>
+    request<Array<{ filename: string }>>(`/api/getStyleDocs/${encodeURIComponent(classID)}`),
   requestQuestion: (sessionID: string) =>
     request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
       Content: question.content,
@@ -209,10 +244,25 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ active: payload.active })
     }),
-  updateSessionParams: (payload: { sessionID: string; sessionParams: Record<string, unknown> }) =>
-    request(`/api/updateSessionParams/${encodeURIComponent(payload.sessionID)}`, {
+  updateSessionParams: (payload: { sessionID: string; sessionParams: Record<string, unknown> }) => {
+    const formData = new FormData()
+    const params = payload.sessionParams as {
+      name?: string
+      difficulty?: number
+      cumulative?: boolean
+      topics?: string[]
+      selectedTopics?: string[]
+      customRequests?: string
+    }
+    if (params.name) formData.append('name', params.name)
+    if (typeof params.difficulty === 'number') formData.append('difficulty', String(params.difficulty))
+    if (typeof params.cumulative === 'boolean') formData.append('cumulative', String(params.cumulative))
+    const topics = params.selectedTopics ?? params.topics ?? []
+    topics.forEach((topic) => formData.append('selectedTopics', topic))
+    if (typeof params.customRequests === 'string') formData.append('customRequests', params.customRequests)
+    return request(`/api/updateSessionParams/${encodeURIComponent(payload.sessionID)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload.sessionParams)
+      body: formData
     })
+  }
 }
