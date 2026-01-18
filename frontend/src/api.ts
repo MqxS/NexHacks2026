@@ -168,7 +168,7 @@ export const api = {
       return Promise.resolve({})
     }
     return request('/api/deleteClass', {
-      method: 'POST',
+      method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
@@ -185,7 +185,7 @@ export const api = {
     }),
   deleteStyleDoc: (payload: { classID: string; docID: string }) =>
     request('/api/deleteStyleDoc', {
-      method: 'POST',
+      method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     }),
