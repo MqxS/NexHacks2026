@@ -4,5 +4,5 @@ import artGeometry from '../assets/class-art/geometry-04.jpg'
 import artChalk from '../assets/class-art/chalk-05.jpg'
 import artAbstract from '../assets/class-art/abstract-06.jpg'
 
-export const classArt = [artBooks, artLibrary, artGeometry, artChalk]
+export const classArt = [artBooks, artChalk, artLibrary, artGeometry]
 export const createClassArt = artAbstract
