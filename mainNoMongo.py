@@ -38,9 +38,9 @@ class Class:
     sessions: List[Session]
 
 class_cards = [
-    {"id": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
-    {"id": 2, "name": "Science", "professor": "Dr. Joseph"},
-    {"id": 3, "name": "History", "professor": "Dr. Max"}
+    {"classID": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
+    {"classID": 2, "name": "Science", "professor": "Dr. Joseph"},
+    {"classID": 3, "name": "History", "professor": "Dr. Max"}
 ]
 
 @server.route("/api/hello")
@@ -69,8 +69,8 @@ def create_class():
         or payload.get("professor")
         or "Instructor"
     )
-    next_id = max(card["id"] for card in class_cards) + 1 if class_cards else 1
-    class_cards.append({"id": next_id, "name": name, "professor": professor})
+    next_id = max(card["classID"] for card in class_cards) + 1 if class_cards else 1
+    class_cards.append({"classID": next_id, "name": name, "professor": professor})
     return jsonify({"classID": str(next_id)})
 
 @server.route("/api/createSession/<classID>", methods=["POST"])
