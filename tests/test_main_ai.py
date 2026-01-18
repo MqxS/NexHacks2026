@@ -118,5 +118,36 @@ class TestMainAI(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data["hint"], "Subtract 1")
 
+    def test_create_class(self):
+        # Mock syllabus file
+        from io import BytesIO
+        syllabus_content = b"Syllabus content"
+        data = {
+            "syllabus": (BytesIO(syllabus_content), "syllabus.pdf"),
+            "name": "Calculus 101",
+            "professor": "Dr. Smith"
+        }
+        
+        # Mock AI class file generation
+        mock_class_file = MagicMock()
+        mock_class_file.to_dict.return_value = {"syllabus": {}, "concepts": ["Limits"]}
+        mock_class_file.concepts = ["Limits"]
+        self.mock_ai.create_class_file_from_pdfs.return_value = mock_class_file
+        
+        # Mock Mongo insert
+        self.mock_classes.insert_one.return_value.inserted_id = ObjectId()
+        
+        response = self.app.post("/api/createClass", data=data, content_type='multipart/form-data')
+        
+        self.assertEqual(response.status_code, 200)
+        self.mock_ai.create_class_file_from_pdfs.assert_called_once()
+        self.mock_classes.insert_one.assert_called_once()
+        
+        # Verify inserted data has classFile and topics
+        args, _ = self.mock_classes.insert_one.call_args
+        inserted_doc = args[0]
+        self.assertEqual(inserted_doc["topics"], ["Limits"])
+        self.assertIsNotNone(inserted_doc["classFile"])
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,7 @@
 import random
 import sys
 import os
+import tempfile
 import json
 import dataclasses
 from dataclasses import dataclass, asdict
@@ -112,18 +113,45 @@ def create_class():
                 data=Binary(sf.read())
             ))
 
+    class_file_data = None
+    extracted_topics = []
+
+    if ai_util:
+        try:
+            # Create a temporary file for the syllabus
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_syllabus:
+                tmp_syllabus.write(syllabus_bytes)
+                tmp_syllabus_path = tmp_syllabus.name
+            
+            try:
+                # Call AI to generate class file
+                generated_class_file = ai_util.create_class_file_from_pdfs(
+                    syllabus_pdf_path=tmp_syllabus_path,
+                    problem_pdf_paths=[],
+                    class_name=request.form.get("name", "Untitled Class")
+                )
+                
+                class_file_data = generated_class_file.to_dict()
+                extracted_topics = generated_class_file.concepts
+                
+            finally:
+                # Clean up temporary file
+                if os.path.exists(tmp_syllabus_path):
+                    os.remove(tmp_syllabus_path)
+                    
+        except Exception as e:
+            print(f"Error generating class file: {e}")
+            # Fallback to empty data if AI fails
+
     class_doc = Class(
         syllabus=syllabus_file_obj,
         styleFiles=style_files,
         name=request.form.get("name", "Untitled Class"),
         professor=request.form.get("professor", "Unknown"),
-        topics=[],
+        topics=extracted_topics,
         sessions=[],
-        classFile=None # Initialized as None, will be populated by AI analysis later if needed
+        classFile=class_file_data
     )
-
-    # TODO: We might want to trigger AI processing of the syllabus here to create a ClassFile
-    # For now, we just save the raw file.
 
     result = mongo.classes.insert_one(asdict(class_doc))
 
