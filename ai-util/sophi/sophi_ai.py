@@ -1100,6 +1100,9 @@ class SophiAIUtil:
         system_instruction = (
             "You are a tutoring hint generator. "
             "You must either ask a single clarifying follow-up question, or provide a hint. "
+            "If an image is provided, you MUST analyze it to understand exactly where the user is in the problem "
+            "and identify any specific errors or misconceptions visible in their work. "
+            "Use this visual understanding to classify the best hint type and generate the optimal hint. "
             "If you provide a hint, keep it short and aligned with one of the hint types. "
             "Use LaTeX for math delimited by $$ ... $$. "
             "Whenever possible, supply a Wolfram Alpha query that can validate the key claim. "
@@ -1161,6 +1164,7 @@ class SophiAIUtil:
             payload: JsonDict = {
                 "problem": problem,
                 "status_prompt": status_prompt,
+                "has_work_image": bool(status_image_bytes),
                 "hint_history": hint_history or [],
                 "hint_type": hint_type,
                 "hint_types": [
