@@ -532,7 +532,7 @@ def set_adaptive(sessionID):
     return jsonify({"status": "Adaptive setting updated"})
 
 # IMPLEMENTED: KARTHIK #3 - AI Hint Generation
-@server.route("/api/requestHint/<questionID>")
+@server.route("/api/requestHint/<questionID>", methods=["GET", "POST"])
 def request_hint(questionID):
     if not ai_util:
         return jsonify({"error": "AI module not initialized"}), 500
@@ -546,7 +546,12 @@ def request_hint(questionID):
     
     # We could optionally ask the user for their current status/thoughts to generate a better hint
     # For now, we assume a generic "I'm stuck" status.
-    status_prompt = request.args.get("status", "I am stuck and unsure what to do next.")
+    status_prompt = (
+        request.form.get("hintRequest")
+        or request.args.get("status")
+        or request.form.get("status")
+        or "I am stuck and unsure what to do next."
+    )
     
     try:
         hint_res = ai_util.generate_hint(

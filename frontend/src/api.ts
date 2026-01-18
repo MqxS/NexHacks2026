@@ -236,8 +236,15 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ answer: payload.studentAnswer })
     }),
-  requestHint: (payload: { questionID: string; hintRequest: string }) =>
-    request<{ hint: string }>(`/api/requestHint/${encodeURIComponent(payload.questionID)}`),
+  requestHint: (payload: { questionID: string; hintRequest: string; photo?: File | null }) => {
+    const formData = new FormData()
+    formData.append('hintRequest', payload.hintRequest)
+    if (payload.photo) formData.append('photo', payload.photo)
+    return request<{ hint: string }>(`/api/requestHint/${encodeURIComponent(payload.questionID)}`, {
+      method: 'POST',
+      body: formData
+    })
+  },
   setAdaptive: (payload: { sessionID: string; active: boolean }) =>
     request(`/api/setAdaptive/${encodeURIComponent(payload.sessionID)}`, {
       method: 'POST',
