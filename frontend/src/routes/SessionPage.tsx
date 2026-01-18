@@ -371,7 +371,7 @@ export const SessionPage = () => {
             onClick={() => hintMutation.mutate()}
             disabled={!questionQuery.data || hintRequest.trim().length === 0}
             className={cn(
-              'mt-4 w-full rounded-full bg-espresso px-4 py-2 text-sm font-medium text-paper',
+              'mt-4 w-full rounded-full bg-sage px-4 py-2 text-sm font-medium text-paper',
               'disabled:cursor-not-allowed disabled:opacity-60'
             )}
           >
