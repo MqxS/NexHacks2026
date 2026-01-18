@@ -11,13 +11,13 @@ import {cn} from '../lib/utils'
 import * as Slider from '@radix-ui/react-slider'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { ChevronDown, Flame, Snowflake, Clock, Settings } from 'lucide-react'
+import { ChevronDown, Flame, Snowflake, Clock, Settings, Check } from 'lucide-react'
 
 export const ClassSessionSetup = () => {
   const navigate = useNavigate()
   const { classID } = useParams()
   const [difficulty, setDifficulty] = useState(0.5)
-  const [topic, setTopic] = useState<string | null>(null)
+  const [topicsSelected, setTopicsSelected] = useState<string[]>([])
   const [cumulative, setCumulative] = useState(false)
   const [adaptive, setAdaptive] = useState(false)
   const [custom, setCustom] = useState('')
@@ -130,34 +130,69 @@ export const ClassSessionSetup = () => {
                       type="button"
                       className="mt-2 flex w-full items-center justify-between rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
                     >
-                      {topic ?? 'Select a topic'}
+                      {topicsSelected.length === 0
+                        ? 'Select topics'
+                        : topicsSelected.length === 1
+                          ? topicsSelected[0]
+                          : `${topicsSelected.length} topics`}
                       <ChevronDown className="h-4 w-4" />
                     </button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content
                     align="start"
                     sideOffset={8}
-                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper"
+                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper z-50"
                   >
+                    <div className="mb-2 text-[11px] text-espresso/60">Select as many as you'd like</div>
                     <input
                       value={topicSearch}
                       onChange={(event) => setTopicSearch(event.target.value)}
                       className="mb-2 w-full rounded-lg border border-espresso/20 bg-paper px-2 py-1 text-xs"
                       placeholder="Search topics"
                     />
-                    {(topics ?? [])
-                      .filter((item) => item.toLowerCase().includes(topicSearch.toLowerCase()))
-                      .map((item) => (
-                      <DropdownMenu.Item
-                        key={item}
-                        className="cursor-pointer rounded-lg px-3 py-2 text-sm text-espresso outline-none hover:bg-sand"
-                        onSelect={() => setTopic(item)}
-                      >
-                        {item}
-                      </DropdownMenu.Item>
-                    ))}
+                    <div className="max-h-56 overflow-y-auto pr-1">
+                      {(topics ?? [])
+                        .filter((item) => item.toLowerCase().includes(topicSearch.toLowerCase()))
+                        .map((item) => {
+                          const active = topicsSelected.includes(item)
+                          return (
+                            <DropdownMenu.Item
+                              key={item}
+                              className={cn(
+                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm outline-none hover:bg-sand',
+                                active ? 'bg-sand text-espresso' : 'text-espresso'
+                              )}
+                              onSelect={(event) => {
+                                event.preventDefault()
+                                setTopicsSelected((prev) =>
+                                  prev.includes(item) ? prev.filter((topicItem) => topicItem !== item) : [...prev, item]
+                                )
+                              }}
+                            >
+                              <span>{item}</span>
+                              <span className="flex h-4 w-4 items-center justify-center rounded border border-espresso/20 bg-paper">
+                                {active ? <Check className="h-3 w-3 text-espresso" /> : null}
+                              </span>
+                            </DropdownMenu.Item>
+                          )
+                        })}
+                    </div>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
+              )}
+              {topicsSelected.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {topicsSelected.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setTopicsSelected((prev) => prev.filter((topicItem) => topicItem !== item))}
+                      className="rounded-full border border-espresso/20 bg-sand px-3 py-1 text-xs text-espresso"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 

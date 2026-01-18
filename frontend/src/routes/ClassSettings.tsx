@@ -104,7 +104,6 @@ export const ClassSettings = () => {
             >
               {replaceSyllabus.isPending ? 'Updating...' : 'Replace syllabus'}
             </button>
-            <p className="mt-2 text-xs text-espresso/60">Updating class index...</p>
           </div>
         </PaperCard>
 
@@ -124,7 +123,6 @@ export const ClassSettings = () => {
             >
               {uploadDocs.isPending ? 'Uploading...' : 'Upload style docs'}
             </button>
-            <p className="mt-2 text-xs text-espresso/60">Regenerating class-file...</p>
             {uploadedDocs.length === 0 ? (
               <p className="mt-3 text-sm text-espresso/70">No style docs yet.</p>
             ) : (
@@ -166,8 +164,8 @@ export const ClassSettings = () => {
 
       <Dialog.Root open={deleteOpen} onOpenChange={setDeleteOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-espresso/40 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-espresso/55 backdrop-blur-[3px]" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-espresso/20 bg-paper p-6 shadow-lift">
             <Dialog.Title className="text-lg font-semibold text-espresso">Confirm deletion</Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-espresso/70">
               Type <span className="font-semibold text-espresso">{className || classID}</span> to confirm.
@@ -201,6 +199,18 @@ export const ClassSettings = () => {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {(replaceSyllabus.isPending || uploadDocs.isPending || deleteDoc.isPending) && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-espresso/30 backdrop-blur-[2px]">
+          <div className="rounded-3xl border border-espresso/20 bg-paper/90 px-10 py-8 text-center shadow-lift">
+            <div className="mx-auto mb-4 orbit-loader">
+              <div className="orbit-ring" />
+              <div className="orbit-dot" />
+            </div>
+            <p className="text-sm font-medium text-espresso">Regenerating class context</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

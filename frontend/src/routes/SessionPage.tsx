@@ -10,11 +10,11 @@ import {LoadingSkeleton} from '../components/LoadingSkeleton'
 import {cn} from '../lib/utils'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import {ChevronDown, ChevronLeft, Lightbulb, Sliders} from 'lucide-react'
+import { ChevronDown, ChevronLeft, Lightbulb, Sliders, Check } from 'lucide-react'
 
 type SessionParams = {
   difficulty: number
-  topic: string
+  topics: string[]
   cumulative: boolean
   customRequests: string
 }
@@ -35,7 +35,7 @@ export const SessionPage = () => {
   const questionRef = useRef<HTMLDivElement | null>(null)
   const [params, setParams] = useState<SessionParams>({
     difficulty: 0.5,
-    topic: 'All topics',
+    topics: [],
     cumulative: false,
     customRequests: ''
   })
@@ -57,9 +57,16 @@ export const SessionPage = () => {
     const stored = localStorage.getItem(`sessionParams:${sessionID}`)
     if (!stored) return
     try {
-      const parsed = JSON.parse(stored) as Partial<SessionParams> & { adaptive?: boolean }
-      setParams((prev) => ({ ...prev, ...parsed }))
-      setSavedParams((prev) => ({ ...prev, ...parsed }))
+      const parsed = JSON.parse(stored) as Partial<SessionParams> & {
+        adaptive?: boolean
+        topic?: string
+      }
+      const nextParams = {
+        ...parsed,
+        topics: parsed.topics ?? (parsed.topic ? [parsed.topic] : [])
+      }
+      setParams((prev) => ({ ...prev, ...nextParams }))
+      setSavedParams((prev) => ({ ...prev, ...nextParams }))
       if (typeof parsed.adaptive === 'boolean') {
         setAdaptive(parsed.adaptive)
       }
@@ -364,37 +371,80 @@ export const SessionPage = () => {
                       type="button"
                       className="mt-2 flex w-full items-center justify-between rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
                     >
-                      {params.topic || 'Select a topic'}
+                      {params.topics.length === 0
+                        ? 'Select topics'
+                        : params.topics.length === 1
+                          ? params.topics[0]
+                          : `${params.topics.length} topics`}
                       <ChevronDown className="h-4 w-4" />
                     </button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content
                     align="start"
                     sideOffset={8}
-                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper"
+                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper z-50"
                   >
+                    <div className="mb-2 text-[11px] text-espresso/60">Select as many as you'd like</div>
                     <input
                       value={topicSearch}
                       onChange={(event) => setTopicSearch(event.target.value)}
                       className="mb-2 w-full rounded-lg border border-espresso/20 bg-paper px-2 py-1 text-xs"
                       placeholder="Search topics"
                     />
-                    {(topicsQuery.data ?? [])
-                      .filter((item: string) => item.toLowerCase().includes(topicSearch.toLowerCase()))
-                      .map((item: string) => (
-                        <DropdownMenu.Item
-                          key={item}
-                          className="cursor-pointer rounded-lg px-3 py-2 text-sm text-espresso outline-none hover:bg-sand"
-                          onSelect={() => setParams({ ...params, topic: item })}
-                        >
-                          {item}
-                        </DropdownMenu.Item>
-                      ))}
+                    <div className="max-h-56 overflow-y-auto pr-1">
+                      {(topicsQuery.data ?? [])
+                        .filter((item: string) => item.toLowerCase().includes(topicSearch.toLowerCase()))
+                        .map((item: string) => {
+                          const active = params.topics.includes(item)
+                          return (
+                            <DropdownMenu.Item
+                              key={item}
+                              className={cn(
+                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm outline-none hover:bg-sand',
+                                active ? 'bg-sand text-espresso' : 'text-espresso'
+                              )}
+                              onSelect={(event) => {
+                                event.preventDefault()
+                                setParams((prev) => ({
+                                  ...prev,
+                                  topics: prev.topics.includes(item)
+                                    ? prev.topics.filter((topicItem) => topicItem !== item)
+                                    : [...prev.topics, item]
+                                }))
+                              }}
+                            >
+                              <span>{item}</span>
+                              <span className="flex h-4 w-4 items-center justify-center rounded border border-espresso/20 bg-paper">
+                                {active ? <Check className="h-3 w-3 text-espresso" /> : null}
+                              </span>
+                            </DropdownMenu.Item>
+                          )
+                        })}
+                    </div>
                     {topicsQuery.data && topicsQuery.data.length === 0 ? (
                       <div className="px-3 py-2 text-xs text-espresso/60">No topics available</div>
                     ) : null}
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
+                {params.topics.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {params.topics.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() =>
+                          setParams((prev) => ({
+                            ...prev,
+                            topics: prev.topics.filter((topicItem) => topicItem !== item)
+                          }))
+                        }
+                        className="rounded-full border border-espresso/20 bg-sand px-3 py-1 text-xs text-espresso"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="text-sm font-medium text-espresso">Session style</label>
