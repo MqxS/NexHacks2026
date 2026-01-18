@@ -16,7 +16,7 @@ export type Feedback = {
 }
 
 type BackendClassCard = {
-  id: number | string
+  classID: number | string
   name: string
   professor: string
 }
@@ -32,7 +32,7 @@ type BackendQuestion = {
 
 type BackendSession = {
   sessionID: string
-  timestamp: string
+  name: string
   topics: string[]
 }
 
@@ -100,7 +100,7 @@ export const api = {
     if (isDev) return Promise.resolve(loadDevClasses())
     return request<BackendClassCard[]>('/api/getClassCards').then((cards) =>
       cards.map((card) => ({
-        classID: String(card.id),
+        classID: String(card.classID),
         Name: card.name,
         Professor: card.professor
       }))
@@ -156,7 +156,11 @@ export const api = {
     request<BackendSession[]>(`/api/getRecentSessions/${encodeURIComponent(classID)}`),
   getSessionParams: (sessionID: string) =>
     request<Record<string, unknown>>(`/api/getSessionParams/${encodeURIComponent(sessionID)}`),
-  createSession: () => request<{ sessionID: string }>(`/api/createSession`),
+  createSession: (classID: string, formData: FormData) =>
+    request<{ sessionID: string }>(`/api/createSession/${encodeURIComponent(classID)}`, {
+      method: 'POST',
+      body: formData
+    }),
   deleteClass: (payload: { classID: string }) => {
     if (isDev) {
       const next = loadDevClasses().filter((card) => card.classID !== payload.classID)

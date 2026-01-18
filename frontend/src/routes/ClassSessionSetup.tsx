@@ -1,13 +1,13 @@
-import {useState} from 'react'
-import {useMutation, useQuery} from '@tanstack/react-query'
-import {useNavigate, useParams} from 'react-router-dom'
-import {toast} from 'sonner'
-import {api} from '../api'
-import {PaperCard} from '../components/PaperCard'
-import {LoadingSkeleton} from '../components/LoadingSkeleton'
-import {UploadDropzone} from '../components/UploadDropzone'
-import {SessionCard} from '../components/SessionCard'
-import {cn} from '../lib/utils'
+import { useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
+import { api } from '../api'
+import { PaperCard } from '../components/PaperCard'
+import { LoadingSkeleton } from '../components/LoadingSkeleton'
+import { UploadDropzone } from '../components/UploadDropzone'
+import { SessionCard } from '../components/SessionCard'
+import { cn } from '../lib/utils'
 import * as Slider from '@radix-ui/react-slider'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
@@ -16,6 +16,7 @@ import { ChevronDown, Flame, Snowflake, Clock, Settings, Check } from 'lucide-re
 export const ClassSessionSetup = () => {
   const navigate = useNavigate()
   const { classID } = useParams()
+  const [sessionName, setSessionName] = useState('')
   const [difficulty, setDifficulty] = useState(0.5)
   const [topicsSelected, setTopicsSelected] = useState<string[]>([])
   const [cumulative, setCumulative] = useState(false)
@@ -38,7 +39,17 @@ export const ClassSessionSetup = () => {
 
   const createSession = useMutation({
     mutationFn: async () => {
-      return api.createSession()
+      if (!classID) {
+        throw new Error('Missing class ID')
+      }
+      const formData = new FormData()
+      formData.append('name', sessionName || 'New Session')
+      formData.append('difficulty', String(difficulty))
+      formData.append('adaptive', String(adaptive))
+      formData.append('cumulative', String(cumulative))
+      formData.append('topics', JSON.stringify(topicsSelected))
+      if (file[0]) formData.append('file', file[0])
+      return api.createSession(classID, formData)
     },
     onSuccess: (data) => {
       if (classID) {
@@ -50,15 +61,6 @@ export const ClassSessionSetup = () => {
   })
 
   const sessions = sessionsQuery.data ?? []
-
-  const formatSessionTime = (timestamp: string) => {
-    const date = new Date(timestamp)
-    return new Intl.DateTimeFormat('en-US', {
-      weekday: 'long',
-      hour: 'numeric',
-      minute: '2-digit'
-    }).format(date)
-  }
 
   const resumeSession = useMutation({
     mutationFn: async (sessionID: string) => {
@@ -96,6 +98,15 @@ export const ClassSessionSetup = () => {
           </div>
 
           <div className="mt-8 space-y-6">
+            <div>
+              <label className="text-sm font-medium text-espresso">Session name</label>
+              <input
+                value={sessionName}
+                onChange={(event) => setSessionName(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+                placeholder="Midterm review"
+              />
+            </div>
             <div>
               <label className="text-sm font-medium text-espresso">Difficulty</label>
               <div className="mt-3 flex items-center gap-3">
@@ -293,7 +304,7 @@ export const ClassSessionSetup = () => {
               {sessions.map((session) => (
                 <SessionCard
                   key={session.sessionID}
-                  title={formatSessionTime(session.timestamp)}
+                  title={session.name || 'Session'}
                   tags={session.topics}
                   onResume={() => resumeSession.mutate(session.sessionID)}
                 />

@@ -139,12 +139,14 @@ def get_recent_sessions(classID):
 
     sessions = mongo.sessions.find(
         {"classID": obj_id},
-        {"name": 1}
+        {"name": 1, "focusedConcepts": 1}
     ).sort("_id", -1).limit(5)
 
     return jsonify([
         {
             "sessionID": str(doc["_id"]),
+            # "timestamp": doc["_id"].generation_time.isoformat(),
+            "topics": doc.get("focusedConcepts", []) or [],
             "name": doc.get("name", "Untitled Session")
         }
         for doc in sessions
@@ -165,7 +167,7 @@ def get_session_params(sessionID):
     if not doc:
         return jsonify({"error": "Session not found"}), 404
     session = Session(
-        name=request.form.get("name", "New Session"),
+        name=doc.get("name", "New Session"),
         difficulty=doc.get("difficulty", 0.5),
         isCumulative=doc.get("isCumulative", False),
         adaptive=doc.get("adaptive", True),

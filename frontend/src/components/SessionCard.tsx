@@ -3,10 +3,12 @@ import {cn} from '../lib/utils'
 
 export const SessionCard = ({
   title,
+  subtitle,
   tags,
   onResume
 }: {
   title: string
+  subtitle?: string
   tags: string[]
   onResume?: () => void
 }) => {
@@ -15,6 +17,7 @@ export const SessionCard = ({
       <div className="flex h-full flex-col gap-3">
         <div>
           <p className="text-sm font-medium text-espresso">{title}</p>
+          {subtitle ? <p className="mt-1 text-xs text-espresso/60">{subtitle}</p> : null}
         </div>
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (

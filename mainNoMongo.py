@@ -73,11 +73,18 @@ def create_class():
     class_cards.append({"id": next_id, "name": name, "professor": professor})
     return jsonify({"classID": str(next_id)})
 
-@server.route("/api/createSession")
-def create_session():
+@server.route("/api/createSession/<classID>", methods=["POST"])
+def create_session(classID):
     time.sleep(1.2)
+    # payload = request.get_json(silent=True) or {}
+    # name = (
+    #     request.form.get("name")
+    #     or payload.get("name")
+    #     or "New Session"
+    # )
     session = {
-        "sessionID": "ABC123",
+        "sessionID": "ABC123"
+        # "name": name
     }
     return jsonify(session)
 
@@ -110,12 +117,14 @@ def get_recent_sessions(classID):
     sessions = [
         {
             "sessionID": "S1",
-            "timestamp": "2026-01-17T14:10:00Z",
+            "name": "Test Session 1",
+            # "timestamp": "2026-01-17T14:10:00Z",
             "topics": ["Algebra", "Geometry"]
         },
         {
             "sessionID": "S2",
-            "timestamp": "2026-01-16T18:30:00Z",
+            "name": "Test Session 2",
+            # "timestamp": "2026-01-16T18:30:00Z",
             "topics": ["Calculus"]
         }
     ]
@@ -124,6 +133,7 @@ def get_recent_sessions(classID):
 @server.route("/api/getSessionParams/<sessionID>")
 def get_session_params(sessionID):
     session_params = {
+        "name": "Midterm review",
         "difficulty": 0.6,
         "topic": "Algebra",
         "cumulative": False,
