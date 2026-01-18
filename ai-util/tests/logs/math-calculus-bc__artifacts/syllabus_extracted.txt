@@ -1,0 +1,73 @@
+Week 1: Transcendental Functions
+- Differentiation and Integration of Functions with Bases other than e & Applications
+
+Week 2: Differential Equations
+- Solving Separable Differential Equations
+- Growth & Decay
+- Newton’s Law of Cooling
+- Slope Fields
+- Euler’s Method
+
+Week 3: Transcendental Functions
+- Differentiation & Integration of Inverse Trig Functions
+
+Week 4: Applications of Integration
+- Calculations of Volumes of Solids (Washer, Shell, and General Cross-section methods)
+- Arc Length
+- Areas of Surfaces of Revolution
+
+Week 5: Advanced Integration Techniques
+- Trigonometric Integration
+- Integration Using Trig Substitution
+
+Week 6: Advanced Integration Techniques
+- Integration Using Partial Fractions
+- Integration by Tables
+- Integration by Parts
+
+Week 7: Limits & Advanced Integration Techniques
+- L’Hopital’s Rule
+- Improper Integrals
+
+Week 8: Parametric Equations & Vector-Valued Functions
+- Differentiation of Parametric Functions
+- Curves given parametrically
+- Differentiation of Vector-Valued Functions
+- Calculation of Speed
+- Area of a region bounded by a polar graph
+
+Week 9: Infinite Series
+- Sequences, Series & Convergence
+- The Integral Test
+- p-series
+
+Week 10: Infinite Series
+- Comparisons of Series
+- Alternating Series
+- Ratio & Root Tests
+
+Week 11: Infinite Series
+- Taylor Polynomials & Approximations
+
+Week 12: Infinite Series
+- Power Series
+- Taylor & Maclaurin Series
+
+Week 13: Infinite Series
+- Maclaurin Series for functions e^x, sin x, cos x, and 1/(1-x)
+
+Week 14: Infinite Series & AP Exam Review
+- LaGrange Error Bound for Taylor Polynomials
+- In-depth Review of Selected AP Topics in Preparation for AP Exam
+
+Week 15: AP Exam Review
+- In-depth Review of Selected AP Topics in Preparation for AP Exam
+
+Week 16: AP Exam Review
+- In-depth Review of Selected AP Topics in Preparation for AP Exam
+
+Week 17: AP Exam Review
+- In-depth Review of Selected AP Topics
+- AP Exam
+
+Week 18: Post AP Exam Selected Topics

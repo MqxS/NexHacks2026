@@ -529,7 +529,7 @@ class SophiaAIUtil:
 
         if not use_wolfram:
             system_instruction = (
-                "You determine if a math question is well-posed and has a valid answer. "
+                "You determine if a question is well-posed and has a valid answer. "
                 "If yes, provide a concise final answer. Return JSON only. "
                 "Do not include any preamble, markdown, or code fences."
             )
@@ -537,6 +537,10 @@ class SophiaAIUtil:
                 (
                     json.dumps({"question": "Solve for x: 2x+3=11"}, ensure_ascii=False),
                     {"ok": True, "answer": "x=4", "explanation": "Linear equation with a unique solution."},
+                ),
+                (
+                    json.dumps({"question": "What is the capital of France?"}, ensure_ascii=False),
+                    {"ok": True, "answer": "Paris", "explanation": "Standard geography fact."},
                 ),
                 (
                     json.dumps({"question": "Solve for x: x=x+1"}, ensure_ascii=False),
@@ -650,6 +654,22 @@ class SophiaAIUtil:
                     "is_consistent": True,
                     "wolfram_query": "Simplify( (2x+3=11) && (2x=8) )",
                     "explanation": "Subtracting 3 from both sides is consistent with the step 2x=8.",
+                },
+            ),
+            (
+                json.dumps(
+                    {
+                        "question": "Who wrote 'The Great Gatsby'?",
+                        "current_step": "I think it was Hemingway.",
+                        "hint": "The author also wrote 'This Side of Paradise'.",
+                        "hint_type": "Conceptual",
+                    },
+                    ensure_ascii=False,
+                ),
+                {
+                    "is_consistent": True,
+                    "wolfram_query": None,
+                    "explanation": "F. Scott Fitzgerald wrote both; hint points away from Hemingway.",
                 },
             ),
             (
@@ -945,7 +965,7 @@ class SophiaAIUtil:
     def _build_validation_prompt(self, *, question: str) -> str:
         system_instruction = (
             "You write a strict validation prompt for another AI model. "
-            "It must evaluate a student's step-by-step work for a math question. "
+            "It must evaluate a student's step-by-step work for a question. "
             "Return JSON only."
         )
         few_shots = [
