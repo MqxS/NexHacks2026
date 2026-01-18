@@ -2,7 +2,7 @@ FROM node:20-bullseye
 
 # Install Python and system dependencies
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip poppler-utils && \
+    apt-get install -y python3 python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
