@@ -5,6 +5,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+
 class WolframAlphaChecker:
     def __init__(
         self,

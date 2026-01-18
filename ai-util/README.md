@@ -18,11 +18,13 @@ python ai-util/tests/test_utils.py cs1332
 
 ## Inspiration
 **Sophi** was inspired by the idea that practice should feel closer to a one-on-one tutor than a generic worksheet, with the goal to solve the following problems:
-*   Bullet about finding practice materials that align with the professor's style
-*   Bullet about creating hints that provide the optimal level of intellectual stimulation
+*   Notoriously, most professors offer only two to three practice sets for each exam, leaving most students with no choice but to redo the homework and practice exams, or consult "non-canon" resources
+*   As a student, we have little other choice than to view the practice solutions - there are currently no autonomous ways to 
 *   Bullet about creating an adaptive workflow to maximize the ROI of studying
 
-Each of us faced this same problem in our first semester as freshmen and our goal is to 
+
+
+Each of us faced this same problem in our first semester as freshmen, with professors not being able to and our goal is to 
 
 We know this market is saturated, but pride ourselves on the ability to leverage LLM customization to mimic instructor-style problem generation.
 
@@ -34,27 +36,32 @@ Each session dynamically generates questions, validates answers, provides target
 ## How we built it
 Sophi is structured around a few core abstractions:
 
-- **Class**: A collection of practice sets for a given course.
 - **Session**: A single practice environment with configurable parameters.
-- **Class File (JSON)**: Auto-generated metadata containing:
+- **Class**: A collection of *sessions* for a given course.
+- **Class File (JSON)**: Custom-curated class metadata containing:
   - Topic breakdown (indented syllabus-style hierarchy)
   - Textbook citation (if applicable)
   - Style-notes derived from assignments (professor vocabulary, problem structure, common phrasing)
 
-Early design decisions included:
-- Starting with **free-response questions only** to encourage deeper reasoning.
-- Restricting answers to **numerical responses** where appropriate for reliable validation.
-- Building adaptive behavior at the session level rather than globally.
+Additionally, Sophi leverages *RAG workflows* (leveraging FAISS vector-store databases) and *symbolic learning* (courtesy of Wolfram Alpha) to provide questions, hints, and answers grounded in real results.
 
 The backend maintains session context across interactions, ensuring hints, feedback, and follow-ups are part of a continuous conversation rather than isolated prompts.
 
 ## Challenges we ran into
-Unlike prior hackathons, our team 
+Karthik:
+
+Max:
+
+Joseph:
+
 
 ## Accomplishments that we're proud of
 
+It was quite hard to brainstorm an idea for NexHacks - we wanted to do something big and unique, and attempt to contribute to a problem we all had firsthand experience with.
 
 ## What we learned
 
 
 ## What's next for Sophi
+
+

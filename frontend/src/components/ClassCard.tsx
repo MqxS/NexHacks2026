@@ -1,6 +1,6 @@
-import { PenLine } from 'lucide-react'
-import { PaperCard } from './PaperCard'
-import { cn } from '../lib/utils'
+import {PenLine} from 'lucide-react'
+import {PaperCard} from './PaperCard'
+import {cn} from '../lib/utils'
 
 export const ClassCard = ({
   name,

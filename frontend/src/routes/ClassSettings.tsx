@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import {useMemo, useState} from 'react'
+import {useMutation, useQuery} from '@tanstack/react-query'
 import * as Dialog from '@radix-ui/react-dialog'
-import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
-import { api } from '../api'
-import { PaperCard } from '../components/PaperCard'
-import { UploadDropzone } from '../components/UploadDropzone'
-import { cn } from '../lib/utils'
+import {useNavigate, useParams} from 'react-router-dom'
+import {toast} from 'sonner'
+import {api} from '../api'
+import {PaperCard} from '../components/PaperCard'
+import {UploadDropzone} from '../components/UploadDropzone'
+import {cn} from '../lib/utils'
 
 export const ClassSettings = () => {
   const { classID } = useParams()

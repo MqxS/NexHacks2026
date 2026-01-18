@@ -1,5 +1,5 @@
-import { PaperCard } from './PaperCard'
-import { cn } from '../lib/utils'
+import {PaperCard} from './PaperCard'
+import {cn} from '../lib/utils'
 
 export const SessionCard = ({
   title,

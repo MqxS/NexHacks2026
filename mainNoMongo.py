@@ -1,15 +1,12 @@
 import random
 import time
-from flask import Flask, jsonify, request
 from dataclasses import dataclass
 from typing import List
 
 from bson import ObjectId, Binary
-
-# from backend.mongo import connect
+from flask import Flask, jsonify, request
 
 server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
-# mongo = connect()
 
 @dataclass
 class Question:
