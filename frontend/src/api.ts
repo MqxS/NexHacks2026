@@ -128,10 +128,11 @@ export const api = {
       saveDevClasses(next)
       return Promise.resolve({})
     }
-    return request('/api/editClassName', {
+    const formData = new FormData()
+    formData.append('name', payload.newName)
+    return request(`/api/editClassName/${encodeURIComponent(payload.classID)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: formData
     })
   },
   editClassProf: (payload: { classID: string; newProf: string }) => {
@@ -142,10 +143,11 @@ export const api = {
       saveDevClasses(next)
       return Promise.resolve({})
     }
-    return request('/api/editClassProf', {
+    const formData = new FormData()
+    formData.append('professor', payload.newProf)
+    return request(`/api/editClassProf/${encodeURIComponent(payload.classID)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: formData
     })
   },
   getClassTopics: (classID: string) =>
@@ -167,10 +169,8 @@ export const api = {
       saveDevClasses(next)
       return Promise.resolve({})
     }
-    return request('/api/deleteClass', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    return request(`/api/deleteClass/${encodeURIComponent(payload.classID)}`, {
+      method: 'DELETE'
     })
   },
   replaceSyllabus: (formData: FormData) =>
