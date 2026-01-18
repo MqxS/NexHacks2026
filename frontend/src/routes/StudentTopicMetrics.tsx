@@ -1,7 +1,7 @@
 import {useMemo, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {useNavigate, useParams} from 'react-router-dom'
-import {api} from '../api'
+import {api, type TopicMetric} from '../api'
 import {PaperCard} from '../components/PaperCard'
 import {LoadingSkeleton} from '../components/LoadingSkeleton'
 import {CenteredCarousel} from '../components/CenteredCarousel'
@@ -56,7 +56,7 @@ export const StudentTopicMetrics = () => {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <label className="text-sm font-medium text-espresso"></label>
+        <label className="text-sm font-medium text-espresso">Search topics</label>
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
