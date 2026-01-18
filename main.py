@@ -21,7 +21,7 @@ class Question:
 @dataclass
 class Session:
     name: str
-    classID: bson.ObjectId
+    classID: str
     questions: List[Question]
     adaptive: bool
     difficulty: float
@@ -96,15 +96,10 @@ def create_session(classID):
     else:
         file_bin = None
 
-    try:
-        obj_id = ObjectId(classID)
-    except bson.errors.InvalidId:
-        return jsonify({"error": "Invalid classID"}), 400
-
     session = Session(
         name=request.form.get("name", "New Session"),
         questions=[],
-        classID=obj_id,
+        classID=classID,
         adaptive=request.form.get("adaptive", "false").lower() == "true",
         difficulty=float(request.form.get("difficulty", 0.5)),
         isCumulative=request.form.get("cumulative", "false").lower() == "true",
