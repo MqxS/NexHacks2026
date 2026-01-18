@@ -114,7 +114,7 @@ export const ClassSessionSetup = () => {
     <>
       <ProcessingOverlay active={Boolean(processingMessage)} title={processingMessage?.title} subtitle={processingMessage?.subtitle} />
       <div className="grid gap-10 lg:grid-cols-[2fr,1fr]">
-      <div className="space-y-8">
+      <div className="space-y-8 min-w-0">
         <PaperCard className="p-8">
           <div className="flex items-start justify-between">
             <div>
@@ -315,7 +315,7 @@ export const ClassSessionSetup = () => {
           </div>
         </PaperCard>
 
-        <div>
+        <div className="flex h-[300px] min-h-0 w-full max-w-full flex-none flex-col overflow-hidden min-w-0">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-espresso">Recent sessions</h2>
             <span className="text-xs text-espresso/60">Keep momentum going</span>
@@ -327,7 +327,7 @@ export const ClassSessionSetup = () => {
               ))}
             </div>
           ) : sessionsQuery.isError || sessions.length === 0 ? (
-            <PaperCard className="flex items-center justify-between">
+            <PaperCard className="flex flex-1 items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="rounded-full bg-sand p-2 text-espresso">
                   <Clock className="h-4 w-4" />
@@ -336,11 +336,11 @@ export const ClassSessionSetup = () => {
               </div>
             </PaperCard>
           ) : (
-            <div className="h-[240px]">
+            <div className="flex-1 min-h-0 w-full max-w-full overflow-hidden min-w-0">
               <CenteredCarousel
                 items={sessions}
                 initialIndex={sessions.length === 1 ? 0 : 1}
-                className="pt-6 pb-10 px-[calc(50%-120px)]"
+                className="h-full w-full max-w-full min-w-0 overflow-x-auto overflow-y-hidden pt-6 pb-10 px-[calc(50%-120px)]"
                 renderItem={(session) => (
                   <SessionCard
                     title={session.name || 'Session'}
