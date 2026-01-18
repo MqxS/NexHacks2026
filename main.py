@@ -21,6 +21,7 @@ class Question:
 @dataclass
 class Session:
     name: str
+    classID: bson.ObjectId
     questions: List[Question]
     adaptive: bool
     difficulty: float
@@ -95,9 +96,15 @@ def create_session(classID):
     else:
         file_bin = None
 
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
     session = Session(
         name=request.form.get("name", "New Session"),
         questions=[],
+        classID=obj_id,
         adaptive=request.form.get("adaptive", "false").lower() == "true",
         difficulty=float(request.form.get("difficulty", 0.5)),
         isCumulative=request.form.get("cumulative", "false").lower() == "true",
@@ -162,13 +169,14 @@ def get_session_params(sessionID):
 
     doc = mongo.sessions.find_one(
         {"_id": obj_id},
-        {"name": 1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
+        {"name": 1, "classID":1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
     )
     if not doc:
         return jsonify({"error": "Session not found"}), 404
     session = Session(
         name=doc.get("name", "New Session"),
         difficulty=doc.get("difficulty", 0.5),
+        classID=doc.get("classID"),
         isCumulative=doc.get("isCumulative", False),
         adaptive=doc.get("adaptive", True),
         focusedConcepts=doc.get("focusedConcepts", []),
