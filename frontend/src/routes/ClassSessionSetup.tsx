@@ -1,23 +1,24 @@
-import {useState} from 'react'
-import {useMutation, useQuery} from '@tanstack/react-query'
-import {useNavigate, useParams} from 'react-router-dom'
-import {toast} from 'sonner'
-import {api} from '../api'
-import {PaperCard} from '../components/PaperCard'
-import {LoadingSkeleton} from '../components/LoadingSkeleton'
-import {UploadDropzone} from '../components/UploadDropzone'
-import {SessionCard} from '../components/SessionCard'
-import {cn} from '../lib/utils'
+import { useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
+import { api } from '../api'
+import { PaperCard } from '../components/PaperCard'
+import { LoadingSkeleton } from '../components/LoadingSkeleton'
+import { UploadDropzone } from '../components/UploadDropzone'
+import { SessionCard } from '../components/SessionCard'
+import { cn } from '../lib/utils'
 import * as Slider from '@radix-ui/react-slider'
 import * as Switch from '@radix-ui/react-switch'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import {ChevronDown, Clock, Flame, Snowflake} from 'lucide-react'
+import { ChevronDown, Flame, Snowflake, Clock, Settings, Check } from 'lucide-react'
 
 export const ClassSessionSetup = () => {
   const navigate = useNavigate()
   const { classID } = useParams()
+  const [sessionName, setSessionName] = useState('')
   const [difficulty, setDifficulty] = useState(0.5)
-  const [topic, setTopic] = useState<string | null>(null)
+  const [topicsSelected, setTopicsSelected] = useState<string[]>([])
   const [cumulative, setCumulative] = useState(false)
   const [adaptive, setAdaptive] = useState(false)
   const [custom, setCustom] = useState('')
@@ -38,7 +39,17 @@ export const ClassSessionSetup = () => {
 
   const createSession = useMutation({
     mutationFn: async () => {
-      return api.createSession()
+      if (!classID) {
+        throw new Error('Missing class ID')
+      }
+      const formData = new FormData()
+      formData.append('name', sessionName || 'New Session')
+      formData.append('difficulty', String(difficulty))
+      formData.append('adaptive', String(adaptive))
+      formData.append('cumulative', String(cumulative))
+      formData.append('topics', JSON.stringify(topicsSelected))
+      if (file[0]) formData.append('file', file[0])
+      return api.createSession(classID, formData)
     },
     onSuccess: (data) => {
       if (classID) {
@@ -50,15 +61,6 @@ export const ClassSessionSetup = () => {
   })
 
   const sessions = sessionsQuery.data ?? []
-
-  const formatSessionTime = (timestamp: string) => {
-    const date = new Date(timestamp)
-    return new Intl.DateTimeFormat('en-US', {
-      weekday: 'long',
-      hour: 'numeric',
-      minute: '2-digit'
-    }).format(date)
-  }
 
   const resumeSession = useMutation({
     mutationFn: async (sessionID: string) => {
@@ -75,9 +77,30 @@ export const ClassSessionSetup = () => {
     onError: (error: Error) => toast.error(error.message || 'Could not resume session')
   })
 
+  const processingMessage = createSession.isPending
+    ? {
+        title: 'Preparing your session...',
+        subtitle: 'Setting up topics and pacing'
+      }
+    : null
+
+  const blendColor = (start: [number, number, number], end: [number, number, number], t: number) => {
+    const mix = (a: number, b: number) => Math.round(a + (b - a) * t)
+    return `rgb(${mix(start[0], end[0])}, ${mix(start[1], end[1])}, ${mix(start[2], end[2])})`
+  }
+
+  const cold = [156, 183, 213] as [number, number, number]
+  const edge = Math.min(1, Math.max(0, difficulty))
+  const cool = blendColor(cold, [176, 196, 222], edge)
+  const hotStart = Math.min(100, Math.max(0, ((edge - 0.45) / 0.55) * 100))
+  const gradient =
+    edge < 0.45
+      ? `linear-gradient(90deg, #9CB7D5 0%, ${cool} 100%)`
+      : `linear-gradient(90deg, #9CB7D5 0%, #9CB7D5 ${100 - hotStart}%, #C98B6A 100%)`
+
   return (
     <>
-      <SessionLoadingOverlay active={createSession.isPending} />
+      <ProcessingOverlay active={Boolean(processingMessage)} title={processingMessage?.title} subtitle={processingMessage?.subtitle} />
       <div className="grid gap-10 lg:grid-cols-[2fr,1fr]">
       <div className="space-y-8">
         <PaperCard className="p-8">
@@ -90,6 +113,15 @@ export const ClassSessionSetup = () => {
 
           <div className="mt-8 space-y-6">
             <div>
+              <label className="text-sm font-medium text-espresso">Session name</label>
+              <input
+                value={sessionName}
+                onChange={(event) => setSessionName(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
+                placeholder="Midterm review"
+              />
+            </div>
+            <div>
               <label className="text-sm font-medium text-espresso">Difficulty</label>
               <div className="mt-3 flex items-center gap-3">
                 <Snowflake className="h-4 w-4 text-sage" />
@@ -101,8 +133,14 @@ export const ClassSessionSetup = () => {
                   step={0.01}
                   onValueChange={(value) => setDifficulty(value[0])}
                 >
-                  <Slider.Track className="relative h-2 w-full rounded-full bg-sand">
-                    <Slider.Range className="absolute h-full rounded-full bg-sage" />
+                  <Slider.Track className="relative h-2 w-full rounded-full bg-espresso/15 overflow-hidden">
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: gradient,
+                        width: `${Math.max(0, Math.min(1, difficulty)) * 100}%`
+                      }}
+                    />
                   </Slider.Track>
                   <Slider.Thumb className="block h-5 w-5 rounded-full border border-espresso/30 bg-paper shadow-paper" />
                 </Slider.Root>
@@ -123,34 +161,69 @@ export const ClassSessionSetup = () => {
                       type="button"
                       className="mt-2 flex w-full items-center justify-between rounded-xl border border-espresso/20 bg-paper px-3 py-2 text-sm"
                     >
-                      {topic ?? 'Select a topic'}
+                      {topicsSelected.length === 0
+                        ? 'Select topics'
+                        : topicsSelected.length === 1
+                          ? topicsSelected[0]
+                          : `${topicsSelected.length} topics`}
                       <ChevronDown className="h-4 w-4" />
                     </button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content
                     align="start"
                     sideOffset={8}
-                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper"
+                    className="mt-2 w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border border-espresso/20 bg-paper p-2 shadow-paper z-50"
                   >
+                    <div className="mb-2 text-[11px] text-espresso/60">Select as many as you'd like</div>
                     <input
                       value={topicSearch}
                       onChange={(event) => setTopicSearch(event.target.value)}
                       className="mb-2 w-full rounded-lg border border-espresso/20 bg-paper px-2 py-1 text-xs"
                       placeholder="Search topics"
                     />
-                    {(topics ?? [])
-                      .filter((item) => item.toLowerCase().includes(topicSearch.toLowerCase()))
-                      .map((item) => (
-                      <DropdownMenu.Item
-                        key={item}
-                        className="cursor-pointer rounded-lg px-3 py-2 text-sm text-espresso outline-none hover:bg-sand"
-                        onSelect={() => setTopic(item)}
-                      >
-                        {item}
-                      </DropdownMenu.Item>
-                    ))}
+                    <div className="max-h-56 overflow-y-auto pr-1">
+                      {(topics ?? [])
+                        .filter((item) => item.toLowerCase().includes(topicSearch.toLowerCase()))
+                        .map((item) => {
+                          const active = topicsSelected.includes(item)
+                          return (
+                            <DropdownMenu.Item
+                              key={item}
+                              className={cn(
+                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm outline-none hover:bg-sand',
+                                active ? 'bg-sand text-espresso' : 'text-espresso'
+                              )}
+                              onSelect={(event) => {
+                                event.preventDefault()
+                                setTopicsSelected((prev) =>
+                                  prev.includes(item) ? prev.filter((topicItem) => topicItem !== item) : [...prev, item]
+                                )
+                              }}
+                            >
+                              <span>{item}</span>
+                              <span className="flex h-4 w-4 items-center justify-center rounded border border-espresso/20 bg-paper">
+                                {active ? <Check className="h-3 w-3 text-espresso" /> : null}
+                              </span>
+                            </DropdownMenu.Item>
+                          )
+                        })}
+                    </div>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
+              )}
+              {topicsSelected.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {topicsSelected.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setTopicsSelected((prev) => prev.filter((topicItem) => topicItem !== item))}
+                      className="rounded-full border border-sage/40 bg-sage/20 px-3 py-1 text-xs text-espresso"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -191,7 +264,7 @@ export const ClassSessionSetup = () => {
               <Switch.Root
                 checked={adaptive}
                 onCheckedChange={(value) => setAdaptive(value)}
-                className="relative h-6 w-11 rounded-full bg-espresso/20 data-[state=checked]:bg-espresso"
+                className="relative h-6 w-11 rounded-full bg-espresso/20 data-[state=checked]:bg-sage"
               >
                 <Switch.Thumb className="block h-5 w-5 translate-x-1 rounded-full bg-paper shadow transition data-[state=checked]:translate-x-5" />
               </Switch.Root>
@@ -217,7 +290,7 @@ export const ClassSessionSetup = () => {
               type="button"
               onClick={() => createSession.mutate()}
               className={cn(
-                'mt-4 w-full rounded-full bg-espresso px-4 py-3 text-sm font-medium text-paper transition',
+                'mt-4 w-full rounded-full bg-sage px-4 py-3 text-sm font-medium text-paper transition hover:-translate-y-0.5',
                 'hover:-translate-y-0.5'
               )}
             >
@@ -251,7 +324,7 @@ export const ClassSessionSetup = () => {
               {sessions.map((session) => (
                 <SessionCard
                   key={session.sessionID}
-                  title={formatSessionTime(session.timestamp)}
+                  title={session.name || 'Session'}
                   tags={session.topics}
                   onResume={() => resumeSession.mutate(session.sessionID)}
                 />
@@ -260,21 +333,37 @@ export const ClassSessionSetup = () => {
           )}
         </div>
       </div>
-      <div className="space-y-6">
-        <PaperCard className="sticky top-28">
+      <div className="sticky top-28 space-y-6">
+        <PaperCard>
           <h3 className="text-lg font-semibold text-espresso">Setup notes</h3>
           <p className="mt-2 text-sm text-espresso/70">
             We will remember these choices for this class. You can adjust difficulty and topics at any time during the
             session.
           </p>
         </PaperCard>
+        <button
+          type="button"
+          onClick={() => navigate(`/class/${classID}/settings`)}
+          className="flex items-center justify-between rounded-2xl border border-espresso/20 bg-paper px-4 py-3 text-sm font-medium text-espresso shadow-paper transition hover:-translate-y-0.5"
+        >
+          <span>Class files & settings </span>
+          <Settings className="h-4 w-4" />
+        </button>
       </div>
       </div>
     </>
   )
 }
 
-const SessionLoadingOverlay = ({ active }: { active: boolean }) => {
+const ProcessingOverlay = ({
+  active,
+  title,
+  subtitle
+}: {
+  active: boolean
+  title?: string
+  subtitle?: string
+}) => {
   if (!active) return null
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-espresso/30 backdrop-blur-[2px]">
@@ -283,8 +372,8 @@ const SessionLoadingOverlay = ({ active }: { active: boolean }) => {
           <div className="orbit-ring" />
           <div className="orbit-dot" />
         </div>
-        <p className="text-sm font-medium text-espresso">Preparing your session...</p>
-        <p className="mt-1 text-xs text-espresso/60">Setting up topics and pacing</p>
+        <p className="text-sm font-medium text-espresso">{title}</p>
+        {subtitle ? <p className="mt-1 text-xs text-espresso/60">{subtitle}</p> : null}
       </div>
     </div>
   )

@@ -38,9 +38,9 @@ class Class:
     sessions: List[Session]
 
 class_cards = [
-    {"id": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
-    {"id": 2, "name": "Science", "professor": "Dr. Joseph"},
-    {"id": 3, "name": "History", "professor": "Dr. Max"}
+    {"classID": 1, "name": "Mathematics", "professor": "Dr. Karthik"},
+    {"classID": 2, "name": "Science", "professor": "Dr. Joseph"},
+    {"classID": 3, "name": "History", "professor": "Dr. Max"}
 ]
 
 @server.route("/api/hello")
@@ -53,7 +53,7 @@ def get_class_cards():
 
 @server.route("/api/createClass", methods=["POST"])
 def create_class():
-    time.sleep(7.71)
+    time.sleep(1.5)
     payload = request.get_json(silent=True) or {}
     name = (
         request.form.get("Name")
@@ -69,17 +69,39 @@ def create_class():
         or payload.get("professor")
         or "Instructor"
     )
-    next_id = max(card["id"] for card in class_cards) + 1 if class_cards else 1
-    class_cards.append({"id": next_id, "name": name, "professor": professor})
+    next_id = max(card["classID"] for card in class_cards) + 1 if class_cards else 1
+    class_cards.append({"classID": next_id, "name": name, "professor": professor})
     return jsonify({"classID": str(next_id)})
 
-@server.route("/api/createSession")
-def create_session():
-    time.sleep(7.71)
+@server.route("/api/createSession/<classID>", methods=["POST"])
+def create_session(classID):
+    time.sleep(1.2)
+    # payload = request.get_json(silent=True) or {}
+    # name = (
+    #     request.form.get("name")
+    #     or payload.get("name")
+    #     or "New Session"
+    # )
     session = {
-        "sessionID": "ABC123",
+        "sessionID": "ABC123"
+        # "name": name
     }
     return jsonify(session)
+
+@server.route("/api/replaceSyllabus/<classID>", methods=["POST"])
+def replace_syllabus(classID):
+    time.sleep(1.2)
+    return jsonify({"status": "Syllabus replaced"})
+
+@server.route("/api/uploadStyleDocs/<classID>", methods=["POST"])
+def upload_style_docs(classID):
+    time.sleep(1.4)
+    return jsonify({"status": "Style docs uploaded"})
+
+@server.route("/api/deleteStyleDoc/<classID>", methods=["DELETE"])
+def delete_style_doc(classID):
+    time.sleep(0.8)
+    return jsonify({"status": "Style doc deleted"})
 
 @server.route("/api/getClassTopics/<classID>")
 def get_class_topics(classID):
@@ -95,12 +117,14 @@ def get_recent_sessions(classID):
     sessions = [
         {
             "sessionID": "S1",
-            "timestamp": "2026-01-17T14:10:00Z",
+            "name": "Test Session 1",
+            # "timestamp": "2026-01-17T14:10:00Z",
             "topics": ["Algebra", "Geometry"]
         },
         {
             "sessionID": "S2",
-            "timestamp": "2026-01-16T18:30:00Z",
+            "name": "Test Session 2",
+            # "timestamp": "2026-01-16T18:30:00Z",
             "topics": ["Calculus"]
         }
     ]
@@ -109,6 +133,7 @@ def get_recent_sessions(classID):
 @server.route("/api/getSessionParams/<sessionID>")
 def get_session_params(sessionID):
     session_params = {
+        "name": "Midterm review",
         "difficulty": 0.6,
         "topic": "Algebra",
         "cumulative": False,
@@ -188,6 +213,56 @@ def request_hint(questionID):
         "hint": "It's also known as the city of lights."
     }
     return jsonify(hint)
+
+@server.route("/api/editClassName/<classID>", methods=["POST"])
+def edit_class_name(classID):
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    new_name = request.form.get("name")
+    if not new_name:
+        return jsonify({"error": "No name provided"}), 400
+
+    for card in class_cards:
+        if card["classID"] == class_id:
+            card["name"] = new_name
+            return jsonify({"status": "Class name updated"})
+
+    return jsonify({"error": "Class not found"}), 404
+
+@server.route("/api/editClassProf/<classID>", methods=["POST"])
+def edit_class_prof(classID):
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    new_professor = request.form.get("professor")
+    if not new_professor:
+        return jsonify({"error": "No professor name provided"}), 400
+
+    for card in class_cards:
+        if card["classID"] == class_id:
+            card["professor"] = new_professor
+            return jsonify({"status": "Class professor updated"})
+
+    return jsonify({"error": "Class not found"}), 404
+
+@server.route("/api/deleteClass/<classID>", methods=["DELETE", "POST"])
+def delete_class(classID):
+    try:
+        class_id = int(classID)
+    except ValueError:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    for index, card in enumerate(class_cards):
+        if card["classID"] == class_id:
+            class_cards.pop(index)
+            return jsonify({"status": "Class deleted"})
+
+    return jsonify({"error": "Class not found"}), 404
 
 @server.route("/", defaults={"path": ""})
 @server.route("/<path:path>")

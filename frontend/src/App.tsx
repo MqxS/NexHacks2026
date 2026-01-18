@@ -5,9 +5,9 @@ import {ClassSessionSetup} from './routes/ClassSessionSetup'
 import {ClassSettings} from './routes/ClassSettings'
 import {SessionPage} from './routes/SessionPage'
 import {cn} from './lib/utils'
-import {Settings} from 'lucide-react'
-import {InlineMath} from 'react-katex'
-import {AnimatePresence, motion} from 'framer-motion'
+import { Home as HomeIcon, Settings } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import appIcon from './assets/icons/icon-nobg.png'
 
 const Breadcrumbs = () => {
   const location = useLocation()
@@ -32,7 +32,7 @@ const Breadcrumbs = () => {
 
   return (
     <div className="flex items-center gap-2 text-sm text-espresso/70">
-      {crumbs.map((crumb, index) => (
+      {crumbs.slice(1).map((crumb, index) => (
         <button
           key={`${crumb.label}-${index}`}
           type="button"
@@ -41,7 +41,7 @@ const Breadcrumbs = () => {
           disabled={!crumb.path}
         >
           {crumb.label}
-          {index < crumbs.length - 1 ? <span className="mx-2 text-espresso/40">/</span> : null}
+          {index < crumbs.length - 2 ? <span className="mx-2 text-espresso/40">/</span> : null}
         </button>
       ))}
     </div>
@@ -67,19 +67,40 @@ const SettingsButton = () => {
   )
 }
 
+const HomeButton = () => {
+  const navigate = useNavigate()
+  return (
+    <button
+      type="button"
+      className="flex h-11 w-11 items-center justify-center rounded-full border border-espresso/20 bg-paper text-espresso shadow-paper transition hover:-translate-y-0.5"
+      onClick={() => navigate('/')}
+      aria-label="Home"
+    >
+      <HomeIcon className="h-5 w-5" />
+    </button>
+  )
+}
+
 const Shell = ({ children }: { children: ReactNode }) => {
   return (
     <div className="app-shell relative">
       <div className="noise-overlay" />
       <header className="sticky top-0 z-20 border-b border-espresso/10 bg-paper/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2">
           <div className="flex items-center gap-4">
-            <div className="rounded-2xl border border-espresso/20 bg-sand px-3 py-2 text-lg font-semibold text-espresso shadow-paper">
-              <InlineMath>{'so\\varphi'}</InlineMath>
+            <div className="h-16 w-24 overflow-hidden rounded-3xl">
+              <img
+                src={appIcon}
+                alt="Sophia"
+                className="h-full w-full object-cover object-[center_50%] shadow-paper"
+              />
             </div>
             <Breadcrumbs />
           </div>
-          <SettingsButton />
+          <div className="flex items-center gap-3">
+            <SettingsButton />
+            <HomeButton />
+          </div>
         </div>
       </header>
       <main className="relative mx-auto max-w-6xl px-6 pb-16 pt-10">{children}</main>

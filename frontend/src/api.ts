@@ -16,7 +16,7 @@ export type Feedback = {
 }
 
 type BackendClassCard = {
-  id: number | string
+  classID: number | string
   name: string
   professor: string
 }
@@ -32,7 +32,7 @@ type BackendQuestion = {
 
 type BackendSession = {
   sessionID: string
-  timestamp: string
+  name: string
   topics: string[]
 }
 
@@ -100,7 +100,7 @@ export const api = {
     if (isDev) return Promise.resolve(loadDevClasses())
     return request<BackendClassCard[]>('/api/getClassCards').then((cards) =>
       cards.map((card) => ({
-        classID: String(card.id),
+        classID: String(card.classID),
         Name: card.name,
         Professor: card.professor
       }))
@@ -128,10 +128,11 @@ export const api = {
       saveDevClasses(next)
       return Promise.resolve({})
     }
-    return request('/api/editClassName', {
+    const formData = new FormData()
+    formData.append('name', payload.newName)
+    return request(`/api/editClassName/${encodeURIComponent(payload.classID)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: formData
     })
   },
   editClassProf: (payload: { classID: string; newProf: string }) => {
@@ -142,10 +143,11 @@ export const api = {
       saveDevClasses(next)
       return Promise.resolve({})
     }
-    return request('/api/editClassProf', {
+    const formData = new FormData()
+    formData.append('professor', payload.newProf)
+    return request(`/api/editClassProf/${encodeURIComponent(payload.classID)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: formData
     })
   },
   getClassTopics: (classID: string) =>
@@ -156,35 +158,38 @@ export const api = {
     request<BackendSession[]>(`/api/getRecentSessions/${encodeURIComponent(classID)}`),
   getSessionParams: (sessionID: string) =>
     request<Record<string, unknown>>(`/api/getSessionParams/${encodeURIComponent(sessionID)}`),
-  createSession: () => request<{ sessionID: string }>(`/api/createSession`),
+  createSession: (classID: string, formData: FormData) =>
+    request<{ sessionID: string }>(`/api/createSession/${encodeURIComponent(classID)}`, {
+      method: 'POST',
+      body: formData
+    }),
   deleteClass: (payload: { classID: string }) => {
     if (isDev) {
       const next = loadDevClasses().filter((card) => card.classID !== payload.classID)
       saveDevClasses(next)
       return Promise.resolve({})
     }
-    return request('/api/deleteClass', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    return request(`/api/deleteClass/${encodeURIComponent(payload.classID)}`, {
+      method: 'DELETE'
     })
   },
-  replaceSyllabus: (formData: FormData) =>
-    request('/api/replaceSyllabus', {
+  replaceSyllabus: (classID: string, formData: FormData) =>
+    request(`/api/replaceSyllabus/${encodeURIComponent(classID)}`, {
       method: 'POST',
       body: formData
     }),
-  uploadStyleDocs: (formData: FormData) =>
-    request('/api/uploadStyleDocs', {
+  uploadStyleDocs: (classID: string, formData: FormData) =>
+    request(`/api/uploadStyleDocs/${encodeURIComponent(classID)}`, {
       method: 'POST',
       body: formData
     }),
   deleteStyleDoc: (payload: { classID: string; docID: string }) =>
-    request('/api/deleteStyleDoc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }),
+    request(
+      `/api/deleteStyleDoc/${encodeURIComponent(payload.classID)}?docID=${encodeURIComponent(payload.docID)}`,
+      {
+      method: 'DELETE'
+      }
+    ),
   requestQuestion: (sessionID: string) =>
     request<BackendQuestion>(`/api/requestQuestion/${encodeURIComponent(sessionID)}`).then((question) => ({
       Content: question.content,

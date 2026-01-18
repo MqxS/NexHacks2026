@@ -6,7 +6,7 @@ export default {
       colors: {
         paper: '#FFF8E8',
         sand: '#F7EED3',
-        sage: '#AAB396',
+        sage: '#7D9B79',
         espresso: '#674636',
         ink: '#3F2A20'
       },

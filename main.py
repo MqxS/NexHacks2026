@@ -19,19 +19,25 @@ class Question:
     wasUserCorrect: bool
 
 @dataclass
+class FileUpload:
+    filename: str
+    data: Binary
+
+@dataclass
 class Session:
     name: str
+    classID: str
     questions: List[Question]
     adaptive: bool
     difficulty: float
     isCumulative : bool
     focusedConcepts: List[str] #optional
-    file: Binary #optional
+    file: FileUpload #optional
 
 @dataclass
 class Class:
-    syllabus: Binary
-    styleFiles: List[Binary] #optional
+    syllabus: FileUpload
+    styleFiles: List[FileUpload] #optional
     name: str
     professor: str
     topics: List[str]
@@ -67,13 +73,21 @@ def create_class():
     syllabus_file = request.files["syllabus"]
     syllabus_bytes = syllabus_file.read()
 
+    syllabus_file = FileUpload(
+        filename=syllabus_file.filename,
+        data=Binary(syllabus_bytes)
+    )
+
     style_files = []
     for sf in request.files.getlist("styleFiles"):
         if sf and sf.filename:
-            style_files.append(Binary(sf.read()))
+            style_files.append(FileUpload(
+                filename=sf.filename,
+                data=Binary(sf.read())
+            ))
 
     class_doc = Class(
-        syllabus=Binary(syllabus_bytes),
+        syllabus=syllabus_file,
         styleFiles=style_files,
         name=request.form.get("name", "Untitled Class"),
         professor=request.form.get("professor", "Unknown"),
@@ -87,7 +101,7 @@ def create_class():
         "classID": str(result.inserted_id)
     })
 
-@server.route("/api/createSession/<classID>")
+@server.route("/api/createSession/<classID>", methods=["POST"])
 def create_session(classID):
     file_storage = request.files.get("file")
     if file_storage and file_storage.filename:
@@ -95,14 +109,20 @@ def create_session(classID):
     else:
         file_bin = None
 
+    file_doc = FileUpload(
+        filename=file_storage.filename if file_storage else "",
+        data=file_bin
+    )
+
     session = Session(
         name=request.form.get("name", "New Session"),
         questions=[],
+        classID=classID,
         adaptive=request.form.get("adaptive", "false").lower() == "true",
         difficulty=float(request.form.get("difficulty", 0.5)),
         isCumulative=request.form.get("cumulative", "false").lower() == "true",
         focusedConcepts=[],
-        file=file_bin
+        file=file_doc
     )
 
     result = mongo.sessions.insert_one(asdict(session))
@@ -111,7 +131,7 @@ def create_session(classID):
         "sessionID": str(result.inserted_id)
     })
 
-@server.route("/api/getClassTopics/<classID>")
+@server.route("/api/getClassTopics/<classID>", methods=["GET"])
 def get_class_topics(classID):
     try:
         obj_id = ObjectId(classID)
@@ -130,28 +150,25 @@ def get_class_topics(classID):
 
     return jsonify(topics_out)
 
-@server.route("/api/getRecentSessions/<classID>")
+@server.route("/api/getRecentSessions/<classID>", methods=["GET"])
 def get_recent_sessions(classID):
-    try:
-        obj_id = ObjectId(classID)
-    except bson.errors.InvalidId:
-        return jsonify({"error": "Invalid classID"}), 400
-
     sessions = mongo.sessions.find(
-        {"classID": obj_id},
-        {"name": 1}
+        {"classID": classID},
+        {"name": 1, "focusedConcepts": 1}
     ).sort("_id", -1).limit(5)
 
     return jsonify([
         {
             "sessionID": str(doc["_id"]),
+            # "timestamp": doc["_id"].generation_time.isoformat(),
+            "topics": doc.get("focusedConcepts", []) or [],
             "name": doc.get("name", "Untitled Session")
         }
         for doc in sessions
         if "_id" in doc
     ])
 
-@server.route("/api/getSessionParams/<sessionID>")
+@server.route("/api/getSessionParams/<sessionID>", methods=["GET"])
 def get_session_params(sessionID):
     try:
         obj_id = ObjectId(sessionID)
@@ -160,24 +177,25 @@ def get_session_params(sessionID):
 
     doc = mongo.sessions.find_one(
         {"_id": obj_id},
-        {"name": 1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
+        {"name": 1, "classID":1, "difficulty": 1, "isCumulative": 1, "adaptive": 1, "focusedConcepts": 1}
     )
     if not doc:
         return jsonify({"error": "Session not found"}), 404
-    session = Session(
-        name=request.form.get("name", "New Session"),
-        difficulty=doc.get("difficulty", 0.5),
-        isCumulative=doc.get("isCumulative", False),
-        adaptive=doc.get("adaptive", True),
-        focusedConcepts=doc.get("focusedConcepts", []),
-        questions=[],
-        file=Binary(b"")
-    )
 
-    return jsonify(asdict(session))
+    session = {
+        "name": doc.get("name", "New Session"),
+        "difficulty": doc.get("difficulty", 0.5),
+        "classID": doc.get("classID", ""),
+        "isCumulative": doc.get("isCumulative", False),
+        "adaptive": doc.get("adaptive", True),
+        "focusedConcepts": doc.get("focusedConcepts", []),
+        "questions": []
+    }
+
+    return jsonify(session)
 
 #TODO: KARTHIK #1
-@server.route("/api/requestQuestion/<sessionID>")
+@server.route("/api/requestQuestion/<sessionID>", methods=["GET"])
 def request_question(sessionID):
     questions = [
         {"questionId": "Q101", "content": "What is the capital of France?"},
@@ -292,6 +310,156 @@ def request_hint(questionID):
         "hint": "It's also known as the city of lights."
     }
     return jsonify(hint)
+
+@server.route("/api/editClassName/<classID>", methods=["POST"])
+def edit_class_name(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "name" not in request.form:
+        return jsonify({"error": "No name provided"}), 400
+
+    new_name = request.form["name"]
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"name": new_name}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class name updated"})
+
+@server.route("/api/editClassProf/<classID>", methods=["POST"])
+def edit_class_prof(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "professor" not in request.form:
+        return jsonify({"error": "No professor name provided"}), 400
+
+    new_professor = request.form["professor"]
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"professor": new_professor}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class professor updated"})
+
+@server.route("/api/deleteClass/<classID>", methods=["DELETE", "POST"])
+def delete_class(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    result = mongo.classes.delete_one({"_id": obj_id})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class deleted"})
+
+
+@server.route("/api/deleteSession/<sessionID>", methods=["DELETE"])
+def delete_session(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    result = mongo.sessions.delete_one({"_id": obj_id})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Session deleted"})
+
+@server.route("/api/replaceSyllabus/<classID>", methods=["POST"])
+def replace_syllabus(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "syllabus" not in request.files:
+        return jsonify({"error": "No syllabus file provided"}), 400
+
+    syllabus_file = request.files["syllabus"]
+    syllabus_bytes = syllabus_file.read()
+
+    syllabus_file = FileUpload(
+        filename=syllabus_file.filename,
+        data=Binary(syllabus_bytes)
+    )
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"syllabus": asdict(syllabus_file)}}
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Syllabus replaced"})
+
+@server.route("/api/uploadStyleDocs/<classID>", methods=["POST"])
+def upload_style_docs(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    style_files = []
+    for sf in request.files.getlist("styleFiles"):
+        if sf and sf.filename:
+            style_files.append(FileUpload(
+                filename=sf.filename,
+                data=Binary(sf.read())
+            ))
+    if not style_files:
+        return jsonify({"error": "No style files provided"}), 400
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$push": {"styleFiles": {"$each": [asdict(sf) for sf in style_files]}}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Style docs uploaded"})
+
+@server.route("/api/deleteStyleDoc/<classID>/<docName>", methods=["DELETE"])
+def delete_style_doc(classID, docName):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$pull": {"styleFiles": {"filename": docName}}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Style doc deleted"})
+
+@server.route("/api/getStyleDocs/<classID>", methods=["GET"])
+def get_style_docs(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    doc = mongo.classes.find_one({"_id": obj_id}, {"styleFiles": 1})
+    if not doc:
+        return jsonify({"error": "Class not found"}), 404
+    style_files = doc.get("styleFiles", [])
+    return jsonify([
+        {
+            "filename": sf.get("filename", ""),
+        }
+        for sf in style_files
+    ])
+
 
 @server.route("/", defaults={"path": ""})
 @server.route("/<path:path>")
