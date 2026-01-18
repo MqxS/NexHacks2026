@@ -2,8 +2,8 @@
   "class_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc",
   "is_math": true,
   "use_wolfram": true,
-  "syllabus_chars": 1919,
-  "practice_items_count": 11,
+  "syllabus_chars": 1744,
+  "practice_items_count": 5,
   "steps": {
     "parse_syllabus": {
       "name": "Parsing syllabus PDF",
@@ -103,14 +103,15 @@
     }
   },
   "generated": {
-    "question": "Find $\\lim_{x \\to 0} \\frac{5^x - 1}{x}$. (A) 0 (B) 1 (C) $\\ln 5$ (D) 5 (E) Does not exist",
-    "answer": "log(5)",
-    "wolfram_query": "limit (5^x - 1)/x as x -> 0",
-    "validation_prompt": "You are a mathematical validator. Evaluate the student's step-by-step work for the limit problem: $\\lim_{x \\to 0} \\frac{5^x - 1}{x}$. For the provided step, check for: 1) Correct application of L'Hopital's Rule or the definition of the derivative. 2) Correct differentiation of $a^x$. 3) Algebraic accuracy. Output a JSON object with: 'is_valid' (boolean), 'error_category' (string or null), and 'feedback' (string). Do not provide the final answer (C) unless the student has already derived it correctly. Focus on whether the logic follows from the previous state.",
+    "question": "Find the limit: $\\lim_{x \\to 0} \\frac{e^{3x} - 1}{x}$.",
+    "answer": "3",
+    "wolfram_query": "limit (e^(3x) - 1) / x as x -> 0",
+    "validation_prompt": "You are a mathematical validator. Evaluate the student's step-by-step work for the limit: $\\lim_{x \\to 0} \\frac{e^{3x} - 1}{x}$. For the provided step, check for algebraic accuracy, correct application of limit laws, or proper use of L'Hôpital's Rule if applicable. Return a JSON object with the following keys: 'is_valid' (boolean), 'error_category' (string or null, e.g., 'algebraic', 'differentiation', 'limit_property'), and 'feedback' (a brief hint without giving away the final answer). Ensure the logic is sound for the specific value $x \\to 0$.",
     "metadata": {
       "difficulty_level": 3,
       "concepts": [
-        "Differentiation and Integration of Functions with Bases other than e",
+        "Transcendental Functions",
+        "Differentiation of Exponential and Logarithmic Functions",
         "L’Hopital’s Rule"
       ],
       "unit": "math-calculus-bc",
@@ -122,16 +123,16 @@
     }
   },
   "generated_with_suggestion": {
-    "question": "A population of space-dinosaurs $P(t)$ satisfies the differential equation $\\frac{dP}{dt} = P \\ln 3$. If $P(0) = 1$, what is the value of $\\lim_{t \\to 2} \\frac{P(t) - 9}{t - 2}$? (A) $9$ (B) $9 \\ln 3$ (C) $3 \\ln 9$ (D) $27$ (E) $\\ln 3$",
-    "answer": "9 log(3)",
-    "wolfram_query": "limit (3^t - 9)/(t-2) as t->2",
-    "validation_prompt": "You are an expert mathematics evaluator. Your task is to assess a student's step-by-step solution to the provided calculus problem involving a differential equation and a limit. \n\nContext:\n- The differential equation dP/dt = P ln 3 with P(0) = 1 yields the solution P(t) = 3^t.\n- The limit lim_{t -> 2} [P(t) - 9] / [t - 2] is the definition of the derivative P'(2).\n- Since P(2) = 3^2 = 9, the limit is indeed P'(2).\n- P'(t) = 3^t ln 3, so P'(2) = 9 ln 3.\n\nEvaluation Instructions:\n1. Check if the student correctly identifies P(t) = 3^t.\n2. Check if the student recognizes the limit as the derivative of P(t) at t=2.\n3. Verify the differentiation and substitution steps.\n4. Ensure the student selects the correct multiple-choice option (B).\n\nOutput Format:\nReturn a JSON object with these keys:\n- \"is_valid\" (boolean): Whether the current step is mathematically sound.\n- \"error_type\" (string|null): If invalid, categorize the error (e.g., \"Differential Equation Solution\", \"Limit Interpretation\", \"Differentiation Error\", \"Arithmetic\").\n- \"feedback\" (string): A concise explanation of the validity or error.\n- \"suggestion\" (string|null): A guiding hint for the student if they are incorrect or stuck, without providing the final answer.",
+    "question": "A spacecraft's velocity is modeled by $v(t) = \\frac{e^{3t} - 1}{t}$. Find the limit: $\\lim_{t \\to 0} v(t)$.",
+    "answer": "3",
+    "wolfram_query": "limit (e^(3t) - 1)/t as t -> 0",
+    "validation_prompt": "You are a mathematical validator. Evaluate the student's step for the limit: lim_{t -> 0} (e^{3t} - 1) / t. 1. Check if the student correctly identifies the 0/0 indeterminate form. 2. If L'Hopital's Rule is applied, verify the derivatives: d/dt(e^{3t}-1) = 3e^{3t} and d/dt(t) = 1. 3. If Taylor series expansion is used, verify e^{3t} = 1 + 3t + (9t^2)/2 + ... 4. Check for algebraic errors or incorrect limit properties. Return a JSON object with: 'is_step_correct' (boolean), 'error_type' (string or null), and 'feedback' (string). Do not reveal the final answer (3) unless the student has already derived it.",
     "metadata": {
       "difficulty_level": 3,
       "concepts": [
-        "Transcendental Functions",
-        "Separable Differential Equations",
-        "L'Hopital's Rule"
+        "Differentiation of Exponential and Logarithmic Functions",
+        "Limits",
+        "L’Hopital’s Rule"
       ],
       "unit": "math-calculus-bc",
       "cumulative": true,
@@ -142,8 +143,8 @@
   },
   "validation_ok": {
     "ok": true,
-    "wolfram_query": "limit (5^x - 1)/x as x -> 0",
-    "wolfram_result": "log(5)",
+    "wolfram_query": "limit (e^(3x) - 1) / x as x -> 0",
+    "wolfram_result": "3",
     "details": null
   },
   "validation_bad": {
@@ -155,45 +156,45 @@
   "hints": {
     "Metacognitive / Reflection": {
       "kind": "hint",
-      "text": "Does this expression look like the definition of a derivative for a specific function at a specific point?",
+      "text": "Does this expression remind you of the definition of the derivative for a specific function at a certain point?",
       "hint_type": "Metacognitive / Reflection",
-      "wolfram_query": "limit (5^x - 1)/x as x -> 0",
-      "wolfram_result": "log(5)"
+      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
+      "wolfram_result": "3"
     },
     "Conceptual": {
       "kind": "hint",
-      "text": "This limit matches the definition of the derivative of the function f(x) = 5^x evaluated at x = 0.",
+      "text": "Consider how this limit matches the definition of the derivative of f(x) = e^(3x) at x = 0.",
       "hint_type": "Conceptual",
-      "wolfram_query": "limit (5^x - 1)/x as x -> 0",
-      "wolfram_result": "log(5)"
+      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
+      "wolfram_result": "3"
     },
     "Strategic": {
       "kind": "hint",
-      "text": "Since direct substitution results in the indeterminate form 0/0, try applying L'Hôpital's Rule or recognizing this expression as the definition of the derivative for f(x) = 5^x at x = 0.",
+      "text": "Since direct substitution results in the indeterminate form 0/0, consider using L'Hôpital's Rule or applying the standard limit formula for (e^u - 1)/u by using a substitution.",
       "hint_type": "Strategic",
-      "wolfram_query": "limit (5^x - 1)/x as x -> 0",
-      "wolfram_result": "log(5)"
+      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
+      "wolfram_result": "3"
     },
     "Procedural / Subgoal": {
       "kind": "hint",
-      "text": "Start by checking the form of the limit by substituting x=0. If you get an indeterminate form like 0/0, you can apply L'Hôpital's Rule by differentiating the numerator and denominator separately.",
+      "text": "Since direct substitution gives 0/0, try applying L'Hôpital's Rule by differentiating the numerator and denominator separately.",
       "hint_type": "Procedural / Subgoal",
-      "wolfram_query": "Limit[(5^x - 1)/x, x -> 0]",
-      "wolfram_result": "log(5)"
+      "wolfram_query": "Limit[(exp(3x)-1)/x, x->0]",
+      "wolfram_result": "3"
     },
     "Bottom-Out / Explicit": {
       "kind": "hint",
-      "text": "This limit is the definition of the derivative of f(x) = 5^x at x = 0. Using the rule for exponential derivatives or L'Hôpital's Rule, the limit evaluates to ln 5.",
+      "text": "Apply L'Hôpital's Rule by differentiating the numerator and denominator: the derivative of e^(3x) - 1 is 3e^(3x) and the derivative of x is 1, so the limit becomes 3e^(3*0)/1, which equals 3.",
       "hint_type": "Bottom-Out / Explicit",
-      "wolfram_query": "Limit[(5^x - 1)/x, x -> 0]",
-      "wolfram_result": "log(5)"
+      "wolfram_query": "limit (e^(3x)-1)/x as x->0",
+      "wolfram_result": "3"
     }
   },
   "hint_validation": {
     "ok": false,
     "wolfram_query": null,
     "wolfram_result": null,
-    "details": null
+    "details": "The hint mentions a derivative, which is irrelevant to solving the linear equation 2x + 3 = 11. Additionally, the statement 'The derivative is x' is mathematically incorrect in this context."
   },
   "settings_analyses": [
     {
@@ -205,7 +206,7 @@
         ]
       },
       "should_regenerate_question": true,
-      "notes": "Increase difficulty and focus on chain rule."
+      "notes": "Increase difficulty and add chain rule to focus concepts."
     },
     {
       "request_type": "regenerate_question",
@@ -227,7 +228,7 @@
       "request_type": "create_class_file",
       "parameter_changes": {},
       "should_regenerate_question": false,
-      "notes": "Generate a class file for AP Calculus based on provided syllabus and examples."
+      "notes": "Generate/refresh background class file for AP Calculus."
     }
   ],
   "artifacts_dir": "/Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts"
