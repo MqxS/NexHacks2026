@@ -2,6 +2,7 @@ import {useEffect, useMemo, useRef, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {api} from '../api'
 import {PaperCard} from '../components/PaperCard'
+import {ChevronDown} from 'lucide-react'
 import {cn} from '../lib/utils'
 
 type RawMastery = {
@@ -195,15 +196,15 @@ export const InstructorInsights = () => {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <PaperCard className="flex h-full flex-col">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-espresso/60">Class selection</p>
-            <p className="mt-2 text-sm text-espresso/70">
-              Choose a class to generate a mastery snapshot.
-            </p>
-          </div>
-          <div className="mt-4 space-y-3">
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr] items-stretch">
+        <PaperCard className="relative min-h-[420px]">
+          <div className="space-y-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-espresso/60">Class selection</p>
+              <p className="mt-2 text-sm text-espresso/70">
+                Choose a class to generate a mastery snapshot.
+              </p>
+            </div>
             <div className="relative">
               <select
                 value={selectedClassId}
@@ -220,12 +221,12 @@ export const InstructorInsights = () => {
                 ))}
               </select>
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-espresso/50">
-                ▼
+                <ChevronDown className="h-4 w-4" />
               </span>
             </div>
             {isError ? <p className="text-xs text-red-600">We could not load classes.</p> : null}
           </div>
-          <div className="mt-auto space-y-3 pt-6 text-xs text-espresso/70">
+          <div className="absolute bottom-6 left-0 right-0 space-y-3 pt-2 text-xs text-espresso/70">
             <div className="flex items-center justify-between pb-2">
               <span>Bubble size</span>
               <span className="font-medium text-espresso">Questions asked</span>
@@ -312,14 +313,14 @@ export const InstructorInsights = () => {
                         {`${bubble.topic}\n${bubble.questions} questions\n${bubble.correct}% correct`}
                       </title>
                     </circle>
-                    {bubble.radius > 42 ? (
+                    {bubble.radius > 48 && bubble.topic.length <= 12 ? (
                       <text
                         x={bubble.x}
                         y={bubble.y}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        fontSize={12}
-                        fill="rgba(51, 35, 26, 0.85)"
+                        fontSize={Math.max(9, Math.min(14, bubble.radius * 0.2))}
+                        fill="rgba(255, 255, 255, 0.92)"
                         fontWeight={600}
                       >
                         {bubble.topic}
