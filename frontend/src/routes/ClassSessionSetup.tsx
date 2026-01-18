@@ -47,7 +47,8 @@ export const ClassSessionSetup = () => {
       formData.append('difficulty', String(difficulty))
       formData.append('adaptive', String(adaptive))
       formData.append('cumulative', String(cumulative))
-      formData.append('topics', JSON.stringify(topicsSelected))
+      formData.append('customRequests', custom)
+      topicsSelected.forEach((topic) => formData.append('selectedTopics', topic))
       if (file[0]) formData.append('file', file[0])
       return api.createSession(classID, formData)
     },

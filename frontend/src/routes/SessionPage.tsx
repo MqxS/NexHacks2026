@@ -78,14 +78,9 @@ export const SessionPage = () => {
     if (sessionParamsQuery.status !== 'success') return
     const parsed = sessionParamsQuery.data as Partial<SessionParams> & {
       adaptive?: boolean
-      topic?: string
     }
-    const nextParams = {
-      ...parsed,
-      topics: parsed.topics ?? (parsed.topic ? [parsed.topic] : [])
-    }
-    setParams((prev) => ({ ...prev, ...nextParams }))
-    setSavedParams((prev) => ({ ...prev, ...nextParams }))
+    setParams((prev) => ({ ...prev, ...parsed }))
+    setSavedParams((prev) => ({ ...prev, ...parsed }))
     if (typeof parsed.adaptive === 'boolean') {
       setAdaptive(parsed.adaptive)
     }

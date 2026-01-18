@@ -299,13 +299,40 @@ def update_session_params(sessionID):
     return jsonify({"status": "Session parameters updated"})
 
 @server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
-def set_adaptive(sessionID, setting):
+def set_adaptive_legacy(sessionID, setting):
     try:
         obj_id = ObjectId(sessionID)
     except bson.errors.InvalidId:
         return jsonify({"error": "Invalid sessionID"}), 400
 
     adaptive = setting.lower() == "true"
+
+    result = mongo.sessions.update_one(
+        {"_id": obj_id},
+        {"$set": {"adaptive": adaptive}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Adaptive setting updated"})
+
+@server.route("/api/setAdaptive/<sessionID>", methods=["POST"])
+def set_adaptive(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    payload = request.get_json(silent=True) or {}
+    if "active" in payload:
+        adaptive = bool(payload.get("active"))
+    elif "adaptive" in payload:
+        adaptive = bool(payload.get("adaptive"))
+    elif "active" in request.form:
+        adaptive = request.form.get("active").lower() == "true"
+    elif "adaptive" in request.form:
+        adaptive = request.form.get("adaptive").lower() == "true"
+    else:
+        return jsonify({"error": "No adaptive setting provided"}), 400
 
     result = mongo.sessions.update_one(
         {"_id": obj_id},
