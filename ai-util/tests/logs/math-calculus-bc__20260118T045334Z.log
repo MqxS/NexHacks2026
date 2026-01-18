@@ -1,0 +1,114 @@
+2026-01-17 23:53:34,013 [INFO] Log file: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__20260118T045334Z.log
+2026-01-17 23:53:34,014 [INFO] Environment status: {
+  "gemini_api_key_set": true,
+  "wolfram_app_id_set": true,
+  "tokenc_api_key_set": true
+}
+2026-01-17 23:53:34,044 [INFO] Repo root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026
+2026-01-17 23:53:34,044 [INFO] ai-util root: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util
+2026-01-17 23:53:34,044 [INFO] Sophi module dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sophi
+2026-01-17 23:53:34,044 [INFO] Selected class dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc
+2026-01-17 23:53:34,044 [INFO] Class type: math (wolfram enabled)
+2026-01-17 23:53:34,044 [INFO] syllabus.pdf: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/sample_classes/math-calculus-bc/syllabus.pdf
+2026-01-17 23:53:34,044 [INFO] practice PDFs: 1
+2026-01-17 23:53:34,044 [INFO]  - AP-Calculus-BC-hw.pdf
+2026-01-17 23:53:34,044 [INFO] Artifacts dir: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts
+2026-01-17 23:53:34,044 [INFO] Parsing syllabus PDF...
+2026-01-17 23:54:04,102 [INFO] Syllabus extracted chars: 1744
+2026-01-17 23:54:04,102 [INFO] Parsing practice PDFs...
+2026-01-17 23:54:46,976 [INFO] Practice items extracted: 5
+2026-01-17 23:54:46,976 [INFO] Sample practice items:
+Find \(\lim_{x \to 1} \frac{x^2 - 3x + 2}{x - 1}\).
+
+For what value(s) of \(k\), if any, is \(f(x) = \begin{cases} x^2 - k & \text{if } x < 2 \\ 2x + k & \text{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)?
+
+If \(f(x) = \sqrt{x^2 - 8x + 1}\), then \(f'(x)\) is:
+2026-01-17 23:54:46,977 [INFO] Creating class file from PDFs...
+2026-01-17 23:56:45,006 [INFO] Class file saved: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts/class_file.json
+2026-01-17 23:56:45,007 [INFO] Class file concepts: 42
+2026-01-17 23:56:45,007 [INFO] Adjusted session: {
+  "difficulty_level": 3,
+  "cumulative": true,
+  "adaptive": true,
+  "focus_concepts": [
+    "Transcendental Functions",
+    "Differentiation of Exponential and Logarithmic Functions",
+    "Integration of Exponential and Logarithmic Functions",
+    "Differentiation of Inverse Trigonometric Functions",
+    "Integration of Inverse Trigonometric Functions"
+  ],
+  "unit_focus": "math-calculus-bc"
+}
+2026-01-17 23:56:45,007 [INFO] Generating question...
+2026-01-17 23:56:57,417 [INFO] Generated question:
+Find the limit: $\lim_{x \to 0} \frac{e^{3x} - 1}{x}$.
+2026-01-17 23:56:57,417 [INFO] Generated answer:
+3
+2026-01-17 23:56:57,417 [INFO] Verified with wolfram: True
+2026-01-17 23:56:57,418 [INFO] Validation prompt length: 552
+2026-01-17 23:56:57,419 [INFO] Saved question record: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__artifacts/question_history.jsonl
+2026-01-17 23:56:57,419 [INFO] Generating question with suggestions...
+2026-01-17 23:57:39,289 [INFO] Generated question (with suggestions):
+A spacecraft's velocity is modeled by $v(t) = \frac{e^{3t} - 1}{t}$. Find the limit: $\lim_{t \to 0} v(t)$.
+2026-01-17 23:57:39,289 [INFO] Generated answer (with suggestions):
+3
+2026-01-17 23:57:39,289 [INFO] Validating question (expected valid)...
+2026-01-17 23:57:41,749 [INFO] Validation ok=True wolfram_query=limit (e^(3x) - 1) / x as x -> 0
+2026-01-17 23:57:41,749 [INFO] Validating question (expected invalid)...
+2026-01-17 23:57:45,982 [INFO] Bad validation ok=False wolfram_query=None wolfram_result=None
+2026-01-17 23:57:45,982 [INFO] Generating hint (Metacognitive / Reflection)...
+2026-01-17 23:57:49,534 [INFO] Hint (Metacognitive / Reflection) kind=hint type=Metacognitive / Reflection
+Does this expression remind you of the definition of the derivative for a specific function at a certain point?
+2026-01-17 23:57:49,534 [INFO] Generating hint (Conceptual)...
+2026-01-17 23:57:53,204 [INFO] Hint (Conceptual) kind=hint type=Conceptual
+Consider how this limit matches the definition of the derivative of f(x) = e^(3x) at x = 0.
+2026-01-17 23:57:53,204 [INFO] Generating hint (Strategic)...
+2026-01-17 23:57:57,372 [INFO] Hint (Strategic) kind=hint type=Strategic
+Since direct substitution results in the indeterminate form 0/0, consider using L'Hôpital's Rule or applying the standard limit formula for (e^u - 1)/u by using a substitution.
+2026-01-17 23:57:57,372 [INFO] Generating hint (Procedural / Subgoal)...
+2026-01-17 23:58:02,006 [INFO] Hint (Procedural / Subgoal) kind=hint type=Procedural / Subgoal
+Since direct substitution gives 0/0, try applying L'Hôpital's Rule by differentiating the numerator and denominator separately.
+2026-01-17 23:58:02,006 [INFO] Generating hint (Bottom-Out / Explicit)...
+2026-01-17 23:58:06,351 [INFO] Hint (Bottom-Out / Explicit) kind=hint type=Bottom-Out / Explicit
+Apply L'Hôpital's Rule by differentiating the numerator and denominator: the derivative of e^(3x) - 1 is 3e^(3x) and the derivative of x is 1, so the limit becomes 3e^(3*0)/1, which equals 3.
+2026-01-17 23:58:06,351 [INFO] Validating hint against a step...
+2026-01-17 23:58:09,657 [INFO] Hint validation ok=False wolfram_query=None
+2026-01-17 23:58:09,657 [INFO] Analyzing settings request (adjust_session_parameter)...
+2026-01-17 23:58:13,449 [INFO] Settings analysis (adjust_session_parameter): {
+  "request_type": "adjust_session_parameter",
+  "parameter_changes": {
+    "difficulty_level_delta": 1,
+    "focus_concepts_add": [
+      "chain rule"
+    ]
+  },
+  "should_regenerate_question": true,
+  "notes": "Increase difficulty and add chain rule to focus concepts."
+}
+2026-01-17 23:58:13,449 [INFO] Analyzing settings request (regenerate_question)...
+2026-01-17 23:58:22,013 [INFO] Settings analysis (regenerate_question): {
+  "request_type": "regenerate_question",
+  "parameter_changes": {},
+  "should_regenerate_question": true,
+  "notes": "User requested regeneration due to similarity with previous questions."
+}
+2026-01-17 23:58:22,014 [INFO] Analyzing settings request (save_metadata)...
+2026-01-17 23:58:25,889 [INFO] Settings analysis (save_metadata): {
+  "request_type": "save_metadata",
+  "parameter_changes": {
+    "learner_profile_add": [
+      "struggles_with_factoring"
+    ]
+  },
+  "should_regenerate_question": false,
+  "notes": "Store as learner metadata for adaptiveness."
+}
+2026-01-17 23:58:25,890 [INFO] Analyzing settings request (create_class_file)...
+2026-01-17 23:58:28,653 [INFO] Settings analysis (create_class_file): {
+  "request_type": "create_class_file",
+  "parameter_changes": {},
+  "should_regenerate_question": false,
+  "notes": "Generate/refresh background class file for AP Calculus."
+}
+2026-01-17 23:58:28,654 [INFO] Saved results JSON: /Users/karthiksing05/Documents/Independent-Projects/NexHacks2026/ai-util/tests/logs/math-calculus-bc__20260118T045334Z.json
+2026-01-17 23:58:28,654 [INFO] Done.

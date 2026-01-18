@@ -1,76 +1,11 @@
-Find \(\lim_{x \to -1^+} \frac{x^2 - 1}{x^3 + 2x^2 + x}\).
-(A) 2
-(B) 1
-(C) 0
-(D) -1
-(E) Does not exist
+Question: Find \(\lim_{x \to 1} \frac{x^2 - 3x + 2}{x - 1}\).
+Answer: -1
 
-For what value(s) of \(k\), if any, is \(f(x) = \begin{cases} x^2 - k & \text{if } x < 2 \\ 2x + k & \text{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)?
-(A) -4, -2
-(B) 2
-(C) 4
-(D) -2, 4
-(E) Does not exist
+Question: For what value(s) of \(k\), if any, is \(f(x) = \begin{cases} x^2 - k & \text{if } x < 2 \\ k^2 - x & \text{if } x \ge 2 \end{cases}\) continuous on \((-\infty, \infty)\)?
+Answer: 2
 
-If \(f(x) = \sqrt{x^2 - 8x + 1}\), then \(f'(x)\) is
-(A) \(\frac{x-8}{\sqrt{x^2-8x+1}}\)
-(B) \(\frac{8}{\sqrt{x^2-8x+1}}\)
-(C) \(\frac{2x-8}{2\sqrt{x^2-8x+1}}\)
-(D) \(\frac{x-4}{\sqrt{x^2-8x+1}}\)
-(E) \(\frac{x+2}{\sqrt{x^2-8x+1}}\)
+Question: If \(f(x) = \sqrt{x^2 - 8x + 1}\), then \(f'(x)\) is:
+Answer: \(\frac{x - 4}{\sqrt{x^2 - 8x + 1}}\)
 
-Evaluate \(\int \frac{8}{1+8x} \, dx\).
-(A) \(8 \ln|1+8x| + C\)
-(B) \(\ln|1+8x| + C\)
-(C) \(\ln|8x| + C\)
-(D) \(\frac{1}{8} \ln|1+8x| + C\)
-(E) \(-\frac{1}{8} \ln|1+8x| + C\)
-
-A particle moves along the x-axis so that at any time \(t \ge 0\), its velocity is given by \(v(t) = \cos(\frac{\pi}{4}t)\). If the position of the particle at time \(t = 4\) is \(x = 7\), what is the particle’s position at time \(t = 0\)?
-(A) \(\frac{2}{3}\)
-(B) \(\frac{5}{4}\)
-(C) \(-\frac{1}{2}\)
-(D) 0
-(E) \(\frac{3}{2}\)
-
-Given \(f(x) = \frac{x^4 - 2x^2}{27}\), for what values of \(x\) is the graph of \(f\) concave downwards?
-(A) \(-3 < x < 0\)
-(B) \(0 < x < 3\)
-(C) \(3 < x < \infty\)
-(D) \(-3 < x < 0\) and \(0 < x < 3\)
-(E) \(x < -3\) and \(x > 3\)
-
-Let \(f\) be defined by \(f(x) = \sqrt{x-6}\) for all real numbers \(x\). For what values of \(x\) is the function increasing?
-(A) \((-\infty, -6)\)
-(B) \((-\infty, 6)\)
-(C) \([-6, 0)\)
-(D) \((0, 6)\)
-(E) \((6, \infty)\)
-
-Find an equation for the line tangent to the graph of \(f(x) = \sqrt{x-7}\) at the point where \(x = 16\).
-(A) \(y = \frac{1}{6}x - 2\)
-(B) \(y = \frac{1}{6}x - \frac{1}{3}\)
-(C) \(y = \frac{1}{6}x + \frac{1}{3}\)
-(D) \(y = \frac{1}{6}x - 2\)
-(E) \(y = \frac{1}{6}x + \frac{1}{3}\)
-
-What is the equation of the line tangent to the curve \(y = x^3 - 2x^2\) at the point \((2,0)\)?
-(A) \(y = 4x - 8\)
-(B) \(y = 4x + 8\)
-(C) \(y = 4x - 8\)
-(D) \(y = \frac{1}{4}x - 8\)
-(E) \(y = \frac{1}{4}x + 8\)
-
-A particle moves along the x-axis so that its velocity at any time \(t \ge 0\) is given by \(v(t) = 4t^3 - 4t\). Which of the following expressions could represent the position \(x(t)\) of the particle at any time \(t \ge 0\)?
-(A) \(3t^2 - 4\)
-(B) \(t^3 - 3t^2\)
-(C) \(t^4 - 2t^2 + 4\)
-(D) \(t^4 - 2t^2 - 3\)
-(E) \(t^4 - 4t^2 + 4\)
-
-What is the slope of the tangent line to \(x^2 + xy + y^2 = 3\) that lies in the first quadrant at the point where \(y = 1\)?
-(A) -2
-(B) -3
-(C) 3
-(D) -1
-(E) 1
+Question: Evaluate \(\int \frac{8}{1 + 8x} \, dx\).
+Answer: \(\ln|1 + 8x| + C\)

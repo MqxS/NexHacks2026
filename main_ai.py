@@ -1,0 +1,696 @@
+import random
+import sys
+import os
+import json
+import dataclasses
+from dataclasses import dataclass, asdict
+from typing import List, Dict, Any, Optional
+
+import bson
+from bson import Binary, ObjectId
+from flask import Flask, jsonify, request
+
+from backend.mongo import connect
+
+# Add ai-util/sophi to sys.path to import modules
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sophi_path = os.path.join(current_dir, "ai-util", "sophi")
+if sophi_path not in sys.path:
+    sys.path.insert(0, sophi_path)
+
+try:
+    from sophi_ai import SophiAIUtil, SessionParameters, ClassFile, GeneratedQuestion, ValidationResult, HintResponse
+    from wolfram_checker import WolframAlphaChecker
+except ImportError as e:
+    print(f"Error importing AI modules: {e}")
+    # Fallback or exit if essential
+    SophiAIUtil = None
+
+server = Flask(__name__, static_folder="frontend/dist", static_url_path="")
+mongo = connect()
+
+# Initialize AI Utility
+# We assume environment variables GEMINI_API_KEY and WOLFRAM_APP_ID are set.
+ai_util = SophiAIUtil() if SophiAIUtil else None
+
+@dataclass
+class Question:
+    content: str
+    userAnswer: str
+    aiAnswer: str
+    wasUserCorrect: bool
+    questionId: str # Added to track specific questions
+    metadata: Dict[str, Any] # Added to store AI metadata (validation prompt, etc.)
+
+@dataclass
+class FileUpload:
+    filename: str
+    data: Binary
+
+@dataclass
+class Session:
+    name: str
+    classID: str
+    questions: List[Question]
+    adaptive: bool
+    difficulty: float
+    isCumulative : bool
+    selectedTopics: List[str] #optional
+    customRequests: str #optional
+    file: FileUpload #optional
+
+@dataclass
+class Class:
+    syllabus: FileUpload
+    styleFiles: List[FileUpload] #optional
+    name: str
+    professor: str
+    topics: List[str]
+    sessions: List[Session]
+    classFile: Optional[Dict[str, Any]] = None # To store processed ClassFile from AI
+
+@server.route("/api/hello")
+def hello():
+    return jsonify({"message": "API Working!"})
+
+@server.route("/api/getClassCards", methods=["GET"])
+def get_class_cards():
+    classes = mongo.classes.find(
+        {},
+        {"name": 1, "professor": 1}
+    )
+
+    return jsonify([
+        {
+            "classID": str(doc["_id"]),
+            "name": doc.get("name", "Untitled Class"),
+            "professor": doc.get("professor", "Unknown")
+        }
+        for doc in classes
+        if "_id" in doc
+    ])
+
+@server.route("/api/createClass", methods=["POST"])
+def create_class():
+    #multipart/form-data
+    if "syllabus" not in request.files:
+        return jsonify({"error": "No syllabus file provided"}), 400
+
+    syllabus_file = request.files["syllabus"]
+    syllabus_bytes = syllabus_file.read()
+
+    syllabus_file_obj = FileUpload(
+        filename=syllabus_file.filename,
+        data=Binary(syllabus_bytes)
+    )
+
+    style_files = []
+    for sf in request.files.getlist("styleFiles"):
+        if sf and sf.filename:
+            style_files.append(FileUpload(
+                filename=sf.filename,
+                data=Binary(sf.read())
+            ))
+
+    class_doc = Class(
+        syllabus=syllabus_file_obj,
+        styleFiles=style_files,
+        name=request.form.get("name", "Untitled Class"),
+        professor=request.form.get("professor", "Unknown"),
+        topics=[],
+        sessions=[],
+        classFile=None # Initialized as None, will be populated by AI analysis later if needed
+    )
+
+    # TODO: We might want to trigger AI processing of the syllabus here to create a ClassFile
+    # For now, we just save the raw file.
+
+    result = mongo.classes.insert_one(asdict(class_doc))
+
+    return jsonify({
+        "classID": str(result.inserted_id)
+    })
+
+@server.route("/api/createSession/<classID>", methods=["POST"])
+def create_session(classID):
+    file_storage = request.files.get("file")
+    if file_storage and file_storage.filename:
+        file_bin = Binary(file_storage.read())
+    else:
+        file_bin = None
+
+    file_doc = FileUpload(
+        filename=file_storage.filename if file_storage else "",
+        data=file_bin
+    )
+
+    session = Session(
+        name=request.form.get("name", "New Session"),
+        questions=[],
+        classID=classID,
+        adaptive=request.form.get("adaptive", "false").lower() == "true",
+        difficulty=float(request.form.get("difficulty", 0.5)), # 0.0 to 1.0, map to 1-5 for AI
+        isCumulative=request.form.get("cumulative", "false").lower() == "true",
+        selectedTopics=request.form.getlist("selectedTopics"),
+        customRequests=request.form.get("customRequests", ""),
+        file=file_doc
+    )
+
+    result = mongo.sessions.insert_one(asdict(session))
+
+    return jsonify({
+        "sessionID": str(result.inserted_id)
+    })
+
+@server.route("/api/getClassTopics/<classID>", methods=["GET"])
+def get_class_topics(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    doc = mongo.classes.find_one({"_id": obj_id}, {"topics": 1})
+    if not doc:
+        return jsonify({"error": "Class not found"}), 404
+
+    topics = doc.get("topics", [])
+    if topics and all(isinstance(t, str) for t in topics):
+        topics_out = [{"title": t} for t in topics]
+    else:
+        topics_out = topics
+
+    return jsonify(topics_out)
+
+@server.route("/api/getRecentSessions/<classID>", methods=["GET"])
+def get_recent_sessions(classID):
+    sessions = mongo.sessions.find(
+        {"classID": classID},
+        {"name": 1, "focusedConcepts": 1} # Note: focusedConcepts might not be in Session dataclass yet, assuming it maps to selectedTopics or similar
+    ).sort("_id", -1).limit(5)
+
+    return jsonify([
+        {
+            "sessionID": str(doc["_id"]),
+            # "timestamp": doc["_id"].generation_time.isoformat(),
+            "topics": doc.get("selectedTopics", []) or [],
+            "name": doc.get("name", "Untitled Session")
+        }
+        for doc in sessions
+        if "_id" in doc
+    ])
+
+@server.route("/api/getSessionParams/<sessionID>", methods=["GET"])
+def get_session_params(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    doc = mongo.sessions.find_one(
+        {"_id": obj_id},
+        {
+            "name": 1,
+            "classID":1,
+            "difficulty": 1,
+            "isCumulative": 1,
+            "adaptive": 1,
+            "selectedTopics": 1,
+            "customRequests": 1
+        }
+    )
+    if not doc:
+        return jsonify({"error": "Session not found"}), 404
+
+    session = {
+        "name": doc.get("name", "New Session"),
+        "difficulty": doc.get("difficulty", 0.5),
+        "classID": doc.get("classID", ""),
+        "isCumulative": doc.get("isCumulative", False),
+        "adaptive": doc.get("adaptive", True),
+        "selectedTopics": doc.get("selectedTopics", []),
+        "customRequests": doc.get("customRequests", ""),
+        "questions": []
+    }
+
+    return jsonify(session)
+
+# IMPLEMENTED: KARTHIK #1 - AI Question Generation
+@server.route("/api/requestQuestion/<sessionID>", methods=["GET"])
+def request_question(sessionID):
+    if not ai_util:
+        return jsonify({"error": "AI module not initialized"}), 500
+
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    session_doc = mongo.sessions.find_one({"_id": obj_id})
+    if not session_doc:
+        return jsonify({"error": "Session not found"}), 404
+
+    # Fetch class info to get syllabus text or class file
+    class_id_str = session_doc.get("classID")
+    class_doc = None
+    if class_id_str:
+        try:
+            class_doc = mongo.classes.find_one({"_id": ObjectId(class_id_str)})
+        except:
+            pass
+    
+    # Prepare SessionParameters
+    # Map difficulty 0.0-1.0 to 1-5
+    diff_float = float(session_doc.get("difficulty", 0.5))
+    difficulty_level = max(1, min(5, int(diff_float * 5)))
+    
+    sess_params = SessionParameters(
+        difficulty_level=difficulty_level,
+        cumulative=session_doc.get("isCumulative", False),
+        adaptive=session_doc.get("adaptive", True),
+        focus_concepts=session_doc.get("selectedTopics", []),
+        unit_focus=None # Could be derived from class or topics
+    )
+
+    # Get history
+    questions = session_doc.get("questions", [])
+    history = []
+    for q in questions:
+        # Convert stored Question dicts to history format expected by SophiAI
+        # history: list[JsonDict] -> [{"question": "...", "correct": True/False}, ...]
+        h_item = {
+            "question": q.get("content"),
+            "correct": q.get("wasUserCorrect"),
+            # "answer": q.get("aiAnswer") # Optional
+        }
+        history.append(h_item)
+
+    # Prepare ClassFile or Syllabus Text
+    # Ideally we should have processed the syllabus into a ClassFile.
+    # For now, if we have a raw syllabus file, we might need to extract text on the fly 
+    # OR better, assuming we can pass the raw text if extracted.
+    # Since extracting text from PDF is heavy, let's see if we have `classFile` stored.
+    
+    class_file_obj = None
+    file_upload_text = None
+    
+    if class_doc and class_doc.get("classFile"):
+        try:
+            class_file_obj = ClassFile.from_dict(class_doc["classFile"])
+        except:
+            pass
+            
+    # Also check session specific file
+    if session_doc.get("file") and session_doc.get("file").get("data"):
+         # This would require PDF text extraction which is in FileUtils/SophiAI
+         # For this implementation, we might skip extracting text from binary on the fly 
+         # unless we implement a caching mechanism or do it at upload time.
+         pass
+
+    # Generate Question
+    try:
+        generated_q = ai_util.generate_question(
+            session=sess_params,
+            question_answer_history=history,
+            class_file=class_file_obj,
+            user_suggestions=session_doc.get("customRequests"),
+            use_wolfram=True # Enable Wolfram
+        )
+    except Exception as e:
+        print(f"Error generating question: {e}")
+        # Fallback to a generic error or retry without wolfram
+        return jsonify({"error": f"Failed to generate question: {str(e)}"}), 500
+
+    # Create a temporary ID for the question
+    q_id = str(ObjectId())
+    
+    # We don't save the question to the session yet? 
+    # Usually in these flows, we return the question, and when the user answers, we save it.
+    # But to validate the answer later, we need to store the expected answer and validation prompt.
+    # So we should probably store a "pending question" or add it to the session with a "pending" status.
+    # However, the current data model `Question` implies a completed interaction (userAnswer, wasUserCorrect).
+    
+    # Let's return the question and store the metadata in a separate collection or 
+    # assume the client sends back the question content (insecure).
+    # Better: Store pending question in a 'pending_questions' collection or cache.
+    
+    pending_q = {
+        "sessionID": str(session_doc["_id"]),
+        "questionId": q_id,
+        "content": generated_q.question,
+        "aiAnswer": generated_q.answer,
+        "wolfram_query": generated_q.wolfram_query,
+        "validation_prompt": generated_q.validation_prompt,
+        "metadata": generated_q.metadata,
+        "timestamp": bson.datetime.datetime.now()
+    }
+    mongo.pending_questions.insert_one(pending_q)
+
+    return jsonify({
+        "questionId": q_id,
+        "content": generated_q.question
+    })
+
+# IMPLEMENTED: KARTHIK #2 - AI Answer Submission
+@server.route("/api/submitAnswer/<questionID>", methods=["POST"])
+def submit_answer(questionID):
+    if not ai_util:
+        return jsonify({"error": "AI module not initialized"}), 500
+
+    # Find the pending question
+    pending = mongo.pending_questions.find_one({"questionId": questionID})
+    if not pending:
+        # Check if it was already answered/moved to session?
+        return jsonify({"error": "Question not found or expired"}), 404
+
+    user_answer = request.json.get("answer") if request.is_json else request.form.get("answer")
+    if not user_answer:
+        return jsonify({"error": "No answer provided"}), 400
+
+    # Validate Answer using Gemini/Wolfram
+    # We use the validation prompt stored in the pending question
+    
+    validation_prompt = pending.get("validation_prompt")
+    question_text = pending.get("content")
+    
+    is_correct = False
+    feedback = ""
+    
+    # Construct a prompt for the verifier (Gemini)
+    # SophiAIUtil doesn't have a direct "validate_student_answer" method exposed publicly 
+    # that takes the prompt, but we can use the internal gemini client.
+    
+    system_instruction = validation_prompt or "You are a math tutor. Verify the student's answer."
+    user_prompt = json.dumps({
+        "question": question_text,
+        "student_step_or_answer": user_answer,
+        "output_contract": {
+            "ok": "boolean",
+            "feedback": "string"
+        }
+    }, ensure_ascii=False)
+    
+    try:
+        val_res = ai_util.gemini.generate_json(
+            system_instruction=system_instruction,
+            user_prompt=user_prompt
+        )
+        is_correct = bool(val_res.get("ok"))
+        feedback = str(val_res.get("feedback") or "")
+    except Exception as e:
+        print(f"Validation failed: {e}")
+        # Fallback
+        feedback = "Could not verify answer automatically."
+    
+    # Move from pending to session history
+    question_entry = Question(
+        content=question_text,
+        userAnswer=user_answer,
+        aiAnswer=pending.get("aiAnswer"),
+        wasUserCorrect=is_correct,
+        questionId=questionID,
+        metadata=pending.get("metadata", {})
+    )
+    
+    mongo.sessions.update_one(
+        {"_id": ObjectId(pending["sessionID"])},
+        {"$push": {"questions": asdict(question_entry)}}
+    )
+    
+    # Cleanup pending? (Optional, keep for logs)
+    # mongo.pending_questions.delete_one({"questionId": questionID})
+
+    return jsonify({
+        "isCorrect": is_correct,
+        "correctAnswer": pending.get("aiAnswer"),
+        "whyIsWrong": feedback if not is_correct else "Correct!"
+    })
+
+@server.route("/api/updateSessionParams/<sessionID>", methods=["POST"])
+def update_session_params(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    update_fields = {}
+    if "name" in request.form:
+        update_fields["name"] = request.form["name"]
+    if "difficulty" in request.form:
+        try:
+            update_fields["difficulty"] = float(request.form["difficulty"])
+        except ValueError:
+            return jsonify({"error": "Invalid difficulty value"}), 400
+    if "cumulative" in request.form:
+        update_fields["isCumulative"] = request.form["cumulative"].lower() == "true"
+    if "selectedTopics" in request.form:
+        update_fields["selectedTopics"] = request.form.getlist("selectedTopics")
+    if "customRequests" in request.form:
+        update_fields["customRequests"] = request.form["customRequests"]
+
+    if not update_fields:
+        return jsonify({"error": "No valid fields to update"}), 400
+
+    result = mongo.sessions.update_one(
+        {"_id": obj_id},
+        {"$set": update_fields}
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Session parameters updated"})
+
+@server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
+def set_adaptive_legacy(sessionID, setting):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    adaptive = setting.lower() == "true"
+
+    result = mongo.sessions.update_one(
+        {"_id": obj_id},
+        {"$set": {"adaptive": adaptive}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Adaptive setting updated"})
+
+@server.route("/api/setAdaptive/<sessionID>", methods=["POST"])
+def set_adaptive(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    payload = request.get_json(silent=True) or {}
+    if "active" in payload:
+        adaptive = bool(payload.get("active"))
+    elif "adaptive" in payload:
+        adaptive = bool(payload.get("adaptive"))
+    elif "active" in request.form:
+        adaptive = request.form.get("active").lower() == "true"
+    elif "adaptive" in request.form:
+        adaptive = request.form.get("adaptive").lower() == "true"
+    else:
+        return jsonify({"error": "No adaptive setting provided"}), 400
+
+    result = mongo.sessions.update_one(
+        {"_id": obj_id},
+        {"$set": {"adaptive": adaptive}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Adaptive setting updated"})
+
+# IMPLEMENTED: KARTHIK #3 - AI Hint Generation
+@server.route("/api/requestHint/<questionID>")
+def request_hint(questionID):
+    if not ai_util:
+        return jsonify({"error": "AI module not initialized"}), 500
+
+    # Find the pending question
+    pending = mongo.pending_questions.find_one({"questionId": questionID})
+    if not pending:
+        return jsonify({"error": "Question not found"}), 404
+
+    question_text = pending.get("content")
+    
+    # We could optionally ask the user for their current status/thoughts to generate a better hint
+    # For now, we assume a generic "I'm stuck" status.
+    status_prompt = request.args.get("status", "I am stuck and unsure what to do next.")
+    
+    try:
+        hint_res = ai_util.generate_hint(
+            status_prompt=status_prompt,
+            problem=question_text,
+            hint_type="Strategic", # Default to strategic
+            use_wolfram=True
+        )
+        return jsonify({
+            "hint": hint_res.text,
+            "kind": hint_res.kind
+        })
+    except Exception as e:
+        print(f"Hint generation failed: {e}")
+        return jsonify({"hint": "Try breaking the problem into smaller steps."})
+
+@server.route("/api/editClassName/<classID>", methods=["POST"])
+def edit_class_name(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "name" not in request.form:
+        return jsonify({"error": "No name provided"}), 400
+
+    new_name = request.form["name"]
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"name": new_name}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class name updated"})
+
+@server.route("/api/editClassProf/<classID>", methods=["POST"])
+def edit_class_prof(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "professor" not in request.form:
+        return jsonify({"error": "No professor name provided"}), 400
+
+    new_professor = request.form["professor"]
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"professor": new_professor}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class professor updated"})
+
+@server.route("/api/deleteClass/<classID>", methods=["DELETE", "POST"])
+def delete_class(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    result = mongo.classes.delete_one({"_id": obj_id})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Class deleted"})
+
+
+@server.route("/api/deleteSession/<sessionID>", methods=["DELETE"])
+def delete_session(sessionID):
+    try:
+        obj_id = ObjectId(sessionID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid sessionID"}), 400
+
+    result = mongo.sessions.delete_one({"_id": obj_id})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Session not found"}), 404
+    return jsonify({"status": "Session deleted"})
+
+@server.route("/api/replaceSyllabus/<classID>", methods=["POST"])
+def replace_syllabus(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    if "syllabus" not in request.files:
+        return jsonify({"error": "No syllabus file provided"}), 400
+
+    syllabus_file = request.files["syllabus"]
+    syllabus_bytes = syllabus_file.read()
+
+    syllabus_file_obj = FileUpload(
+        filename=syllabus_file.filename,
+        data=Binary(syllabus_bytes)
+    )
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$set": {"syllabus": asdict(syllabus_file_obj)}}
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Syllabus replaced"})
+
+@server.route("/api/uploadStyleDocs/<classID>", methods=["POST"])
+def upload_style_docs(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    style_files = []
+    for sf in request.files.getlist("styleFiles"):
+        if sf and sf.filename:
+            style_files.append(FileUpload(
+                filename=sf.filename,
+                data=Binary(sf.read())
+            ))
+    if not style_files:
+        return jsonify({"error": "No style files provided"}), 400
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$push": {"styleFiles": {"$each": [asdict(sf) for sf in style_files]}}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Style docs uploaded"})
+
+@server.route("/api/deleteStyleDoc/<classID>/<docName>", methods=["DELETE"])
+def delete_style_doc(classID, docName):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    result = mongo.classes.update_one(
+        {"_id": obj_id},
+        {"$pull": {"styleFiles": {"filename": docName}}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"status": "Style doc deleted"})
+
+@server.route("/api/getStyleDocs/<classID>", methods=["GET"])
+def get_style_docs(classID):
+    try:
+        obj_id = ObjectId(classID)
+    except bson.errors.InvalidId:
+        return jsonify({"error": "Invalid classID"}), 400
+
+    doc = mongo.classes.find_one({"_id": obj_id}, {"styleFiles": 1})
+    if not doc:
+        return jsonify({"error": "Class not found"}), 404
+    style_files = doc.get("styleFiles", [])
+    return jsonify([
+        {
+            "filename": sf.get("filename", ""),
+        }
+        for sf in style_files
+    ])
+
+@server.route("/", defaults={"path": ""})
+@server.route("/<path:path>")
+def spa(path):
+    if path.startswith("api"):
+        return jsonify({"error": "API route not found"}), 404
+
+    return server.send_static_file("index.html")
+
+if __name__ == '__main__':
+    server.run(port=8080)
