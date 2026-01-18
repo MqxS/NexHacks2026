@@ -413,7 +413,6 @@ def submit_answer(questionID):
                         if is_correct:
                             metric_entry["rightAnswers"] += 1
                         metrics[topic] = metric_entry
-                #update the class metrics in the db
                 mongo.classes.update_one(
                     {"_id": ObjectId(class_id_str)},
                     {"$set": {"metrics": metrics}}
@@ -476,23 +475,6 @@ def update_session_params(sessionID):
         return jsonify({"error": "Session not found"}), 404
     return jsonify({"status": "Session parameters updated"})
 
-@server.route("/api/setAdaptive/<sessionID>/<setting>", methods=["POST"])
-def set_adaptive_legacy(sessionID, setting):
-    try:
-        obj_id = ObjectId(sessionID)
-    except bson.errors.InvalidId:
-        return jsonify({"error": "Invalid sessionID"}), 400
-
-    adaptive = setting.lower() == "true"
-
-    result = mongo.sessions.update_one(
-        {"_id": obj_id},
-        {"$set": {"adaptive": adaptive}}
-    )
-    if result.matched_count == 0:
-        return jsonify({"error": "Session not found"}), 404
-    return jsonify({"status": "Adaptive setting updated"})
-
 @server.route("/api/setAdaptive/<sessionID>", methods=["POST"])
 def set_adaptive(sessionID):
     try:
@@ -534,6 +516,9 @@ def request_hint(questionID):
     existing_hints_data = pending.get("hints", [])
     hint_history = [h.get("text", "") for h in existing_hints_data if h.get("text")]
 
+    image_file = request.files["photo"]
+    image_bytes = image_file.read()
+
     status_prompt = (
         request.form.get("hintRequest")
         or request.args.get("status")
@@ -549,7 +534,9 @@ def request_hint(questionID):
             problem=question_text,
             hint_history=hint_history,
             hint_type=req_hint_type,
-            use_wolfram=True
+            use_wolfram=True,
+            status_image=image_bytes,
+            status_image_mime_type=image_file.mimetype if image_file else None
         )
 
         new_hint_entry = {
