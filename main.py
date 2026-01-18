@@ -176,7 +176,7 @@ def get_session_params(sessionID):
     session = Session(
         name=doc.get("name", "New Session"),
         difficulty=doc.get("difficulty", 0.5),
-        classID=doc.get("classID"),
+        classID=str(doc.get("classID")),
         isCumulative=doc.get("isCumulative", False),
         adaptive=doc.get("adaptive", True),
         focusedConcepts=doc.get("focusedConcepts", []),
