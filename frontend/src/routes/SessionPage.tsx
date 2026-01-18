@@ -52,28 +52,28 @@ export const SessionPage = () => {
     enabled: Boolean(sessionID)
   })
 
+  const sessionParamsQuery = useQuery({
+    queryKey: ['sessionParams', sessionID],
+    queryFn: () => api.getSessionParams(sessionID ?? ''),
+    enabled: Boolean(sessionID)
+  })
+
   useEffect(() => {
-    if (!sessionID) return
-    const stored = localStorage.getItem(`sessionParams:${sessionID}`)
-    if (!stored) return
-    try {
-      const parsed = JSON.parse(stored) as Partial<SessionParams> & {
-        adaptive?: boolean
-        topic?: string
-      }
-      const nextParams = {
-        ...parsed,
-        topics: parsed.topics ?? (parsed.topic ? [parsed.topic] : [])
-      }
-      setParams((prev) => ({ ...prev, ...nextParams }))
-      setSavedParams((prev) => ({ ...prev, ...nextParams }))
-      if (typeof parsed.adaptive === 'boolean') {
-        setAdaptive(parsed.adaptive)
-      }
-    } catch {
-      return
+    if (sessionParamsQuery.status !== 'success') return
+    const parsed = sessionParamsQuery.data as Partial<SessionParams> & {
+      adaptive?: boolean
+      topic?: string
     }
-  }, [sessionID])
+    const nextParams = {
+      ...parsed,
+      topics: parsed.topics ?? (parsed.topic ? [parsed.topic] : [])
+    }
+    setParams((prev) => ({ ...prev, ...nextParams }))
+    setSavedParams((prev) => ({ ...prev, ...nextParams }))
+    if (typeof parsed.adaptive === 'boolean') {
+      setAdaptive(parsed.adaptive)
+    }
+  }, [sessionParamsQuery.status, sessionParamsQuery.data])
 
   const topicsQuery = useQuery({
     queryKey: ['classTopics', classID],
